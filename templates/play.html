@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>등록하기</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+
+<body>
+    <!-- 사용자가 정보를 확인할 컨테이너 -->
+    <div class="info-container">
+        <div class="user-input-info">
+            <button class="close-btn" onclick="removeInfo()">X</button>
+            <h3 id="user-title">제목: </h3>
+            <p id="user-song">곡 이름: </p>
+            <img id="user-thumbnail" src="#" alt="YouTube Thumbnail">
+        </div>
+
+    </div>
+
+    <!-- 입력 폼 -->
+    <div class="input-container">
+        <form id="submission-form" method="post" onsubmit="return false;">
+            <input type="text" id="title-input" placeholder="제목" name="title" required>
+            <input type="text" id="song-name-input" placeholder="곡 이름" name="song_name" required>
+            <input type="url" id="youtube-link-input" placeholder="YouTube 링크" name="youtube_link" required>
+            <button type="button" id="video-preview-btn" onclick="playVideo()">영상 확인</button>
+            <button type="submit">등록하기</button>
+        </form>
+
+    </div>
+    <button id="submit-all">문제 등록</button>
+    <!-- 영상을 재생할 iframe -->
+    <div class="video-container">
+        <iframe id="youtube-iframe" width="1024" height="720" src="" frameborder="0" allowfullscreen></iframe>
+    </div>
+</body>
+
+</html>
