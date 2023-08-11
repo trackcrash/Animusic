@@ -168,3 +168,34 @@ input {
     top: 50%;
     transform: translateY(-50%);
 }
+
+@media (max-width: 768px) {
+    /* 스크린 크기가 768px 이하일 때 적용 */
+    .info-container {
+        grid-template-columns: 1fr;
+        /* 모든 항목을 하나의 열로 표시 */
+        right: 5px;
+        top: 5px;
+    }
+    .user-input-info {
+        flex-basis: 100%;
+        /* 화면의 전체 너비를 차지하게 함 */
+    }
+    .input-container {
+        right: 5px;
+        bottom: 5px;
+    }
+    .video-container {
+        position: relative;
+        left: 0;
+        top: 0;
+        transform: none;
+        width: 100%;
+        height: auto;
+        margin: 20px 0;
+    }
+    #youtube-iframe {
+        width: 100%;
+        height: auto;
+    }
+}
