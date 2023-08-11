@@ -16,5 +16,9 @@ def play():
 def submit():
     return play_controller.submit_to_db()
 
+@app.route('/Show')
+def show():
+    return play_controller.show_table()
+
 if __name__ == '__main__':
     app.run(debug=True)
