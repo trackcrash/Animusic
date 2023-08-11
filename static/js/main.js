@@ -7,10 +7,11 @@ window.onload = function() {
         gridContainer.appendChild(gridItem);
     }
 };
+let videoId = "";
 //영상확인 나중에 초단위 수정 추가
 function playVideo() {
     const ytLink = document.getElementById("youtube-link-input").value;
-    const videoId = ytLink.split("v=")[1]; // This assumes the link format is like "https://www.youtube.com/watch?v=VIDEO_ID"
+    videoId = ytLink.split("v=")[1]; // This assumes the link format is like "https://www.youtube.com/watch?v=VIDEO_ID"
     const embedLink = "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
 
     const iframe = document.createElement("iframe");
