@@ -65,12 +65,12 @@ function createInfoItem(title, song, thumbnail, songURL, answer, hint) {
     // 사용자에게는 보이지 않도록 hidden 유형으로 설정
     AnswerElem.innerText = answer;
     box.appendChild(AnswerElem);
-    AnswerElem.style.display="None";
-    
+    AnswerElem.style.display = "None";
+
     const HintElem = document.createElement('h2'); // 사용자에게는 보이지 않도록 hidden 유형으로 설정
     HintElem.innerText = hint;
     box.appendChild(HintElem);
-    HintElem.style.display="None";
+    HintElem.style.display = "None";
 
     return box;
 }
@@ -97,25 +97,25 @@ document.getElementById('save-btn').addEventListener('click', function() {
             song: song,
             thumbnail: thumbnail,
             songURL: songURL,
-            answer : answer,
-            hint : hint
+            answer: answer,
+            hint: hint
         });
     });
     data = JSON.stringify(data);
     $.ajax({
-            type : "POST",
-            url : "/submit-to-db",
-            dataType : "json",
-            contentType: "application/json",
-            data : data,
-            error: function(request, status, error) {
-                console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-            
-            },
-            success: function(data) {
-                console.log("통신데이터 값 : " + data);
-            }
-        });
+        type: "POST",
+        url: "/submit-to-db",
+        dataType: "json",
+        contentType: "application/json",
+        data: data,
+        error: function(request, status, error) {
+            console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+
+        },
+        success: function(data) {
+            console.log("통신데이터 값 : " + data);
+        }
+    });
     // AJAX를 사용하여 데이터를 서버에 POST
     // fetch('/submit-to-db', {
     //         method: 'POST',

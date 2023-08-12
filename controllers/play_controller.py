@@ -25,4 +25,11 @@ def submit_to_db():
 def show_table():
     queries = session.query(Music)
     entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url, answer= q.answer) for q in queries]
+    # for entry in entries:
+    #     entry['answer'] = entry['answer'].split(',')
     return entries
+# 앞으로 추가할 기능 일단 각 맵마다 mission_id 부여 mission_id기준으로 항목을
+# def show_question_map(mission_id):
+#     mission = session.query(Music).filter(Music.mission_id == mission_id).all()
+#     return mission
+# 

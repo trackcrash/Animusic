@@ -20,10 +20,6 @@ class Music(Base):
         self.hint = hint
     def __repr__(self):
         return "<Music(" , self.title, self.song, self.youtube_url ,self.answer,self.hint,">"
-    
-def save_data(data):
-    
-    return
 
 def save_to_db(data):
     Music.__table__.create(bind=engine, checkfirst=True)
