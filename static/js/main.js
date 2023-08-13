@@ -101,7 +101,12 @@ document.getElementById('save-btn').addEventListener('click', function() {
             hint: hint
         });
     });
+    data.push({
+        MapName:document.querySelector("#MapName-input").value,
+        MapProducer : document.querySelector("#User_Name").innerHTML
+    })
     data = JSON.stringify(data);
+    console.log(data);
     $.ajax({
         type: "POST",
         url: "/submit-to-db",
@@ -114,6 +119,8 @@ document.getElementById('save-btn').addEventListener('click', function() {
         },
         success: function(data) {
             console.log("통신데이터 값 : " + data);
+            alert("등록 완료되었습니다.");
+            location.reload();
         }
     });
     // AJAX를 사용하여 데이터를 서버에 POST

@@ -1,12 +1,12 @@
 #flask main --author: NewKyaru 11/08/2023
+import os
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import LoginManager, current_user, logout_user, login_required
 from controllers import play_controller, login_controller
 from models import login_model
-from chat import chat
 from flask_socketio import SocketIO
 from decouple import config
-import os
+
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
@@ -15,7 +15,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 socketio = SocketIO(app)
-chat.init_chat(app, socketio)
 @login_manager.user_loader
 def load_user(user_id):
     return login_model.get_user_by_id(user_id)
@@ -69,5 +68,10 @@ def register():
         return response
     return render_template('register.html')
 
+@app.route('/Map')
+def mymap():
+    data_list = play_controller.show_mission()
+    return render_template('Map.html', data_list=data_list)
+
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True,host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
