@@ -56,49 +56,53 @@
     </style>
 </head>
 
-<body class="font-sans bg-gray-100 text-black h-screen flex">
+
+<body class="font-sans bg-gray-100 text-black h-screen">
+    {% include "header.html" %}
     <!-- 왼쪽 영역 -->
-    <div class="left-side w-1/2">
-        <div class="video-container bg-gray-500 rounded overflow-hidden">
-            <!-- This is where the video will be played -->
-            <div class="bg-black opacity-50 w-full h-full flex items-center justify-center text-white text-xl">
-                <span>영상이 표시됩니다</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- 오른쪽 영역 -->
-    <div class="right-side w-1/2">
-        <!-- 상단 정보 영역 -->
-        <div class="info-section bg-gray-200 rounded p-2 shadow-md mb-4">
-            <div id="grid-container" class="grid grid-cols-3 gap-4 w-full h-full">
-                <!-- 여기에 .box 아이템들이 추가됩니다 -->
-            </div>
-        </div>
-
-        <!-- 하단 입력 양식 영역 -->
-        <div class="input-form-section">
-            <form id="submission-form" class="space-y-4">
-                <label>제목:</label>
-                <input id="title-input" class="w-full p-2 border border-gray-300 rounded" type="text">
-
-                <label>곡 이름:</label>
-                <input id="song-name-input" class="w-full p-2 border border-gray-300 rounded" type="text">
-
-                <label>정답:</label>
-                <input id="answer-input" class="w-full p-2 border border-gray-300 rounded" type="text">
-
-                <label>힌트:</label>
-                <input id="hint-input" class="w-full p-2 border border-gray-300 rounded" type="text">
-
-                <label>곡 링크:</label>
-                <input id="song-link-input" class="w-full p-2 border border-gray-300 rounded" type="url">
-
-                <div class="flex space-x-2">
-                    <button id="register-btn" class="w-1/2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">등록하기</button>
-                    <button id="save-btn" type="button" class="w-1/2 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">저장하기</button>
+    <div class = "flex">
+        <div class="left-side w-1/2">
+            <div class="video-container bg-gray-500 rounded overflow-hidden">
+                <!-- This is where the video will be played -->
+                <div class="bg-black opacity-50 w-full h-full flex items-center justify-center text-white text-xl">
+                    <span>영상이 표시됩니다</span>
                 </div>
-            </form>
+            </div>
+        </div>
+    
+        <!-- 오른쪽 영역 -->
+        <div class="right-side w-1/2">
+            <!-- 상단 정보 영역 -->
+            <div class="info-section bg-gray-200 rounded p-2 shadow-md mb-4">
+                <div id="grid-container" class="grid grid-cols-3 gap-4 w-full h-full">
+                    <!-- 여기에 .box 아이템들이 추가됩니다 -->
+                </div>
+            </div>
+    
+            <!-- 하단 입력 양식 영역 -->
+            <div class="input-form-section">
+                <form id="submission-form" class="space-y-4">
+                    <label>제목:</label>
+                    <input id="title-input" class="w-full p-2 border border-gray-300 rounded" type="text">
+    
+                    <label>곡 이름:</label>
+                    <input id="song-name-input" class="w-full p-2 border border-gray-300 rounded" type="text">
+    
+                    <label>정답:</label>
+                    <input id="answer-input" class="w-full p-2 border border-gray-300 rounded" type="text">
+    
+                    <label>힌트:</label>
+                    <input id="hint-input" class="w-full p-2 border border-gray-300 rounded" type="text">
+    
+                    <label>곡 링크:</label>
+                    <input id="song-link-input" class="w-full p-2 border border-gray-300 rounded" type="url">
+    
+                    <div class="flex space-x-2">
+                        <button id="register-btn" class="w-1/2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">등록하기</button>
+                        <button id="save-btn" type="button" class="w-1/2 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">저장하기</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </body>
