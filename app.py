@@ -3,13 +3,19 @@ from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import LoginManager, current_user, logout_user, login_required
 from controllers import play_controller, login_controller
 from models import login_model
+from chat import chat
+from flask_socketio import SocketIO
 from decouple import config
+import os
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+socketio = SocketIO(app)
+chat.init_chat(app, socketio)
 @login_manager.user_loader
 def load_user(user_id):
     return login_model.get_user_by_id(user_id)
@@ -64,4 +70,4 @@ def register():
     return render_template('register.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)
