@@ -37,6 +37,7 @@ class Mission(Base):
     MapName = Column(String(255), nullable=False)
     MapProducer = Column(String(255), nullable=False)
     Thumbnail = Column(String(255), nullable=True)
+    active = Column(Boolean, default=False)
     musics = relationship("Music", back_populates="mission")
     def __init__(self, MapName, MapProducer, Thumbnail):
         self.MapName = MapName
@@ -55,10 +56,10 @@ def save_to_db(data):
         MissionThumbnail = "basic"
 
     t2 = Mission(MissionMapName,MissionMapProducer,MissionThumbnail)
-    session.add(t2)   
-    
-    session.commit()    
-
+    session.add(t2)
+    #kyaru - 활성화용 boolean 컬럼 True로 변경
+    t2.active = True
+    session.commit()
     mission_id = t2.id
 
     for item in data:
@@ -72,7 +73,3 @@ def save_to_db(data):
             t1 = Music(title, song,youtube_url,thumbnail_url,answer,hint,mission_id)
             session.add(t1)
             session.commit()    
-
-def get_data():
-    
-    pass

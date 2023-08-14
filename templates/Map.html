@@ -1,43 +1,38 @@
 <!DOCTYPE html>
 <html lang="ko">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>My Map</title>
-        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
-    </head>
-    
-    <body class="font-sans bg-gray-100 text-black h-screen">
-        {% include "header.html" %}
-        <!-- 왼쪽 영역 -->
-        <div class = "flex">
-            <!-- 오른쪽 영역 -->
-            <div class="">
-                <!-- 상단 정보 영역 -->
-                <div class="info-section bg-gray-200 rounded p-2 shadow-md mb-4">
-                    <div id="grid-container" class="grid grid-cols-3 gap-4 w-full h-full">
-                        {% if data_list is defined and data_list %}
-                            {% for data in data_list %}
-                            <a href="play?id={{data['id']}}">
-                            <div class="data-box">
-                                <div>{{ data['id'] }}</div>
-                                <div>{{ data['MapName'] }}</div>
-                                <div>{{ data['MapProducer'] }}</div>
-                                <div>{{ data['Thumbnail'] }}</div>
-                            </div>
-                            </a>
-                            {% endfor %}
-                        {% endif %}
 
-                        <!-- 여기에 .box 아이템들이 추가됩니다 -->
-                    </div>
-                    <button id="addmap-button" onclick="window.location.href='/play'" class="mr-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">등록하기</button>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Map</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="font-sans bg-gray-100 text-black h-screen">
+    {% include "header.html" %}
+    <!-- 왼쪽 영역 -->
+    <div class="flex">
+        <!-- 오른쪽 영역 -->
+        <div class="">
+            <!-- 상단 정보 영역 -->
+            <div class="info-section bg-gray-200 rounded p-2 shadow-md mb-4">
+                <div id="grid-container" class="grid grid-cols-3 gap-4 w-full h-full">
+                    {% if data_list is defined and data_list %} {% for data in data_list %}
+                    <a href="play?id={{data['id']}}">
+                        <div class="data-box">
+                            <div>{{ data['id'] }}</div>
+                            <div>{{ data['MapName'] }}</div>
+                            <div>{{ data['MapProducer'] }}</div>
+                            <div>{{ data['Thumbnail'] }}</div>
+                        </div>
+                    </a>
+                    {% endfor %} {% endif %}
 
                 </div>
-        
-                <!-- 하단 입력 양식 영역 -->
+                <!-- <button id="addmap-button" onclick="window.location.href='/play'" class="mr-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">없어도될듯</button> -->
             </div>
         </div>
-    </body>
-    
+    </div>
+</body>
+
 </html>

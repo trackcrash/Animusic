@@ -29,18 +29,20 @@ document.getElementById('submission-form').addEventListener('submit', function(e
     document.getElementById('grid-container').appendChild(box);
 });
 
-function createInfoItem(title, song, thumbnail, songURL, answer, hint) {
+function createInfoItem(id, title, song, thumbnail, songURL, answer, hint) {
     const box = document.createElement('div');
     box.classList.add('box', 'grid-item');
-
     const closeBtn = document.createElement('button');
     closeBtn.innerText = 'X';
     closeBtn.classList.add('close-btn', 'bg-red-500', 'text-white', 'rounded-full', 'p-1', 'absolute', 'top-2', 'right-2');
-    closeBtn.onclick = function() {
+    closeBtn.onclick = function(event) {
+        event.stopPropagation();
         box.remove();
     };
     box.appendChild(closeBtn);
-
+    if (id) {
+        box.setAttribute('data-id', id);
+    }
     const titleElem = document.createElement('h3');
     titleElem.innerText = "제목: " + title;
     titleElem.classList.add('font-bold', 'mb-2');
@@ -75,6 +77,29 @@ function createInfoItem(title, song, thumbnail, songURL, answer, hint) {
     return box;
 }
 
+document.getElementById('grid-container').addEventListener('click', function(e) {
+    if (e.target.classList.contains('box') || e.target.closest('.box')) {
+        const box = e.target.closest('.box');
+
+        const title = box.querySelector('h3').innerText.split(": ")[1];
+        const song = box.querySelector('p').innerText.split(": ")[1];
+        const songURL = box.querySelector('input').value;
+        const answer = box.querySelector('h1').innerText;
+        const hint = box.querySelector('h2').innerText;
+
+        // 폼에 정보를 설정
+        document.getElementById('title-input').value = title;
+        document.getElementById('song-name-input').value = song;
+        document.getElementById('song-link-input').value = songURL;
+        document.getElementById('answer-input').value = answer;
+        document.getElementById('hint-input').value = hint;
+    }
+});
+document.body.addEventListener('click', function(event) {
+    if (event.target && event.target.classList.contains('close-btn')) {
+        event.target.parentElement.remove();
+    }
+});
 document.getElementById('song-link-input').addEventListener('input', function() {
     loadVideo();
 });
@@ -102,8 +127,8 @@ document.getElementById('save-btn').addEventListener('click', function() {
         });
     });
     data.push({
-        MapName:document.querySelector("#MapName-input").value,
-        MapProducer : document.querySelector("#User_Name").innerHTML
+        MapName: document.querySelector("#MapName-input").value,
+        MapProducer: document.querySelector("#User_Name").innerHTML
     })
     data = JSON.stringify(data);
     console.log(data);
@@ -123,19 +148,5 @@ document.getElementById('save-btn').addEventListener('click', function() {
             location.reload();
         }
     });
-    // AJAX를 사용하여 데이터를 서버에 POST
-    // fetch('/submit-to-db', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         },
-    //         body: JSON.stringify(data)
-    //     })
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         console.log(data);
-    //     })
-    //     .catch(error => {
-    //         console.error('Error:', error);
-    //     });
+
 });
