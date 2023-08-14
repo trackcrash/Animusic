@@ -16,9 +16,24 @@ from sqlalchemy import inspect
 
 def play_controller():
     data = None
-    if request.args.get('id') != None:
-        id = request.args.get('id')
-        data = [show_mission_byid(id),show_table_bymissionid(id)]
+    id = request.args.get('id')
+    if id != None:
+        mission_data = show_mission_byid(id)
+        if current_user.is_authenticated == False or mission_data[0]['MapProducer_id'] != current_user.id:
+            return '''
+            <html>
+                <head>
+                    <title>권한 오류</title>
+                    <script>
+                        alert("권한이 없습니다.");
+                        history.go(-1);
+                    </script>
+                </head>
+                <body>
+                </body>
+            </html>
+            '''
+        data = [mission_data, show_table_bymissionid(id)]
     return play_view.play_view(data)
 
 def SuchTable(table_Name):
@@ -42,28 +57,28 @@ def show_table():
     
 def show_table_bymissionid(missionid):
     Music.__table__.create(bind=engine, checkfirst=True)
-    if SuchTable("MissionTable"):
+    if SuchTable("MusicTable"):
         queries = session.query(Music).filter(Music.mission_id==missionid)
         entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint) for q in queries]
         return entries
 
-def show_mission_index():
-    Mission.__table__.create(bind=engine, checkfirst=True)
-    if SuchTable("MusicTable"):
-        queries = session.query(Mission)
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail) for q in queries]
-        return entries
-    
 def show_mission():
     Mission.__table__.create(bind=engine, checkfirst=True)
-    if SuchTable("MusicTable"):
-        queries = session.query(Mission).filter(Mission.MapProducer == current_user.name)
-        entries = [dict(id=q.id, MapName=q.MapName, MapProducer=q.MapProducer, Thumbnail= q.Thumbnail) for q in queries]
+    if SuchTable("Mission"):
+        queries = session.query(Mission)
+        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id) for q in queries]
+        return entries
+    
+def show_mission_byProducer():
+    Mission.__table__.create(bind=engine, checkfirst=True)
+    if SuchTable("MissionTable"):
+        queries = session.query(Mission).filter(Mission.MapProducer_id == current_user.id)
+        entries = [dict(id=q.id, MapName=q.MapName, MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id) for q in queries]
         return entries
             
 def show_mission_byid(id):
     Mission.__table__.create(bind=engine, checkfirst=True)
     if SuchTable("MissionTable"):
         queries = session.query(Mission).filter(Mission.id == id)
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail) for q in queries]
+        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail, MapProducer_id=q.MapProducer_id) for q in queries]
         return entries

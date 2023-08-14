@@ -5,6 +5,8 @@ from sqlalchemy.orm import relationship
 from models import login_model
 from db.database import Base,engine,session
 from pydantic import BaseModel
+from flask_login import current_user
+
 
 
 class Music(Base):
@@ -39,11 +41,12 @@ class Mission(Base):
     Thumbnail = Column(String(255), nullable=True)
     active = Column(Boolean, default=False)
     musics = relationship("Music", back_populates="mission")
-    def __init__(self, MapName, MapProducer, Thumbnail):
+    MapProducer_id = Column(Integer, ForeignKey('UserTable.id'),nullable=False)
+    def __init__(self, MapName, MapProducer, Thumbnail,MapProducer_id):
         self.MapName = MapName
         self.MapProducer = MapProducer
         self.Thumbnail = Thumbnail
-
+        self.MapProducer_id = MapProducer_id
 
 def save_to_db(data):
     Mission.__table__.create(bind=engine, checkfirst=True)
@@ -54,11 +57,12 @@ def save_to_db(data):
         MissionThumbnail = data[len(data)-1]['Thumbnail']
     else : 
         MissionThumbnail = "basic"
-
-    t2 = Mission(MissionMapName,MissionMapProducer,MissionThumbnail)
+    MissionMapProducer_id = current_user.id
+    t2 = Mission(MissionMapName,MissionMapProducer,MissionThumbnail, MissionMapProducer_id)
+    
+    t2.active= True
     session.add(t2)
     #kyaru - 활성화용 boolean 컬럼 True로 변경
-    t2.active = True
     session.commit()
     mission_id = t2.id
 

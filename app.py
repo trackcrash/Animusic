@@ -31,6 +31,11 @@ def play():
 def show():
     return play_controller.show_table()
 
+@app.route('/submit-to-db', methods=['POST'])
+def submit():
+    return play_controller.submit_to_db()
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -66,7 +71,7 @@ def register():
 
 @app.route('/Map')
 def mymap():
-    data_list = play_controller.show_mission()
+    data_list = play_controller.show_mission_byProducer()
     return render_template('Map.html', data_list=data_list)
 
 if __name__ == '__main__':

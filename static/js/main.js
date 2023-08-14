@@ -18,18 +18,9 @@ function loadVideo() {
 
 document.getElementById('submission-form').addEventListener('submit', function(e) {
     e.preventDefault();
-
-    const title = document.getElementById('title-input').value;
-    const song = document.getElementById('song-name-input').value;
-    const songURL = document.getElementById('song-link-input').value;
-    const thumbnailLink = "https://img.youtube.com/vi/" + videoId + "/maxresdefault.jpg";
-    const answer = document.getElementById('answer-input').value;
-    const hint = document.getElementById('hint-input').value;
-    const box = createInfoItem(title, song, thumbnailLink, songURL, answer, hint);
-    document.getElementById('grid-container').appendChild(box);
 });
 
-function createInfoItem(id, title, song, thumbnail, songURL, answer, hint) {
+function createInfoItem(title, song, songURL, thumbnail, answer, hint, id) {
     const box = document.createElement('div');
     box.classList.add('box', 'grid-item');
     const closeBtn = document.createElement('button');
@@ -76,7 +67,23 @@ function createInfoItem(id, title, song, thumbnail, songURL, answer, hint) {
 
     return box;
 }
+document.getElementById("register-btn").addEventListener("click", function(e)
+{
+    const title = document.getElementById('title-input').value;
+    const song = document.getElementById('song-name-input').value;
+    const songURL = document.getElementById('song-link-input').value;
+    const thumbnailLink = "https://img.youtube.com/vi/" + videoId + "/maxresdefault.jpg";
+    const answer = document.getElementById('answer-input').value;
+    const hint = document.getElementById('hint-input').value;
+    const box = createInfoItem(title, song, songURL, thumbnailLink, answer, hint);
+    document.getElementById('grid-container').appendChild(box);
 
+    const inputList =  document.querySelectorAll('#submission-form input:not([id="MapName-input"])');
+    for(let i = 0; i <inputList.length; i++)
+    {
+        inputList[i].value = "";
+    }
+})
 document.getElementById('grid-container').addEventListener('click', function(e) {
     if (e.target.classList.contains('box') || e.target.closest('.box')) {
         const box = e.target.closest('.box');
