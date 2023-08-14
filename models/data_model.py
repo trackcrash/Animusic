@@ -1,6 +1,7 @@
 from sqlalchemy import Integer, String, DateTime, Boolean
 from sqlalchemy.sql.schema import Column
 from sqlalchemy import create_engine,ForeignKey
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 from models import login_model
 from db.database import Base,engine,session
@@ -19,7 +20,7 @@ class Music(Base):
     answer = Column(String(255), nullable=False)
     hint = Column(String(255), nullable=True)
    # 외래 키 설정
-    mission_id = Column(Integer, ForeignKey('MissionTable.id'),nullable=False)
+    mission_id = Column(Integer, ForeignKey('MissionTable.id',ondelete='CASCADE'),nullable=False )
     # ORM 관계 설정 여기선 양방향 다대다 설정한거임 ㅇㅇ
     mission = relationship("Mission", back_populates="musics")
     def __init__(self, title, song, youtube_url,thumbnail_url, answer, hint, mission_id):
@@ -49,71 +50,134 @@ class Mission(Base):
         self.MapProducer_id = MapProducer_id
 
 def save_to_db(data):
-    Mission.__table__.create(bind=engine, checkfirst=True)
-    Music.__table__.create(bind=engine, checkfirst=True)
-    MissionMapName = data[len(data)-1]['MapName']
-    MissionMapProducer = data[len(data)-1]['MapProducer']
-    if data[len(data)-1].get('Thumbnail') != None:
-        MissionThumbnail = data[len(data)-1]['Thumbnail']
-    else : 
-        MissionThumbnail = "basic"
-    MissionMapProducer_id = current_user.id
-    t2 = Mission(MissionMapName,MissionMapProducer,MissionThumbnail, MissionMapProducer_id)
+    try:
+        Mission.__table__.create(bind=engine, checkfirst=True)
+        Music.__table__.create(bind=engine, checkfirst=True)
+
+        MissionMapName = data[len(data)-1]['MapName']
+        MissionMapProducer = data[len(data)-1]['MapProducer']
+        MissionThumbnail = data[len(data)-1].get('Thumbnail', "basic")
+        new_mission  = Mission(MissionMapName,MissionMapProducer,MissionThumbnail, current_user.id)
+        new_mission.active= True
+        session.add(new_mission)
+        #kyaru - 활성화용 boolean 컬럼 True로 변경
+        session.commit()
+        mission_id = new_mission.id
+
+        for item in data:
+            if item.get('MapName') == None:
+                title = item['title']
+                song = item['song']
+                youtube_url = item['songURL']
+                thumbnail_url = item['thumbnail']
+                answer =  item['answer']
+                hint = item['hint']
+                new_music = Music(title, song,youtube_url,thumbnail_url,answer,hint,mission_id)
+                session.add(new_music)
+                session.commit()    
+    except SQLAlchemyError as e:
+        session.rollback()  # 예외 발생 시 롤백
+        print(f'Error saving data: {str(e)},test')
+        return f'Error saving data: {str(e)}'
     
-    t2.active= True
-    session.add(t2)
-    #kyaru - 활성화용 boolean 컬럼 True로 변경
-    session.commit()
-    mission_id = t2.id
-
-    for item in data:
-        if item.get('MapName') == None:
-            title = item['title']
-            song = item['song']
-            youtube_url = item['songURL']
-            thumbnail_url = item['thumbnail']
-            answer =  item['answer']
-            hint = item['hint']
-            t1 = Music(title, song,youtube_url,thumbnail_url,answer,hint,mission_id)
-            session.add(t1)
-            session.commit()    
-
-# def update_to_db(data):
     
-#     for item in new_data:
-#         existing_mission = Mission.query.filter_by(MissionMapName=item['MapName']).first()
-#         if existing_mission:
-#             # 기존 미션 데이터가 존재하면 업데이트
-#             existing_mission.MissionMapProducer = item['MapProducer']
-#             existing_mission.MissionThumbnail = item.get('Thumbnail', 'basic')
-#             # ... (다른 필드 업데이트) ...
-#         else:
-#             # 기존 미션 데이터가 없으면 추가
-#             new_mission = Mission(
-#                 MissionMapName=item['MapName'],
-#                 MissionMapProducer=item['MapProducer'],
-#                 MissionThumbnail=item.get('Thumbnail', 'basic'),
-#                 MissionMapProducer_id=current_user.id
-#             )
-#             db.session.add(new_mission)
+def update_to_db(data):
+    try:
+        mission_id= data[len(data)-1]['mission_Id']
+        existing_music_ids = [item.id for item in session.query(Music).filter_by(mission_id=data[len(data)-1]['mission_Id']).all()]
+        print(existing_music_ids,"yeah1")
+        ids_to_keep = set(item['Music_id'] for item in data if 'Music_id' in item)
+        print(ids_to_keep,"yeah2")
+        for music_id in existing_music_ids:
+            if music_id not in ids_to_keep:
+                session.query(Music).filter_by(id=music_id).delete()
+        for item in data:
+            if 'mission_Id' in item:
+                mission_query = session.query(Mission).filter_by(id=mission_id).first()
 
-#             db.session.commit()
+                if mission_query:
+                    if 'MapName' in item:
+                        mission_query.MapName = item['MapName']
+                    if 'MapProducer' in item:
+                        mission_query.MapProducer = item['MapProducer']
+                    if 'Thumbnail' in item:
+                        mission_query.MissionThumbnail = item['Thumbnail']
 
-#             # 미션 ID를 가져오거나 생성된 미션의 ID를 사용하여 뮤직 데이터 업데이트
-#             if existing_mission:
-#                 mission_id = existing_mission.id
-#             else:
-#                 mission_id = new_mission.id
+                    session.commit()  # 미션 정보 업데이트 반영
 
-#             new_music = Music(
-#                 title=item['title'],
-#                 song=item['song'],
-#                 # ... (다른 필드들) ...
-#                 mission_id=mission_id
-#             )
-#             db.session.add(new_music)
-#             db.session.commit()
+            if 'Music_id' in item:
+                music_id = item['Music_id']
+                if music_id != None and music_id != "":
+                    music_query = session.query(Music).filter_by(id=music_id).first()
+                    
+                    if music_query:
+                        if 'title' in item:
+                            music_query.title = item['title']
+                        if 'song' in item:
+                            music_query.song = item['song']
+                        if 'songURL' in item:
+                            music_query.songURL = item['songURL']    
+                        if 'thumbnail' in item:
+                            music_query.thumbnail = item['thumbnail']   
+                        if 'answer' in item:
+                            music_query.answer = item['answer']       
+                        if 'hint' in item:
+                            music_query.hint = item['hint'] 
+                        # ... (다른 필드 업데이트) ...
 
-#         return 'Update DB successful'
-#     except Exception as e:
-#         return str(e), 500
+                        session.commit()  # 음악 정보 업데이트 반영
+                    else:
+                        # Music_id가 없으면 새로운 음악 추가
+                        title = item['title']
+                        song = item['song']
+                        youtube_url = item['songURL']
+                        thumbnail_url = item['thumbnail']
+                        answer =  item['answer']
+                        hint = item['hint']
+                        new_music = Music(title, song, youtube_url, thumbnail_url, answer, hint, mission_id= data[len(data)-1]['mission_Id'])
+                        session.add(new_music)
+                        session.commit()
+        
+        return 'Data update successful'
+    except Exception as e:
+        session.rollback()  # 예외 발생 시 롤백
+        print(f'Error updating data: {str(e)}, yew.')
+        return f'Error updating data: {str(e)}'
+    # try:
+    #     # 업데이트할 미션 정보 가져오기
+    #     mission_id = data[-1]['Mission_id']
+    #     mission_map_name = data[-1]['MapName']
+    #     mission_map_producer = data[-1]['MapProducer']
+    #     mission_thumbnail = data[-1].get('Thumbnail', "basic")
+
+    #     # 미션 정보 업데이트
+    #     mission_query = session.query(Mission).filter_by(id=mission_id).first()
+    #     if mission_query:
+    #         mission_query.MapName = mission_map_name
+    #         mission_query.MapProducer = mission_map_producer
+    #         mission_query.MissionThumbnail = mission_thumbnail
+
+    #     # 미션 정보가 없을 경우 예외 처리
+
+    #     # 미션 정보 업데이트 반영
+    #     session.commit()
+
+    #     # 음악 데이터 업데이트 또는 삭제
+    #     music_data = session.query(Music).filter_by(mission_id=mission_id).all()
+    #     for existing_item in music_data:
+    #         matching_item = next((item for item in data if item['id'] == existing_item.id), None)
+    #         if matching_item:
+    #             # 새로운 데이터에 해당 아이템이 존재하면 업데이트
+    #             existing_item.song = matching_item['title']
+    #             # ... (다른 필드 업데이트) ...
+    #             data.remove(matching_item)
+    #         else:
+    #             # 새로운 데이터에 해당 아이템이 없으면 삭제
+    #             session.delete(existing_item)
+
+    #     # 변경사항 커밋
+    #     session.commit()
+    #     return 'Data update successful'
+    # except SQLAlchemyError as e:
+    #     session.rollback()  # 예외 발생 시 롤백
+    #     return f'Error updating data: {str(e)}'

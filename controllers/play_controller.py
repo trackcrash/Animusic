@@ -87,3 +87,27 @@ def show_mission_byid(id):
         queries = session.query(Mission).filter(Mission.id == id)
         entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail, MapProducer_id=q.MapProducer_id) for q in queries]
         return entries
+
+def delete_Mission(id):
+    print(id)
+    session.query(Music).filter_by(mission_id=id).delete()
+    session.commit()
+
+    data_to_delete = session.query(Mission).filter_by(id=id).first()
+    session.delete(data_to_delete)
+    session.commit()
+
+    
+    return    '''
+            <html>
+                <head>
+                    <title>삭제 완료</title>
+                    <script>
+                        alert("삭제가 완료 되었습니다.");
+                        location.href='/';
+                    </script>
+                </head>
+                <body>
+                </body>
+            </html>
+        '''
