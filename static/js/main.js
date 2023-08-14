@@ -69,6 +69,7 @@ function createInfoItem(title, song, songURL, thumbnail, answer, hint, id) {
 }
 document.getElementById("register-btn").addEventListener("click", function(e)
 {
+
     const title = document.getElementById('title-input').value;
     const song = document.getElementById('song-name-input').value;
     const songURL = document.getElementById('song-link-input').value;
@@ -100,6 +101,7 @@ document.getElementById('grid-container').addEventListener('click', function(e) 
         document.getElementById('song-link-input').value = songURL;
         document.getElementById('answer-input').value = answer;
         document.getElementById('hint-input').value = hint;
+        loadVideo();
     }
 });
 document.body.addEventListener('click', function(event) {
@@ -111,7 +113,53 @@ document.getElementById('song-link-input').addEventListener('input', function() 
     loadVideo();
 });
 
+//update이벤트
+document.getElementById('update-btn').addEventListener('click', function() {
+    const items = document.querySelectorAll('.grid-item');
+    let data = [];
 
+    items.forEach(item => {
+        const title = item.querySelector('h3').innerText.split(": ")[1];
+        const song = item.querySelector('p').innerText.split(": ")[1];
+        const thumbnail = item.querySelector('img').src;
+        const songURL = item.querySelector('input').value;
+        const answer = item.querySelector('h1').innerText;
+        const hint = item.querySelector('h2').innerText;
+        data.push({
+            title: title,
+            song: song,
+            thumbnail: thumbnail,
+            songURL: songURL,
+            answer: answer,
+            hint: hint
+        });
+    });
+    data.push({
+        MapName: document.querySelector("#MapName-input").value,
+        MapProducer: document.querySelector("#User_Name").innerHTML,
+        mission_Id : document.querySelector("#Mission_id").innerHTML
+    })
+    data = JSON.stringify(data);
+    console.log(data);
+    $.ajax({
+        type: "POST",
+        url: "/update-to-db",
+        dataType: "json",
+        contentType: "application/json",
+        data: data,
+        error: function(request, status, error) {
+            console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+
+        },
+        success: function(data) {
+            console.log("통신데이터 값 : " + data);
+            alert("등록 완료되었습니다.");
+            location.reload();
+        }
+    });
+
+});
+//save이벤트 
 document.getElementById('save-btn').addEventListener('click', function() {
     const items = document.querySelectorAll('.grid-item');
     let data = [];

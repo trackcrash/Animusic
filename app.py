@@ -74,5 +74,8 @@ def mymap():
     data_list = play_controller.show_mission_byProducer()
     return render_template('Map.html', data_list=data_list)
 
+@app.route('/update-to-db')
+def Update():
+    return play_controller.update_to_db()
 if __name__ == '__main__':
     socketio.run(app, debug=True,host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)

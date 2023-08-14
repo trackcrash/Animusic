@@ -6,7 +6,7 @@ from models import login_model
 from db.database import Base,engine,session
 from pydantic import BaseModel
 from flask_login import current_user
-
+from controllers import play_controller
 
 
 class Music(Base):
@@ -77,3 +77,43 @@ def save_to_db(data):
             t1 = Music(title, song,youtube_url,thumbnail_url,answer,hint,mission_id)
             session.add(t1)
             session.commit()    
+
+# def update_to_db(data):
+    
+#     for item in new_data:
+#         existing_mission = Mission.query.filter_by(MissionMapName=item['MapName']).first()
+#         if existing_mission:
+#             # 기존 미션 데이터가 존재하면 업데이트
+#             existing_mission.MissionMapProducer = item['MapProducer']
+#             existing_mission.MissionThumbnail = item.get('Thumbnail', 'basic')
+#             # ... (다른 필드 업데이트) ...
+#         else:
+#             # 기존 미션 데이터가 없으면 추가
+#             new_mission = Mission(
+#                 MissionMapName=item['MapName'],
+#                 MissionMapProducer=item['MapProducer'],
+#                 MissionThumbnail=item.get('Thumbnail', 'basic'),
+#                 MissionMapProducer_id=current_user.id
+#             )
+#             db.session.add(new_mission)
+
+#             db.session.commit()
+
+#             # 미션 ID를 가져오거나 생성된 미션의 ID를 사용하여 뮤직 데이터 업데이트
+#             if existing_mission:
+#                 mission_id = existing_mission.id
+#             else:
+#                 mission_id = new_mission.id
+
+#             new_music = Music(
+#                 title=item['title'],
+#                 song=item['song'],
+#                 # ... (다른 필드들) ...
+#                 mission_id=mission_id
+#             )
+#             db.session.add(new_music)
+#             db.session.commit()
+
+#         return 'Update DB successful'
+#     except Exception as e:
+#         return str(e), 500

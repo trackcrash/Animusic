@@ -48,6 +48,11 @@ def submit_to_db():
     data_model.save_to_db(data)
     return jsonify({"message": "Data received and processed!"})
 
+def update_to_db():
+    data=request.json
+    data_model.update_to_db(data)
+    return jsonify({"message": "Data received and processed!"})
+
 def show_table():
     Music.__table__.create(bind=engine, checkfirst=True)
     if SuchTable("MusicTable"):
