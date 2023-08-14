@@ -2,10 +2,10 @@
 import os
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import LoginManager, current_user, logout_user, login_required
+from decouple import config
 from controllers import play_controller, login_controller
 from models import login_model
-from flask_socketio import SocketIO
-from decouple import config
+from chat.chat import chat_bp, socketio, make_answer
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
@@ -14,7 +14,9 @@ app.config['SECRET_KEY'] = config('SECRET_KEY')
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-socketio = SocketIO(app)
+socketio.init_app(app)
+app.register_blueprint(chat_bp)
+
 @login_manager.user_loader
 def load_user(user_id):
     return login_model.get_user_by_id(user_id)
@@ -35,6 +37,11 @@ def show():
 def submit():
     return play_controller.submit_to_db()
 
+@app.route('/play-test', methods=['GET', 'POST'])
+def play_test():
+    mission_id = request.args.get('id')
+    data = make_answer(mission_id)
+    return render_template('TestPlay.html',current_user=current_user, music_data=data)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

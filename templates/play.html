@@ -59,7 +59,7 @@
 <body class="font-sans bg-gray-100 text-black h-screen">
     {% include "header.html" %}
     <!-- 왼쪽 영역 -->
-    <div class = "flex">
+    <div class="flex">
         <div class="left-side w-1/2">
             <div class="video-container bg-gray-500 rounded overflow-hidden">
                 <!-- This is where the video will be played -->
@@ -68,7 +68,7 @@
                 </div>
             </div>
         </div>
-    
+
         {% if request.args.get('id') %}
         <!-- 오른쪽 영역 -->
         <div class="right-side w-1/2">
@@ -79,7 +79,8 @@
 
                     {% for d in data[1] %}
                     <div class="box grid-item"><button class="close-btn bg-red-500 text-white rounded-full p-1 absolute top-2 right-2">X</button>
-                        <h3 class="font-bold mb-2">제목: {{ d['title'] }}</h3><p class="mb-2">곡 이름: {{ d['song'] }}</p><img src="{{ d['thumnail_url'] }}" class="w-24 h-24 mx-auto">
+                        <h3 class="font-bold mb-2">제목: {{ d['title'] }}</h3>
+                        <p class="mb-2">곡 이름: {{ d['song'] }}</p><img src="{{ d['thumnail_url'] }}" class="w-24 h-24 mx-auto">
                         <input type="hidden" value="{{ d['youtube_url'] }}">
                         <h1 style="display: none;">{{d['answer']}}</h1>
                         <h2 style="display: none;">{{d['hint']}}</h2>
@@ -87,10 +88,10 @@
                     {% endfor %}
                 </div>
             </div>
-            
+
             <!-- 하단 입력 양식 영역 -->
             <div class="input-form-section">
-                <form id="submission-form" class="space-y-4">                    
+                <form id="submission-form" class="space-y-4">
                     <label>맵 이름</label>
                     <input id="MapName-input" class="w-full p-2 border border-gray-300 rounded" type="text" value="{{data[0][0]['MapName']}}">
                     <label>제목:</label>
@@ -98,13 +99,13 @@
                     <div hidden id="Mission_id">{{data[0][0]['id']}}</div>
                     <label>곡 이름:</label>
                     <input id="song-name-input" class="w-full p-2 border border-gray-300 rounded" type="text">
-    
+
                     <label>정답:</label>
                     <input id="answer-input" class="w-full p-2 border border-gray-300 rounded" type="text">
-    
+
                     <label>힌트:</label>
                     <input id="hint-input" class="w-full p-2 border border-gray-300 rounded" type="text">
-    
+
                     <label>곡 링크:</label>
                     <input id="song-link-input" class="w-full p-2 border border-gray-300 rounded" type="url">
 
@@ -123,25 +124,25 @@
                     <!-- 여기에 .box 아이템들이 추가됩니다 -->
                 </div>
             </div>
-    
+
             <!-- 하단 입력 양식 영역 -->
             <div class="input-form-section">
-                <form id="submission-form" class="space-y-4">                    
+                <form id="submission-form" class="space-y-4">
                     <label>맵 이름</label>
                     <input id="MapName-input" class="w-full p-2 border border-gray-300 rounded" type="text">
-    
+
                     <label>제목:</label>
                     <input id="title-input" class="w-full p-2 border border-gray-300 rounded" type="text">
-    
+
                     <label>곡 이름:</label>
                     <input id="song-name-input" class="w-full p-2 border border-gray-300 rounded" type="text">
-    
+
                     <label>정답:</label>
                     <input id="answer-input" class="w-full p-2 border border-gray-300 rounded" type="text">
-    
+
                     <label>힌트:</label>
                     <input id="hint-input" class="w-full p-2 border border-gray-300 rounded" type="text">
-    
+
                     <label>곡 링크:</label>
                     <input id="song-link-input" class="w-full p-2 border border-gray-300 rounded" type="url">
 
