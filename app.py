@@ -81,8 +81,13 @@ def mymap():
     data_list = play_controller.show_mission_byProducer()
     return render_template('Map.html', data_list=data_list)
 
-@app.route('/update-to-db')
-def Update():
+@app.route('/update-to-db',  methods=['POST'])
+def update():
     return play_controller.update_to_db()
+
+@app.route("/delete-mission", methods=['GET'])
+def deleteMission():
+    return play_controller.delete_Mission(request.args.get('id'))
 if __name__ == '__main__':
     socketio.run(app, debug=True,host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+
