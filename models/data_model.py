@@ -129,7 +129,6 @@ def update_to_db(data):
                             music_query.answer = item['answer']
                         if 'hint' in item:
                             music_query.hint = item['hint']
-                        # ... (다른 필드 업데이트) ...
 
                         session.commit()  # 음악 정보 업데이트 반영
                     else:

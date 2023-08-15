@@ -56,7 +56,7 @@ class User(Base):
         return False
 
     @property
-    def id(self):
+    def get_id(self):
         return str(self.id)
 
 
