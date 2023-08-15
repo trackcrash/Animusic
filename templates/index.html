@@ -21,6 +21,9 @@
                 <p>Producer: {{ mission.MapProducer }}</p>
                 <!-- Thumbnail 이미지가 있다면 추가 -->
                 <img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" />
+                <!--노래 갯수 추가 -->
+                <p>{{ mission.MusicNum }}곡</p>
+
             </a>
             {% endfor %}
         </div>

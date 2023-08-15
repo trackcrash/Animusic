@@ -4,7 +4,8 @@ from views import play_view
 from db.database import session,engine
 from flask_login import current_user
 from models.data_model import Music,Mission
-from sqlalchemy import inspect
+from sqlalchemy import inspect,func
+
 #play_controller backup
 # if request.method == 'POST':
     #     title = request.form.get('title')
@@ -71,7 +72,8 @@ def show_mission():
     Mission.__table__.create(bind=engine, checkfirst=True)
     if SuchTable("MissionTable"):
         queries = session.query(Mission)
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id) for q in queries]
+        #노래 갯수 추가
+        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
         return entries
     
 def show_mission_byProducer():
