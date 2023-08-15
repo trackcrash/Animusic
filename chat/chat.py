@@ -1,9 +1,11 @@
 #chatting, data parse --author: NewKyaru 15/08/2023
-from flask import Blueprint, request, flash, redirect, url_for,jsonify
+from flask import Blueprint, flash, jsonify, redirect, request, url_for
 from flask_login import current_user
 from flask_socketio import emit, SocketIO
-from models.data_model import Music,Mission
+
 from controllers.play_controller import show_table_bymissionid
+from models.data_model import Mission, Music
+
 chat_bp = Blueprint('chat', __name__)
 socketio = SocketIO(cors_allowed_origins="*")
 
@@ -14,15 +16,14 @@ def handle_message(data):
     name = current_user.name
     #answer_list = [item['answer'] for item in data]
     emit('message', {'name': name, 'msg': msg}, broadcast=True)
-#use to get json
+
+# use to get json
 def make_answer(mission_id):
-    data = None
-    if mission_id:
-        data = show_table_bymissionid(mission_id)
-    else:
+    if mission_id is None:
         flash('잘못된 접근입니다.')
         return redirect(url_for('index'))
-    
+
+    data = show_table_bymissionid(mission_id)
     result = []
 
     for item in data:
