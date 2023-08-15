@@ -7,7 +7,6 @@
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-
 </head>
 
 <body class="bg-gray-200 ">
@@ -15,11 +14,15 @@
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 ">
         <div class="grid grid-cols-5 gap-6">
             <!-- this area -->
-            <div class="bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center">01</div>
-            <div class="bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center">02</div>
-            <div class="bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center">03</div>
-            <div class="bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center">04</div>
-            <div class="bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center">05</div>
+            {% for mission in missions %}
+            <a href="/play-test?id={{ mission.id }}" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300">
+                <p>ID: {{ mission.id }}</p>
+                <p>Name: {{ mission.MapName }}</p>
+                <p>Producer: {{ mission.MapProducer }}</p>
+                <!-- Thumbnail 이미지가 있다면 추가 -->
+                <img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" />
+            </a>
+            {% endfor %}
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/main.js')}}"></script>

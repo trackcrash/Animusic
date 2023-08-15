@@ -69,7 +69,7 @@ def show_table_bymissionid(missionid):
 
 def show_mission():
     Mission.__table__.create(bind=engine, checkfirst=True)
-    if SuchTable("Mission"):
+    if SuchTable("MissionTable"):
         queries = session.query(Mission)
         entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id) for q in queries]
         return entries

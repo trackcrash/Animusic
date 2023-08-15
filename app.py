@@ -1,6 +1,6 @@
 #flask main --author: NewKyaru 11/08/2023
 import os
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for ,jsonify
 from flask_login import LoginManager, current_user, logout_user, login_required
 from decouple import config
 from controllers import play_controller, login_controller
@@ -23,7 +23,8 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('index.html', current_user=current_user)
+    missions = play_controller.show_mission()
+    return render_template('index.html', current_user=current_user, missions=missions)
 
 @app.route('/play', methods=['GET', 'POST'])
 def play():
@@ -40,8 +41,13 @@ def submit():
 @app.route('/play-test', methods=['GET', 'POST'])
 def play_test():
     mission_id = request.args.get('id')
-    data = make_answer(mission_id)
-    return render_template('TestPlay.html',current_user=current_user, music_data=data)
+    make_answer(mission_id)
+    return render_template('TestPlay.html',current_user=current_user)
+
+@app.route('/get-music-data', methods=['GET'])
+def get_music_data():
+    mission_id = request.args.get('id')
+    return make_answer(mission_id)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
