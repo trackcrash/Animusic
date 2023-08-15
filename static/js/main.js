@@ -64,7 +64,7 @@ function createInfoItem(title, song, songURL, thumbnail, answer, hint, id) {
     HintElem.innerText = hint;
     box.appendChild(HintElem);
     HintElem.style.display = "None";
-    
+
     const MusicIdElem = document.createElement('h4'); // 사용자에게는 보이지 않도록 hidden 유형으로 설정
     MusicIdElem.innerText = hint;
     box.appendChild(MusicIdElem);
@@ -235,7 +235,7 @@ function UpdateBtn()
                 hint: hint
             });
         }
-        
+
     });
     data.push({
         MapName: document.querySelector("#MapName-input").value,

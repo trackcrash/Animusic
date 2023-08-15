@@ -1,14 +1,14 @@
-from sqlalchemy import Integer, String, DateTime, Boolean
-from sqlalchemy.sql.schema import Column
-from sqlalchemy import create_engine,ForeignKey
+from flask_login import current_user
+from pydantic import BaseModel
+from sqlalchemy import create_engine, ForeignKey
+from sqlalchemy import Boolean, DateTime, Integer, String
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
-from models import login_model
-from db.database import Base,engine,session
-from pydantic import BaseModel
-from flask_login import current_user
-from controllers import play_controller
+from sqlalchemy.sql.schema import Column
 
+from controllers import play_controller
+from models import login_model
+from db.database import Base, engine, session
 
 class Music(Base):
     __tablename__ = 'MusicTable'
@@ -23,6 +23,7 @@ class Music(Base):
     mission_id = Column(Integer, ForeignKey('MissionTable.id',ondelete='CASCADE'),nullable=False )
     # ORM 관계 설정 여기선 양방향 다대다 설정한거임 ㅇㅇ
     mission = relationship("Mission", back_populates="musics")
+
     def __init__(self, title, song, youtube_url,thumbnail_url, answer, hint, mission_id):
         self.title = title
         self.song = song
@@ -31,8 +32,10 @@ class Music(Base):
         self.answer = answer
         self.hint = hint
         self.mission_id = mission_id
+
     def __repr__(self):
         return "<Music(" , self.title, self.song, self.youtube_url ,self.thumbnail_url,self.answer,self.hint,self.mission_id,">"
+
 
 class Mission(Base):
     __tablename__ = 'MissionTable'
@@ -43,11 +46,13 @@ class Mission(Base):
     active = Column(Boolean, default=False)
     musics = relationship("Music", back_populates="mission")
     MapProducer_id = Column(Integer, ForeignKey('UserTable.id'),nullable=False)
+
     def __init__(self, MapName, MapProducer, Thumbnail,MapProducer_id):
         self.MapName = MapName
         self.MapProducer = MapProducer
         self.Thumbnail = Thumbnail
         self.MapProducer_id = MapProducer_id
+
 
 def save_to_db(data):
     try:
@@ -65,7 +70,7 @@ def save_to_db(data):
         mission_id = new_mission.id
 
         for item in data:
-            if item.get('MapName') == None:
+            if item.get('MapName') is None:
                 title = item['title']
                 song = item['song']
                 youtube_url = item['songURL']
@@ -74,13 +79,13 @@ def save_to_db(data):
                 hint = item['hint']
                 new_music = Music(title, song,youtube_url,thumbnail_url,answer,hint,mission_id)
                 session.add(new_music)
-                session.commit()    
+                session.commit()
     except SQLAlchemyError as e:
         session.rollback()  # 예외 발생 시 롤백
         print(f'Error saving data: {str(e)},test')
         return f'Error saving data: {str(e)}'
-    
-    
+
+
 def update_to_db(data):
     try:
         mission_id= data[len(data)-1]['mission_Id']
@@ -91,6 +96,7 @@ def update_to_db(data):
         for music_id in existing_music_ids:
             if music_id not in ids_to_keep:
                 session.query(Music).filter_by(id=music_id).delete()
+
         for item in data:
             if 'mission_Id' in item:
                 mission_query = session.query(Mission).filter_by(id=mission_id).first()
@@ -107,22 +113,22 @@ def update_to_db(data):
 
             if 'Music_id' in item:
                 music_id = item['Music_id']
-                if music_id != None and music_id != "":
+                if music_id is not None and music_id != "":
                     music_query = session.query(Music).filter_by(id=music_id).first()
-                    
+
                     if music_query:
                         if 'title' in item:
                             music_query.title = item['title']
                         if 'song' in item:
                             music_query.song = item['song']
                         if 'songURL' in item:
-                            music_query.songURL = item['songURL']    
+                            music_query.songURL = item['songURL']
                         if 'thumbnail' in item:
-                            music_query.thumbnail = item['thumbnail']   
+                            music_query.thumbnail = item['thumbnail']
                         if 'answer' in item:
-                            music_query.answer = item['answer']       
+                            music_query.answer = item['answer']
                         if 'hint' in item:
-                            music_query.hint = item['hint'] 
+                            music_query.hint = item['hint']
                         # ... (다른 필드 업데이트) ...
 
                         session.commit()  # 음악 정보 업데이트 반영
@@ -137,12 +143,13 @@ def update_to_db(data):
                         new_music = Music(title, song, youtube_url, thumbnail_url, answer, hint, mission_id= data[len(data)-1]['mission_Id'])
                         session.add(new_music)
                         session.commit()
-        
+
         return 'Data update successful'
     except Exception as e:
         session.rollback()  # 예외 발생 시 롤백
         print(f'Error updating data: {str(e)}, yew.')
         return f'Error updating data: {str(e)}'
+
     # try:
     #     # 업데이트할 미션 정보 가져오기
     #     mission_id = data[-1]['Mission_id']

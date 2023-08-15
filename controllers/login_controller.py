@@ -1,18 +1,26 @@
 #user login & api register -- Newkyaru 13/08/2023
-from flask import session, redirect, url_for, flash, render_template, request
-from models import login_model
-from oauthlib.oauth2 import WebApplicationClient
-import requests, json
-from db.database import session as db_session  # 이름 충돌을 피하기 위해 alias 사용
+import json
+
+import requests
 from decouple import config
+from flask import flash, redirect, render_template, request, session, url_for
 from flask_login import login_user
+from oauthlib.oauth2 import WebApplicationClient
+
+from models import login_model
+from db.database import session as db_session  # 이름 충돌을 피하기 위해 alias 사용
+
 
 GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = config('GOOGLE_CLIENT_SECRET')
 GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
+
 def register():
+    if request.method == 'GET':
+        return render_template('register.html')
+
     if request.method == 'POST':
         email = request.form.get('email')
         name = request.form.get('name')
@@ -32,7 +40,7 @@ def register():
         else:
             flash('Registration failed.')
             return redirect(url_for('register'))
-    return render_template('register.html')
+
 
 def user_controller():
     if request.method == 'POST':
@@ -44,10 +52,11 @@ def user_controller():
         if user:
             login_user(user)
             return True
-        else:
-            flash('Invalid email or password')
-            return False
-            
+
+        flash('Invalid email or password')
+        return False
+
+
 def google_login():
     google_provider_cfg = requests.get(GOOGLE_DISCOVERY_URL).json()
     authorization_endpoint = google_provider_cfg["authorization_endpoint"]
@@ -57,7 +66,9 @@ def google_login():
         redirect_uri=request.base_url + "/callback",
         scope=["openid", "email", "profile"],
     )
+
     return redirect(request_uri)
+
 
 def google_callback():
     token_endpoint = requests.get(GOOGLE_DISCOVERY_URL).json()["token_endpoint"]
@@ -77,11 +88,10 @@ def google_callback():
     userinfo_endpoint = requests.get(GOOGLE_DISCOVERY_URL).json()["userinfo_endpoint"]
     uri, headers, body = client.add_token(userinfo_endpoint)
     userinfo_response = requests.get(uri, headers=headers, data=body)
-    
+
     user_info = userinfo_response.json()
     user = login_model.save_google_user(user_info)
 
     # Use Flask-Login to login user
     login_user(user)
-
     return redirect(url_for('index'))
