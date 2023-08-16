@@ -8,17 +8,11 @@ from views import play_view
 from db.database import session,engine
 from models.data_model import Mission, Music
 
-# play_controller backup
-"""
-if request.method == 'POST':
-    title = request.form.get('title')
-    song = request.form.get('song')
-    youtube_url = request.form.get('youtube_url')
-    # Save data to DB
-    data_model.save_data(title, song, youtube_url)
-
-    return play_view.play_post_response({"title": title, "song": song, "youtube_url": youtube_url})
-"""
+#db에 테이블 존재하는지 확인하고 없으면 생성
+def ensure_tables_exist():
+    for table in [Music, Mission]:
+        if not SuchTable(table.__tablename__):
+            table.__table__.create(bind=engine, checkfirst=True)
 
 def play_controller():
     data = None
