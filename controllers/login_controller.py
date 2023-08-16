@@ -93,8 +93,4 @@ def google_callback():
 
     # Use Flask-Login to login user
     login_user(user)
-<<<<<<< Updated upstream
     return redirect(url_for('index'))
-=======
-    return redirect(url_for('index'))
->>>>>>> Stashed changes

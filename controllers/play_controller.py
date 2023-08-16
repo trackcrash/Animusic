@@ -119,8 +119,4 @@ def delete_Mission(id):
             <body>
             </body>
         </html>
-<<<<<<< Updated upstream
     '''
-=======
-    '''
->>>>>>> Stashed changes

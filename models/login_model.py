@@ -84,8 +84,4 @@ def get_user_by_email(email):
 
 
 def get_user_by_id(user_id):
-<<<<<<< Updated upstream
     return session.query(User).filter(User.id == user_id).first()
-=======
-    return session.query(User).filter(User.id == user_id).first()
->>>>>>> Stashed changes

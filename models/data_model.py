@@ -17,21 +17,12 @@ class Music(Base):
     thumbnail_url = Column(String(255), nullable=False)
     answer = Column(String(255), nullable=False)
     hint = Column(String(255), nullable=True)
-<<<<<<< Updated upstream
-   # 외래 키 설정
-    mission_id = Column(Integer, ForeignKey('MissionTable.id',ondelete='CASCADE'),nullable=False )
-    # ORM 관계 설정
-    mission = relationship("Mission", back_populates="musics")
-
-    def __init__(self, title, song, youtube_url,thumbnail_url, answer, hint, mission_id):
-=======
     # 외래 키 설정
     mission_id = Column(Integer, ForeignKey('MissionTable.id', ondelete='CASCADE'), nullable=False)
     # ORM 관계 설정
     mission = relationship("Mission", back_populates="musics")
 
     def __init__(self, title, song, youtube_url, thumbnail_url, answer, hint, mission_id):
->>>>>>> Stashed changes
         self.title = title
         self.song = song
         self.youtube_url = youtube_url
@@ -41,11 +32,7 @@ class Music(Base):
         self.mission_id = mission_id
 
     def __repr__(self):
-<<<<<<< Updated upstream
-        return "<Music(" , self.title, self.song, self.youtube_url ,self.thumbnail_url,self.answer,self.hint,self.mission_id,">"
-=======
         return "<Music(", self.title, self.song, self.youtube_url, self.thumbnail_url, self.answer, self.hint, self.mission_id, ">"
->>>>>>> Stashed changes
 
 
 class Mission(Base):
@@ -56,26 +43,16 @@ class Mission(Base):
     Thumbnail = Column(String(255), nullable=True)
     active = Column(Boolean, default=False)
     musics = relationship("Music", back_populates="mission")
-<<<<<<< Updated upstream
-    MapProducer_id = Column(Integer, ForeignKey('UserTable.id'),nullable=False)
-
-    def __init__(self, MapName, MapProducer, Thumbnail,MapProducer_id):
-=======
     MapProducer_id = Column(Integer, ForeignKey('UserTable.id'), nullable=False)
 
     def __init__(self, MapName, MapProducer, Thumbnail, MapProducer_id):
->>>>>>> Stashed changes
         self.MapName = MapName
         self.MapProducer = MapProducer
         self.Thumbnail = Thumbnail
         self.MapProducer_id = MapProducer_id
 
-<<<<<<< Updated upstream
-#코드 구조개선 --kyaru 16/08/23 12:00
-=======
 
 # 코드 구조개선 --kyaru 16/08/23 12:00
->>>>>>> Stashed changes
 def save_to_db(data):
     try:
         MissionMapName = data[-1]['MapName']
@@ -101,20 +78,12 @@ def save_to_db(data):
         session.rollback()
         print(f'Error saving data: {str(e)}')
         return f'Error saving data: {str(e)}'
-<<<<<<< Updated upstream
-    #세션닫기 추가
-    finally:
-        session.close()
-        
-#코드 구조개선 --kyaru 16/08/23 12:00
-=======
     # 세션닫기 추가
     finally:
         session.close()
 
 
 # 코드 구조개선 --kyaru 16/08/23 12:00
->>>>>>> Stashed changes
 def update_to_db(data):
     try:
         mission_id = data[-1]['mission_Id']
@@ -155,10 +124,6 @@ def update_to_db(data):
         session.rollback()
         print(f'Error saving data: {str(e)}')
         return f'Error saving data: {str(e)}'
-<<<<<<< Updated upstream
-    #세션닫기 추가
-=======
     # 세션닫기 추가
->>>>>>> Stashed changes
     finally:
         session.close()
