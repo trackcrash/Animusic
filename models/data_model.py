@@ -3,11 +3,8 @@ from sqlalchemy import Boolean, Integer, String
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column
-
 from db.database import Base, engine, session
 from flask_login import current_user
-
-
 class Music(Base):
     __tablename__ = 'MusicTable'
     id = Column(Integer, primary_key=True)
