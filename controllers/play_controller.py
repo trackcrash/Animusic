@@ -1,8 +1,6 @@
 from flask import jsonify, request
 from flask_login import current_user
 from sqlalchemy import func, inspect
-
-
 from models import data_model
 from views import play_view
 from db.database import session,engine

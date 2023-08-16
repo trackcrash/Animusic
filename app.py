@@ -4,12 +4,10 @@ import os
 from decouple import config
 from flask import flash, Flask, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, LoginManager, logout_user
-
 from controllers import login_controller, play_controller
 from models import login_model
-from chat.chat import chat_bp, make_answer, socketio
-
-from flask_socketio import SocketIO, emit, join_room, leave_room
+from chat.chat import chat_bp, make_answer, get_room_dict, get_user,room_dict
+from flask_socketio import SocketIO ,emit, join_room, leave_room
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
@@ -107,7 +105,6 @@ def deleteMission():
 
 
 # -------- 채팅 관련 기능 부분 -----------
-room_dict = dict()
 @app.route('/room_list')
 def room_list():
     if current_user.is_authenticated == False:
@@ -116,15 +113,33 @@ def room_list():
     else:
         user_id = current_user.name
         print(f"{user_id} 유저 아이디 확인됨.")
-    return render_template('room_list.html', room_dict=room_dict, user_id=user_id)
+    return render_template('room_list.html')
+
+@app.get("/get-room-dict")
+def get_room_dictAll():
+    return get_room_dict()
+
+@app.get("/get_user_info")
+def get_user_info():
+    return get_user()
 
 @app.route('/multi_game')
 def chat():
     return render_template('multi_game/multi_game.html')
+# ------------------------------------
+
+@socketio.on('message')
+def handle_message(data):
+    msg = data['content']
+    name = current_user.name
+    #answer_list = [item['answer'] for item in data]
+    emit('message', {'name': name, 'msg': msg}, broadcast=True)
+    
 @socketio.on('create_room')
 def create_room(data):
     room_name = data['room_name']  # 사용자 ID
     # 방 중복생성 금지 (클라이언트에 해당 이벤트 요청)
+    print(room_name)
     if room_name in room_dict:
         emit('Do_not_create_duplicates')
     else:
@@ -141,15 +156,13 @@ def create_room(data):
         emit('move_multi_game')
         # 방이 새로 추가된 것을 room_list 페이지에 접속한 모든 사용자에게 채팅방 추가 요청
         emit('room_update', room_name, broadcast=True)
-
+        
 @socketio.on('join')
 def join(data):
-    print(socketio.server.enter_room[request.sid, room])
     room = data['room']
+    print(socketio.server.enter_room[request.sid, room])
     join_room(room)
     print(f"{room}방에 연결되었습니다.")
-
-# ------------------------------------
 
 if __name__ == '__main__':
     play_controller.ensure_tables_exist()
