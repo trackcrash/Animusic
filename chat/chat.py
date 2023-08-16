@@ -23,8 +23,8 @@ def make_answer(mission_id):
 
         # JSON 객체 생성
         music_data = {
-            'is_answered': "false",
-            'show_next_button': "false",
+            'hint': item['hint'],
+            'is_answered': 'false',
             'answer_list': answer_list,
             'youtube_embed_url': youtube_embed_url,
             'title': item['title'],

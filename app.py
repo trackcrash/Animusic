@@ -1,5 +1,5 @@
 #flask main --author: NewKyaru 11/08/2023
-import os
+import os, math
 
 from decouple import config
 from flask import flash, Flask, jsonify, redirect, render_template, request, url_for
@@ -134,7 +134,32 @@ def handle_message(data):
     name = current_user.name
     #answer_list = [item['answer'] for item in data]
     emit('message', {'name': name, 'msg': msg}, broadcast=True)
+
+
+@socketio.on('correctAnswer')
+def handle_correct_answer(data):
+    # 모든 클라이언트에게 정답을 맞췄다는 정보를 중계합니다.
+    emit('correctAnswer', data, broadcast=True)
+vote_counts = {}
+
+#스킵투표
+@socketio.on('voteSkip')
+def handle_vote_skip(data):
+    index = data.get('index')
+    totalPlayers = 2  # 현재 2명으로 설정되어 있음
+
+    if index not in vote_counts:
+        vote_counts[index] = 0
+        
+    vote_counts[index] += 1
+    required_votes = totalPlayers if totalPlayers <= 2 else math.ceil(totalPlayers / 2)
     
+    if vote_counts[index] >= required_votes:
+        vote_counts[index] = 0  # 해당 인덱스의 투표 카운트 초기화
+        emit('nextVideo', {}, broadcast=True)
+    else:
+        emit('updateVoteCount', {'index': index, 'count': vote_counts[index]}, broadcast=True)
+
 @socketio.on('create_room')
 def create_room(data):
     room_name = data['room_name']  # 사용자 ID

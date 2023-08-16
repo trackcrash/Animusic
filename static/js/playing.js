@@ -7,7 +7,9 @@ const videoOverlay = document.getElementById('videoOverlay');
 const nextButton = document.getElementById('nextButton');
 let musicData = [];
 let currentIndex = 0;
-
+let skipvote = 0;
+//server에서 받아올것
+const totalPlayers = 2;
 sendButton.addEventListener('click', function() {
     sendMessage();
 });
@@ -19,7 +21,7 @@ inputMessage.addEventListener('keyup', function(event) {
 });
 
 nextButton.addEventListener('click', function() {
-    nextVideo();
+    voteSkip();
 });
 //메시지전송 and 정답확인
 function sendMessage() {
@@ -54,34 +56,114 @@ function playvideo(index) {
     videoOverlay.style.display = 'block';
 }
 
+//정답 출력용
+function showSongInfo(index) {
+    const songTitle = document.getElementById('songTitle');
+    const songArtist = document.getElementById('songArtist');
+    songTitle.innerText = musicData[index].title;
+    songArtist.innerText = musicData[index].song;
+}
+
 // 사용자의 답안 확인
 function checkAnswer(answer) {
+    // 이미 해당 문제의 정답을 맞췄다면 체크하지 않음
+    if (musicData[currentIndex].is_answered === "true") {
+        return;
+    }
+    //안맞춰졌다면
     if (musicData[currentIndex].answer_list.includes(answer)) {
+        musicData[currentIndex].is_answered = "true";
+        socket.emit('correctAnswer', { index: currentIndex });
         playvideo(currentIndex);
         videoOverlay.style.display = 'none';
+        showSongInfo(currentIndex);
     }
 }
+
+//수신부
+socket.on('correctAnswer', function(data) {
+    if (data.index === currentIndex) {
+        musicData[currentIndex].is_answered = "true";
+        playvideo(currentIndex);
+        videoOverlay.style.display = 'none';
+        showSongInfo(currentIndex);
+    }
+});
+
+//스킵 투표
+function voteSkip() {
+    socket.emit('voteSkip', { index: currentIndex });
+    nextButton.disabled = true;
+}
+
+//투표수 계산
+function requiredSkipVotes(totalPlayers) {
+    if (totalPlayers <= 2) {
+        return totalPlayers;
+    } else if (totalPlayers <= 6) {
+        return Math.ceil(totalPlayers / 2);
+    } else {
+        return Math.ceil(totalPlayers * 0.7);
+    }
+}
+
+//수신부
+socket.on('voteSkip', function(data) {
+    if (data.index === currentIndex) {
+        skipvote++;
+        const requiredVotes = requiredSkipVotes(totalPlayers);
+        if (skipvote >= requiredVotes) {
+            skipvote = 0;
+            nextVideo();
+        }
+    }
+});
+
+//투표수 업데이트
+function updateVoteCountUI(count) {
+    const requiredVotes = requiredSkipVotes(totalPlayers);
+    const skipVoteCountElement = document.getElementById('skipVoteCount');
+    skipVoteCountElement.innerText = `현재 스킵 투표 수: ${count}/${requiredVotes}`;
+}
+
+//수신부
+socket.on('updateVoteCount', function(data) {
+    if (data.index === currentIndex) {
+        skipvote = data.count;
+        updateVoteCountUI(skipvote);
+    }
+});
 
 // 다음 영상 재생
 function nextVideo() {
     currentIndex += 1;
+    skipvote = 0;
+    updateVoteCountUI(skipvote);
+
     if (currentIndex < musicData.length) {
         playvideo(currentIndex);
+        document.getElementById('songTitle').style.display = 'none';
+        document.getElementById('songArtist').style.display = 'none';
+        nextButton.disabled = false;
     } else {
-        // 끝났을 때 처리 임시로 그냥냅둠
         currentIndex = 0;
         videoOverlay.style.display = 'block';
         playvideo(currentIndex);
+        nextButton.disabled = false;
     }
 }
 
+//수신부
+socket.on('nextVideo', function() {
+    nextVideo();
+});
+
+//로딩시
 $(document).ready(function() {
     const missionId = new URLSearchParams(window.location.search).get('id');
     $.getJSON("/get-music-data?id=" + missionId, function(data) {
         musicData = data;
-
+        updateVoteCountUI(0);
         playvideo(currentIndex);
     });
 });
-
-
