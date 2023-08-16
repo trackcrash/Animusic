@@ -267,4 +267,8 @@ function deleteBtn()
 
 }
 $("#update-btn").on("click", UpdateBtn);
+<<<<<<< Updated upstream
 $("#save-btn").on("click", saveBtn);
+=======
+$("#save-btn").on("click", saveBtn);
+>>>>>>> Stashed changes

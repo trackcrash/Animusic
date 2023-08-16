@@ -9,7 +9,10 @@ from models.data_model import Mission, Music
 chat_bp = Blueprint('chat', __name__)
 socketio = SocketIO(cors_allowed_origins="*")
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 @socketio.on('message')
 def handle_message(data):
     msg = data['content']
@@ -42,4 +45,8 @@ def make_answer(mission_id):
             'answer_hint': item['hint']
         }
         result.append(music_data)
+<<<<<<< Updated upstream
     return jsonify(result)
+=======
+    return jsonify(result)
+>>>>>>> Stashed changes

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Room</title>
+</head>
+<body>
+    <h1>Chat Room</h1>
+    <div id="messages"></div>
+    <input id="message-input" type="text">
+    <button id="send-button">Send</button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script>
+        const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        // Additional chat functionality can be implemented here
+    </script>
+    <script src="{{ url_for('static', filename='js/multi_game.js') }}"></script>
+</body>
+</html>

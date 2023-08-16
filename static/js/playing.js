@@ -82,4 +82,8 @@ $(document).ready(function() {
 
         playvideo(currentIndex);
     });
+<<<<<<< Updated upstream
 });
+=======
+});
+>>>>>>> Stashed changes
