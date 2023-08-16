@@ -3,12 +3,11 @@ import json
 
 import requests
 from decouple import config
-from flask import flash, redirect, render_template, request, session, url_for
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import login_user
 from oauthlib.oauth2 import WebApplicationClient
 
 from models import login_model
-from db.database import session as db_session  # 이름 충돌을 피하기 위해 alias 사용
 
 
 GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID')
