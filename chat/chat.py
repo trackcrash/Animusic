@@ -6,7 +6,7 @@ from models.data_model import Mission, Music
 chat_bp = Blueprint('chat', __name__)
 
 room_dict = dict()
-
+user_dict = dict()
 # use to get json
 def make_answer(mission_id):
     if mission_id is None:

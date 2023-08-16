@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html>
 
 <head>
     <title>Chat Room List</title>
@@ -23,12 +21,23 @@
 <body>
     {% include "header.html" %}
     <h1>Chat Room List</h1>
-    <ul id="room-list">
+    <ul id="room-list" class="grid grid-cols-5 gap-6">
+        {% for mission in missions %}
+        <a href="/play-test?id={{ mission.id }}" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300">
+            <p>ID: {{ mission.id }}</p>
+            <p>Name: {{ mission.MapName }}</p>
+            <p>Producer: {{ mission.MapProducer }}</p>
+            <!-- Thumbnail 이미지가 있다면 추가 -->
+            <img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" />
+            <!--노래 갯수 추가 -->
+            <p>{{ mission.MusicNum }}곡</p>
 
-    </ul>
-    <button onclick="create_room_button()">Create Room</button>
-    <!-- 채 팅방 목록 버튼 생성 -->
-    <div id="room-buttons"></div>
+        </a>
+        {% endfor %}
+</ul>
+<button onclick="create_room_button()">Create Room</button>
+<!-- 채 팅방 목록 버튼 생성 -->
+<div id="room-buttons"></div>
 </body>
 
 </html>
