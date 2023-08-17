@@ -1,5 +1,5 @@
 //multi game js --author: NewKyaru 15/08/2023
-let totalPlayers = 2;
+let totalPlayers = 0;
 let musicData = [];
 let currentIndex = 0;
 let skipvote = 0;
@@ -27,7 +27,7 @@ function sendMessage() {
         checkAnswer(content);
     }
 }
-
++
 //정답 출력용
 function showSongInfo(index) {
     const songTitle = document.getElementById('songTitle');
@@ -85,11 +85,13 @@ function playvideo(index) {
 
 function checkAnswer(answer) {
     // 이미 해당 문제의 정답을 맞췄다면 체크하지 않음
-    if (musicData.length >= 1) {
+    if(musicData.length >= 1)
+    {
         if (musicData[currentIndex].is_answered === "true") {
             return;
         }
         //안맞춰졌다면
+    
         if (musicData[currentIndex].answer_list.includes(answer)) {
             musicData[currentIndex].is_answered = "true";
             socket.emit('correctAnswer', { index: currentIndex });
@@ -98,9 +100,8 @@ function checkAnswer(answer) {
             showSongInfo(currentIndex);
         }
     }
-
+    
 }
-
 function requiredSkipVotes(players) {
     return players <= 2 ? players : players <= 6 ? Math.ceil(players / 2) : Math.ceil(players * 0.7);
 }
@@ -172,17 +173,17 @@ function initializeSocketEvents() {
         elements.messages.appendChild(item);
         elements.messages.scrollTop = elements.messages.scrollHeight;
     });
-
     socket.on('nextVideo', function() {
         nextVideo();
     });
-
+    
     socket.on('updateVoteCount', function(data) {
         if (data.index === currentIndex) {
             skipvote = data.count;
             updateVoteCountUI(skipvote);
         }
     });
+    
 }
 
 window.onload = function() {
@@ -191,14 +192,13 @@ window.onload = function() {
     initializeSocketEvents();
 };
 
-window.addEventListener('beforeunload', () => {
-    sessionStorage.removeItem('room_name');
-});
-
+// window.addEventListener('beforeunload', () => {
+//     sessionStorage.removeItem('room_name');
+// });
 
 function MapSelectPopUp() {
     createMapSelectModal();
-
+    
     $('#missionTableModal').modal('show');
 
     $.ajax({

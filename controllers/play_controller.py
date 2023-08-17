@@ -107,14 +107,27 @@ def show_mission_byid(id):
 
 
 
-def delete_Mission(id):
-    print(id)
-    session.query(Music).filter_by(mission_id=id).delete()
-    session.commit()
+def delete_User(id):
+    data = session.query(Mission).filter(Mission.MapProducer_id == id).all()
+    for mission_item  in data:
+        if show_table_bymissionid(mission_item.id):
+            session.query(Music).filter_by(mission_id=mission_item.id).delete()
+            session.commit()
+    if data:
+        session.query(Mission).filter(Mission.MapProducer_id == id).delete()
+        session.commit()
 
-    data_to_delete = session.query(Mission).filter_by(id=id).first()
-    session.delete(data_to_delete)
-    session.commit()
+    # if show_mission_byid(id):
+        
+
+def delete_Mission(id):
+    if show_table_bymissionid(id):
+        session.query(Music).filter_by(mission_id=id).delete()
+        session.commit()
+    if show_mission_byid(id):
+        data_to_delete = session.query(Mission).filter_by(id=id).first()
+        session.delete(data_to_delete)
+        session.commit()
 
     return '''
         <html>

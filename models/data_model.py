@@ -43,7 +43,7 @@ class Mission(Base):
     Thumbnail = Column(String(255), nullable=True)
     active = Column(Boolean, default=False)
     musics = relationship("Music", back_populates="mission")
-    MapProducer_id = Column(Integer, ForeignKey('UserTable.id'), nullable=False)
+    MapProducer_id = Column(Integer, ForeignKey('UserTable.id', ondelete='CASCADE'), nullable=False)
 
     def __init__(self, MapName, MapProducer, Thumbnail, MapProducer_id):
         self.MapName = MapName
