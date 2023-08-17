@@ -193,8 +193,8 @@ def create_room(data):
         #방을 생성할 사용자의 정보를 room_dict에 저장
         session_id = request.sid                #해당 사용자의 세션 id
         print(f"해당 사용자의 방 생성 정보: {session_id, room_name}")
-        room_data = {"room_name": room_name}
-        dict_create(room_dict,session_id,room_data)      
+        room_data = {"room_name": room_name, "session_id":session_id}
+        dict_create(room_dict,room_name,room_data)      
         
         #해당 정보를 key : 방 이름, value : sessionID 로 저장
         # user_data = {'username': current_user.name,'usersid': session_id }  # 유저 데이터를 리스트로 생성
@@ -208,7 +208,7 @@ def create_room(data):
 
         # multi_game.html로 이동
         # 방이 새로 추가된 것을 room_list 페이지에 접속한 모든 사용자에게 채팅방 추가 요청
-        emit('room_update', room_dict[session_id], broadcast=True)
+        emit('room_update', room_dict[room_name], broadcast=True)
 @socketio.on('join')
 def join(data):
     room = data['room']
@@ -220,7 +220,7 @@ def join(data):
         return
     print(f"{room}방에 연결되었습니다.")
     user_data = {'username': user_name,'usersid': session_id }  # 유저 데이터를 리스트로 생성
-    dict_join(user_dict, session_id, user_data)
+    dict_join(user_dict, room, user_data)
     join_room(room)
     update_room_player_count(room)
     print(f"{room}방에 연결되었습니다.")
@@ -229,7 +229,7 @@ def dict_join(dict_name,dict_index,dict_value):
     if dict_index in dict_name:
         dict_name[dict_index].append(dict_value)
     else :
-        dict_name[dict_index] = dict_value
+        dict_name[dict_index] = [dict_value]
 
 def dict_create(dict_name,dict_index,dict_value):
         dict_name[dict_index] = dict_value
@@ -315,10 +315,8 @@ def handle_request_room_players_update(data):
 
     # 방마다 인원 수를 클라이언트에게 전달
 def update_room_player_count(room_name):
-    # print("유저 딕셔너리 확인",user_dict)
-    # print("룸 딕셔너리 확인",room_dict)
-
-    emit('room_players_update', {'room_name': room_name, 'player_count': user_dict}, broadcast=True)
+    print("테스트용", room_name)
+    emit('room_players_update', {'room': room_dict[room_name], 'player_count': user_dict}, broadcast=True)
 
 def find_key_by_room_name(dictionary, room_name):
     for key, val in dictionary.items():

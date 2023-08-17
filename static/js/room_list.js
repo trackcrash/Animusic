@@ -109,9 +109,8 @@ window.onload = function() {
     firstCreateRoom();
 }
 
-socket.on('room_players_update', function(data) {
-    console.log(data)
-    updateRoomCount(data.room_name, data.player_count);
+socket.on('room_players_update', function(data) {;
+    updateRoomCount(data.room[room_name], data.player_count[data.room.room_name].length);
 });
 
 socket.on('room_update', function(data) {
