@@ -5,7 +5,6 @@ from models import data_model
 from views import play_view
 from db.database import session,engine
 from models.data_model import Mission, Music
-
 #db에 테이블 존재하는지 확인하고 없으면 생성
 def ensure_tables_exist():
     for table in [Music, Mission]:
@@ -69,7 +68,11 @@ def show_table_bymissionid(missionid):
         queries = session.query(Music).filter(Music.mission_id==missionid)
         entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint) for q in queries]
         return entries
+    
 
+def get_music_data(data):
+    mission_id = data
+    return mission_id
 
 def show_mission():
     Mission.__table__.create(bind=engine, checkfirst=True)
@@ -79,7 +82,14 @@ def show_mission():
         entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
         return entries
 
-
+def show_mission_active():
+    Mission.__table__.create(bind=engine, checkfirst=True)
+    if SuchTable("MissionTable"):
+        queries = session.query(Mission).filter(Mission.active == True)
+        # 노래 갯수 추가
+        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
+        return entries
+    
 def show_mission_byProducer():
     Mission.__table__.create(bind=engine, checkfirst=True)
     if SuchTable("MissionTable"):
@@ -94,6 +104,7 @@ def show_mission_byid(id):
         queries = session.query(Mission).filter(Mission.id == id)
         entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail, MapProducer_id=q.MapProducer_id) for q in queries]
         return entries
+
 
 
 def delete_Mission(id):

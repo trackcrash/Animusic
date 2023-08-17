@@ -8,6 +8,7 @@
     <title>Test</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
     </head>
 <body class="bg-gray-100 font-sans">
@@ -22,7 +23,17 @@
                 </div>
             </div>
             <div class="p-4">
-                <button id="nextButton" class="bg-green-500 text-white px-4 py-2 rounded">다음 영상</button><span id="skipVoteCount"></span>
+                <div class="grid grid-rows-2 grid-flow-col gap-4">
+                    <button id="nextButton" class="bg-green-500 text-white px-4 py-2 rounded grid-row-1">다음 영상</button>
+                    <button id="MapSelect" class="bg-yellow-500 text-white px-4 py-2 rounded grid-rows-2">
+                        맵선택
+                    </button>
+                    <button id="StartButton" class="bg-yellow-500 text-white px-4 py-2 rounded grid-rows-2">
+                        시작하기
+                    </button>
+                    <span id="skipVoteCount" class="grid-row-3"></span>
+
+                </div>
                 <div class="p-4">
                     <div id="songInfo" class="mt-4">
                         <!--정답 표시용-->
@@ -47,6 +58,20 @@
                     <button id="sendButton" class="bg-blue-500 text-white px-4 py-1 rounded ml-2">보내기</button>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="modal fade" id="missionTableModal" tabindex="-1" aria-labelledby="missionTableModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="missionTableModalLabel"></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!-- 팝업 내용을 표시할 엘리먼트 -->
+              <div id="popup-content"></div>
+            </div>
+          </div>
         </div>
     </div>
 </body>

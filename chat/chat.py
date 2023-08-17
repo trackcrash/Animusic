@@ -32,8 +32,7 @@ def make_answer(mission_id):
             'answer_hint': item['hint']
         }
         result.append(music_data)
-    return jsonify(result)
-
+    return result
 
 def get_room_dict():
     return jsonify(room_dict)

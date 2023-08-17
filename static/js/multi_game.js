@@ -1,22 +1,26 @@
 //play test js --author: NewKyaru 15/08/2023
-$(document).ready(function() {
-    //id는 다른 방식으로 받을 예정
-    const missionId = new URLSearchParams(window.location.search).get('id');
-    $.getJSON("/get-music-data?id=" + missionId, function(data) {
-        musicData = data;
-        updateVoteCountUI(0);
-        playvideo(currentIndex);
-    });
-});
+let totalPlayers = 2;
+let musicData = [];
+let currentIndex = 0;
+let skipvote = 0;
+let selectedId = 0;
 const messages = document.getElementById('messages');
 const inputMessage = document.getElementById('inputMessage');
 const sendButton = document.getElementById('sendButton');
 const videoOverlay = document.getElementById('videoOverlay');
 const nextButton = document.getElementById('nextButton');
 const room_name = sessionStorage.getItem('room_name');
-let totalPlayers = 2;
-let musicData = [];
-let currentIndex = 0;
+const MapSelect = document.getElementById('MapSelect');
+const StartButton = document.getElementById('StartButton');
+// $(document).ready(function() {
+//     //id는 다른 방식으로 받을 예정
+//     const missionId = new URLSearchParams(window.location.search).get('id');
+//     $.getJSON("/get-music-data?id=" + missionId, function(data) {
+//         musicData = data;
+//         updateVoteCountUI(0);
+//         playvideo(currentIndex);
+//     });
+// });
 sendButton.addEventListener('click', function() {
     sendMessage();
     console.log('dd');
@@ -29,9 +33,93 @@ inputMessage.addEventListener('keyup', function(event) {
 });
 
 nextButton.addEventListener('click', function() {
-    nextVideo();
+    nextButton.disabled=true;
+    voteSkip();
 });
+
+
+
+
+
 const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+StartButton.addEventListener("click", function()
+{
+    nextButton.disabled = false;
+    currentIndex = 0;
+    updateVoteCountUI(0);
+    socket.emit('MissionSelect', selectedId, function()
+    {
+        playvideo(currentIndex);
+    });
+})
+
+MapSelect.addEventListener("click",function()
+{
+    MapSelectPopUp();
+})
+function createMapSelectModal() {
+    var modalHtml = '<div class="modal fade" id="missionTableModal" tabindex="-1" aria-labelledby="missionTableModalLabel" aria-hidden="true">';
+    modalHtml += '<div class="modal-dialog">';
+    modalHtml += '<div class="modal-content">';
+    modalHtml += '<div class="modal-header">';
+    modalHtml += '<h5 class="modal-title" id="missionTableModalLabel"></h5>';
+    modalHtml += '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+    modalHtml += '</div>';
+    modalHtml += '<div class="modal-body">';
+    modalHtml += '<div id="popup-content"></div>';
+    modalHtml += '</div>';
+    modalHtml += '</div>';
+    modalHtml += '</div>';
+    modalHtml += '</div>';
+
+    // 이전 모달 요소 삭제
+    $('#missionTableModal').remove();
+
+    // 모달 요소 추가
+    $('body').append(modalHtml);
+}
+function MapSelectPopUp() {
+    createMapSelectModal();
+    $('#missionTableModal').modal('show');
+    
+    // API 호출 및 데이터 표시
+    $.ajax({
+        url: '/api/get_mission_table',
+        type: 'GET',
+        success: function(data) {
+            let tableHtml = '<table><thead><tr><th>ID</th><th>MapName</th><th>MapProducer</th><th>songNum</th></tr></thead><tbody>';
+            for (let i = 0; i < data.length; i++) {
+                tableHtml += '<tr data-id="' + data[i].id + '"><td>' + data[i].id + '</td><td>' + data[i].MapName + '</td><td>' + data[i].MapProducer + '</td><td>'+data[i].MusicNum+'</td></td></tr>';
+            }
+            tableHtml += '</tbody></table>';
+            tableHtml += '<button id="saveButton">저장하기</button>';
+            $('#popup-content').html(tableHtml);
+            
+            // 저장하기 버튼 클릭 시
+            $('#saveButton').click(function() {
+                selectedId = $('#popup-content table tr.selected').data('id');
+                if (selectedId) {
+                    // 여기에 선택한 ID에 대한 저장 동작을 추가하세요.
+                    // 예: API 호출 등을 통해 선택한 ID를 서버에 전달하고 저장 작업 수행
+                    console.log('Selected ID:', selectedId);
+                    // 모달 닫기
+                    $('#missionTableModal').modal('hide');
+                }
+            });
+            
+            // 테이블 행 클릭 시 선택 표시
+            $('#popup-content table tbody tr').click(function() {
+                $(this).toggleClass('selected').siblings().removeClass('selected');
+            });
+        },
+        error: function(error) {
+            console.error('Error fetching mission table data:', error);
+        }
+    });
+}
+
+
 
 //메시지전송 and 정답확인
 function sendMessage() {
@@ -45,6 +133,8 @@ function sendMessage() {
     }
 }
 function playvideo(index) {
+    console.log('musicData:', musicData[index]);
+    console.log('currentIndex:', index);
     let embedLink = musicData[index].youtube_embed_url;
     const iframe = document.createElement("iframe");
     iframe.src = embedLink;
@@ -83,11 +173,23 @@ function checkAnswer(answer) {
     }
 }
 
+socket.on('MissionSelect_get', function(data) {
+    // 서버로부터 받은 데이터 처리
+    let receivedMusicData = data.get_music;
+    musicData = [];
+    for (let i = 0; i < receivedMusicData.length; i++) {
+        musicData.push(receivedMusicData[i]);
+    }
+    console.log('Received saved data:', musicData, currentIndex);
+    // 여기에서 받은 데이터를 원하는 방식으로 처리
+});
 //수신부
 socket.on('correctAnswer', function(data) {
     if (data.index === currentIndex) {
         musicData[currentIndex].is_answered = "true";
         playvideo(currentIndex);
+        document.getElementById('songTitle').style.disable = false;
+        document.getElementById('songArtist').style.disable = false;
         videoOverlay.style.display = 'none';
         showSongInfo(currentIndex);
     }
@@ -95,8 +197,8 @@ socket.on('correctAnswer', function(data) {
 
 //스킵 투표
 function voteSkip() {
+    console.log("스킵에 투표하셨습니다.")
     socket.emit('voteSkip', { index: currentIndex });
-    nextButton.disabled = true;
 }
 
 //투표수 계산
@@ -135,18 +237,25 @@ function updateVoteCountUI(count) {
 function nextVideo() {
     currentIndex += 1;
     skipvote = 0;
-    updateVoteCountUI(skipvote);
-
+    updateVoteCountUI(0);
+    const songTitle = document.getElementById('songTitle')
+    const songArtist = document.getElementById('songArtist')
+    
     if (currentIndex < musicData.length) {
         playvideo(currentIndex);
-        document.getElementById('songTitle').style.display = 'none';
-        document.getElementById('songArtist').style.display = 'none';
+        songTitle.style.display = 'none';
+        songArtist.style.display = 'none';
+        songTitle.innerText = "";
+        songArtist.innerText = "";
         nextButton.disabled = false;
     } else {
+        songTitle.innerText = "";
+        songArtist.innerText = "";
         currentIndex = 0;
         videoOverlay.style.display = 'block';
-        playvideo(currentIndex);
-        nextButton.disabled = false;
+        console.log("게임이 끝났습니다.");
+        // playvideo(currentIndex);
+        nextButton.disabled = true;
     }
 }
 
@@ -166,6 +275,13 @@ window.addEventListener('beforeunload', () => {
 //수신부
 socket.on('nextVideo', function() {
     nextVideo();
+});
+
+socket.on('updateVoteCount', function(data) {
+    if (data.index === currentIndex) {
+        skipvote = data.count;
+        updateVoteCountUI(skipvote);
+    }
 });
 
 socket.on('connect', () => {

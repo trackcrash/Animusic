@@ -6,7 +6,6 @@ from flask import flash, Flask, jsonify, redirect, render_template, request, url
 from flask_login import current_user, login_required, LoginManager, logout_user
 from controllers import login_controller, play_controller
 from models import login_model
-from chat.chat import chat_bp, make_answer, get_room_dict, get_user,room_dict
 from flask_socketio import SocketIO ,emit, join_room, leave_room
 from chat.chat import chat_bp, make_answer, get_room_dict, get_user,room_dict, user_dict
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -39,10 +38,6 @@ def show():
 def submit():
     return play_controller.submit_to_db()
 
-@app.get('/get-music-data')
-def get_music_data():
-    mission_id = request.args.get('id')
-    return make_answer(mission_id)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -122,7 +117,23 @@ def chat():
     mission_id = request.args.get('id')
     make_answer(mission_id)
     return render_template('multi_game/multi_game.html',current_user=current_user)
+
+@app.get('/api/get_mission_table')
+def get_mission_table():
+    mission_table_data = play_controller.show_mission_active()
+    return jsonify(mission_table_data)
+
+
 # ------------------------------------
+@socketio.on('MissionSelect')
+def send_saved_data(data):
+    get_music = make_answer(play_controller.get_music_data(data)) 
+    
+    response = {
+        'get_music': get_music,
+        'data': data
+    }
+    emit('MissionSelect_get', response, broadcast=True)
 
 @socketio.on('message')
 def handle_message(data):
