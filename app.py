@@ -22,8 +22,6 @@ socketio = SocketIO(app)
 @login_manager.user_loader
 def load_user(user_id):
     return login_model.get_user_by_id(user_id)
-
-
 @app.route('/')
 def index():
     missions = play_controller.show_mission()
@@ -65,8 +63,6 @@ def login():
         flash('Invalid email or password')
         return redirect(url_for('login'))
 
-
-
 @app.get('/login/google')
 def google_login():
     return login_controller.google_login()
@@ -83,12 +79,60 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         return login_controller.register()
     return render_template('register.html')
+#----------회원 탈퇴 & 회원 정보수정-----------
+@app.get('/delete_account_confirm')
+def delete_account_confirm():
+    return render_template('account_management/deleteAccountConfirm.html')
+
+@app.get('/delete_account')
+def deleting_account():
+    print(f"\033[92;1m{current_user.name}님의 회원탈퇴 시도중...\033[0m")
+    if play_controller.show_mission_byProducer():
+        play_controller.delete_Mission(current_user.id)
+    result_delete_account = login_model.delete_account()
+    if result_delete_account:
+        print("\033[92;1m회원 탈퇴처리 완료\033[0m")
+        return render_template('account_management/deleteAccountComplete.html')
+    else:
+        print("\033[92;1m회원 탈퇴처리 실패\033[0m")
+        return render_template('account_management/deleteAccountFail.html')
+@app.get('/account_confirm')
+def account_confirm():
+    if current_user.is_authenticated == False:
+        return render_template('account_management/accountConfirm.html')
+    else:
+        return render_template('account_management/managementAccountPage.html')
+@app.route('/get_current_user_is_google_authenticated', methods=['GET'])
+def get_current_user_is_google_authenticated():
+    return jsonify({'check_googleuser': current_user.is_google_authenticated})
+
+@app.route('/update_profile', methods=['POST'])
+def update_profile():
+    data = request.json
+    nickname = data[0]['nickname']
+    password = data[0]['password']
+    newpassword = data[0]['newpassword']
+
+    if current_user.is_google_authenticated: # 구글 유저 인 경우
+        if login_model.account_insert_in_googleuser(nickname):
+            print(f"\033[92;1m사용자의 닉네임이 {nickname}으로 변경되었습니다.\033[0m")
+            return jsonify({'message': '변경이 완료되었습니다.'}), 200
+        else:
+            print("\033[92;1m이미 존재하는 닉네임을 가진 회원이 있으므로 변경할 수 없습니다.\033[0m")
+            return jsonify({'message': '이미 동일한 닉네임이 존재합니다.'}), 400
+    else:
+        if login_model.account_insert(nickname, password, newpassword):
+            print("\033[92;1m사용자의 회원정보가 변경되었습니다.\033[0m")
+            return jsonify({'message': '변경이 완료되었습니다.'}), 200
+        else:
+            print("\033[92;1m사용자의 회원정보 변경이 실패하였습니다.\033[0m")
+            return jsonify({'message': '기존 비밀번호가 일치하지 않거나 동일한 닉네임이 존재합니다.'}), 400
+# -------------------------------------
 
 @app.route('/Map')
 def mymap():
@@ -104,18 +148,16 @@ def update():
 def deleteMission():
     return play_controller.delete_Mission(request.args.get('id'))
 
-
-
 # -------- 채팅 관련 기능 부분 -----------
 room_dict = dict()
 @app.route('/room_list')
 def room_list():
     if current_user.is_authenticated == False:
         user_id = ""
-        print(f"로그인 되어있지 않으므로 멀티플레이는 불가합니다.")
+        print(f"\033[92;1m로그인 되어있지 않으므로 멀티플레이는 불가합니다.\033[0m")
     else:
         user_id = current_user.name
-        print(f"{user_id} 유저 아이디 확인됨.")
+        print(f"\033[92;1m{user_id} 유저 아이디 확인됨.\033[0m")
     return render_template('room_list.html', room_dict=room_dict, user_id=user_id)
 
 @app.route('/multi_game')
@@ -130,24 +172,30 @@ def create_room(data):
     else:
         #방을 생성할 사용자의 정보를 room_dict에 저장
         session_id = request.sid                #해당 사용자의 세션 id
-        print(f"해당 사용자의 방 생성 정보: {session_id, room_name}")
+        print(f"\033[92;1m해당 사용자의 방 생성 정보: {session_id, room_name}\033[0m")
 
         room_dict[room_name] = session_id       #해당 정보를 key : 방 이름, value : sessionID 로 저장
 
         join_room(room_name) # 사용자가 만든 제목으로 방 입장시킴
-        print(f"{room_name}님이 방을 생성하셨습니다.")
+        print(f"\033[92;1m{room_name}님이 방을 생성하셨습니다.\033[0m")
 
         # multi_game.html로 이동
         emit('move_multi_game')
         # 방이 새로 추가된 것을 room_list 페이지에 접속한 모든 사용자에게 채팅방 추가 요청
         emit('room_update', room_name, broadcast=True)
 
+@app.get('/get-roomlist-data')
+def get_roomlist_data():
+
+
+    return room_dict.keys(),
+
 @socketio.on('join')
 def join(data):
-    print(socketio.server.enter_room[request.sid, room])
     room = data['room']
+    print(room_dict[room])
     join_room(room)
-    print(f"{room}방에 연결되었습니다.")
+    print(f"\033[92;1m{room}방에 연결되었습니다.\033[0m")
 
 # ------------------------------------
 

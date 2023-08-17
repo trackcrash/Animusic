@@ -18,7 +18,6 @@ function first_create_room() {
     }
 }
 
-
 // 페이지 로드 시 해당함수 실행
 window.onload = function() {
     first_create_room();
@@ -35,6 +34,10 @@ function create_room_button() {
     // 서버로 create_room 실행 + room_name: user_id 라는 데이터 송신
     if (user_id != "") {
         socket.emit('create_room', { room_name: user_id });
+    }
+    else {
+        alert("멀티게임은 로그인 후에 이용가능합니다.");
+        window.location.href = 'login/google';
     }
 }
 

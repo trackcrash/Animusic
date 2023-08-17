@@ -2,6 +2,7 @@
 from flask_bcrypt import Bcrypt
 from sqlalchemy import Boolean, Column, Integer, String
 from db.database import Base, session, create_tables
+from flask_login import current_user
 
 bcrypt = Bcrypt()
 
@@ -85,3 +86,40 @@ def get_user_by_email(email):
 
 def get_user_by_id(user_id):
     return session.query(User).filter(User.id == user_id).first()
+
+# 회원 탈퇴 처리
+def delete_account():
+    if current_user.is_authenticated:
+        user = session.query(User).filter_by(id=current_user.id).first()
+        if user:
+            session.delete(user)
+            session.commit()
+        return True
+    return False
+
+#구글회원 전용 회원정보 수정
+def account_insert_in_googleuser(nickname):
+    check_samename = session.query(User).filter(User.name == nickname).first()
+    if check_samename:
+        return False
+    else:
+        userinfo = session.query(User).filter_by(id=current_user.id).first()
+        userinfo.name = nickname
+        session.commit()
+        return True
+
+#일반 회원용 회원정보 수정
+def account_insert(nickname, password, newpassword):
+    userinfo = session.query(User).filter_by(id=current_user.id).first()
+
+    if not bcrypt.check_password_hash(userinfo.password, password):
+        return False
+
+    if nickname and not session.query(User).filter(User.name == nickname).first():
+        userinfo.name = nickname
+
+    if newpassword:
+        userinfo.password = newpassword
+
+    session.commit()
+    return True

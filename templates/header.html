@@ -6,7 +6,9 @@
         {% if current_user.is_authenticated %}
         <span class="mr-4 text-blue-500"><p id="User_Name" style="display: inline;">{{ current_user.name }}</p>님, 환영합니다!</span>
         <button id="logout-button" onclick="window.location.href='/logout'" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">로그아웃</button>
-        <button id="MyMap-button" onclick="window.location.href='/Map'" class="mr-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">My Map</button> {% else %}
+        <button id="MyMap-button" onclick="window.location.href='/Map'" class="mr-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">My Map</button>
+        <button id="account-Management-button" onclick="window.location.href='/account_confirm'" class="mt-4 inline-block bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">회원정보 관리</button>
+        <button id="delete-account-button" onclick="window.location.href='/delete_account_confirm'" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition duration-300">회원탈퇴</button> {% else %}
         <button id="login-button" onclick="window.location.href='/login'" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">로그인</button> {% endif %}
     </div>
 </header>
