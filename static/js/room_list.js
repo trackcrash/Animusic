@@ -1,5 +1,4 @@
 const roomNameElementIdPrefix = 'room-count-';
-const socket = io.connect('http://' + document.domain + ':' + location.port);
 
 function fetchData(url, callback) {
     $.getJSON(url, callback);
@@ -30,14 +29,10 @@ function createRoomElement(roomName) {
 
 function updateRoomCount(roomName, playerCount) {
     const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${roomName}`);
+    console.log(roomCountElement, roomName, playerCount);
     if (roomCountElement) {
         roomCountElement.textContent = `${playerCount}명`;
     }
-}
-
-function joinChatRoom(roomName) {
-    socket.emit('join', { room: roomName });
-    window.location.href = `/multi_game?room_name=${roomName}`;
 }
 
 function create_room_button() {
@@ -46,8 +41,12 @@ function create_room_button() {
         if (user_id) { // 사용자가 로그인된 경우
             const room_name = prompt("방 이름을 입력하세요:");
             if (room_name && room_name.trim() !== '') {
+                console.log(room_name);
+                socket.emit('create_room', { room_name: room_name },()=>
+                {
+                    joinChatRoom(room_name);
+                });
                 // 방 이름이 제대로 입력된 경우 방 생성 및 해당 방으로 리다이렉트
-                location.href = `/multi_game?room_name=${room_name.trim()}`;
             } else if (room_name !== null) { // 취소 버튼을 클릭하지 않은 경우
                 alert("올바른 방 이름을 입력해주세요.");
             }
@@ -56,6 +55,16 @@ function create_room_button() {
         }
     });
 }
+
+function joinChatRoom(roomName) {
+    location.href = `/multi_game?room_name=${roomName}`;
+}
+
+
+
+
+
+
 
 function firstCreateRoom() {
     fetchData("/get_user_info", function(user_id) {
@@ -67,7 +76,10 @@ function firstCreateRoom() {
 
         fetchData("/get-room-dict", function(room_dict) {
             const roomButtonsContainer = document.getElementById('room-buttons');
-            for (let roomName in room_dict) {
+            for (let roomId in room_dict) {
+                const roomData = room_dict[roomId];
+                const roomName = roomData.room_name;
+                console.log(roomName)
                 roomButtonsContainer.appendChild(createRoomElement(roomName));
                 socket.emit('request_room_players_update', { room_name: roomName });
             }
@@ -98,13 +110,14 @@ window.onload = function() {
 }
 
 socket.on('room_players_update', function(data) {
+    console.log(data)
     updateRoomCount(data.room_name, data.player_count);
 });
 
-socket.on('room_update', function(room_name) {
+socket.on('room_update', function(data) {
     fetchData("/get_user_info", function(user_id) {
         if (!user_id) return;
-        addRoomToList(room_name);
+        addRoomToList(data.room_name);
     });
 });
 

@@ -1,6 +1,7 @@
 #flask main --author: NewKyaru 11/08/2023
 import os, math
-
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 from decouple import config
 from flask import flash, Flask, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, LoginManager, logout_user
@@ -125,12 +126,78 @@ def get_mission_table():
 
 
 # ------------------------------------
+@socketio.on('connect')
+def handle_connect():
+    # 소켓이 연결되면 실행되는 함수
+    num_connected = len(socketio.server.eio.sockets)
+    print(f"현재 연결된 소켓 수: {num_connected}")
+
+@socketio.on('create_room')
+def create_room(data):
+    room_name = data['room_name']  # 사용자 ID
+    # 방 중복생성 금지 (클라이언트에 해당 이벤트 요청)
+    if room_name in room_dict:
+        emit('Do_not_create_duplicates')
+    else:
+        #방을 생성할 사용자의 정보를 room_dict에 저장
+        session_id = request.sid                #해당 사용자의 세션 id
+        print(f"해당 사용자의 방 생성 정보: {session_id, room_name}")
+        room_data = {"room_name": room_name}
+        dict_create(room_dict,session_id,room_data)      
+        
+        #해당 정보를 key : 방 이름, value : sessionID 로 저장
+        # user_data = {'username': current_user.name,'usersid': session_id }  # 유저 데이터를 리스트로 생성
+        # if room_name in user_dict:
+        #     user_dict[room_name].append(user_data)  # 이미 등록된 방이라면 유저 데이터 리스트에 추가
+        # else:
+        #     user_dict[room_name] = user_data  # 새로운 방이라면 유저 데이터 리스트를 생성하여 저장
+        
+        #join_room(room_name) # 사용자가 만든 제목으로 방 입장시킴
+        print(f"{room_name}님이 방을 생성하셨습니다.")
+
+        # multi_game.html로 이동
+        # 방이 새로 추가된 것을 room_list 페이지에 접속한 모든 사용자에게 채팅방 추가 요청
+        emit('room_update', room_dict[session_id], broadcast=True)
+@socketio.on('join')
+def join(data):
+    room = data['room']
+    print("확인",room)
+    session_id = request.sid
+    user_name = current_user.name
+    if is_user_in_room(user_name, room):
+        emit('already_in_room', {'message': 'You are already in the room.'})
+        return
+    print(f"{room}방에 연결되었습니다.")
+    user_data = {'username': user_name,'usersid': session_id }  # 유저 데이터를 리스트로 생성
+    dict_join(user_dict, session_id, user_data)
+    join_room(room)
+    update_room_player_count(room)
+    print(f"{room}방에 연결되었습니다.")
+
+def dict_join(dict_name,dict_index,dict_value):
+    if dict_index in dict_name:
+        dict_name[dict_index].append(dict_value)
+    else :
+        dict_name[dict_index] = dict_value
+
+def dict_create(dict_name,dict_index,dict_value):
+        dict_name[dict_index] = dict_value
+
+
+@socketio.on('message')
+def handle_message(data):
+    msg = data['content']
+    room = data.get('room')
+    name = current_user.name
+    emit('message', {'name': name, 'msg': msg}, room=room)
+
 @socketio.on("playTheGame")
 def playTheGame(room_name):
     print("start", user_dict)
     totalPlayers = len(user_dict.get(room_name, []))
 
     emit('PlayGame', totalPlayers ,broadcast=True)
+
 @socketio.on('MissionSelect')
 def send_saved_data(data):
     get_music = make_answer(play_controller.get_music_data(data)) 
@@ -141,13 +208,7 @@ def send_saved_data(data):
     }
     emit('MissionSelect_get', response, broadcast=True)
 
-@socketio.on('message')
-def handle_message(data):
-    msg = data['content']
-    room = data.get('room')
-    print(room)
-    name = current_user.name
-    emit('message', {'name': name, 'msg': msg}, room=room)
+
 
 
 @socketio.on('correctAnswer')
@@ -176,58 +237,9 @@ def handle_vote_skip(data):
         emit('updateVoteCount', {'index': index, 'count': vote_counts[index]}, broadcast=True)
 
 
-@socketio.on('create_room')
-def create_room(data):
-    room_name = data['room_name']  # 사용자 ID
-    # 방 중복생성 금지 (클라이언트에 해당 이벤트 요청)
-    print(room_name)
-    if room_name in room_dict:
-        emit('Do_not_create_duplicates')
-    else:
-        #방을 생성할 사용자의 정보를 room_dict에 저장
-        session_id = request.sid                #해당 사용자의 세션 id
-        print(f"해당 사용자의 방 생성 정보: {session_id, room_name}")
 
-        room_dict[room_name] = session_id       #해당 정보를 key : 방 이름, value : sessionID 로 저장
-        user_data = [{'username': current_user.name,'usersid': session_id }]  # 유저 데이터를 리스트로 생성
-        if room_name in user_dict:
-            user_dict[room_name].append(user_data)  # 이미 등록된 방이라면 유저 데이터 리스트에 추가
-        else:
-            user_dict[room_name] = user_data  # 새로운 방이라면 유저 데이터 리스트를 생성하여 저장
-        
-        join_room(room_name) # 사용자가 만든 제목으로 방 입장시킴
-        print(f"{room_name}님이 방을 생성하셨습니다.")
 
-        # multi_game.html로 이동
-        emit('move_multi_game')
-        # 방이 새로 추가된 것을 room_list 페이지에 접속한 모든 사용자에게 채팅방 추가 요청
-        emit('room_update', room_name, broadcast=True)
-        
-@socketio.on('join')
-def join(data):
-    room = data['room']
-    session_id = request.sid
-    user_name = current_user.name
-    if is_user_in_room(user_name, room):
-        emit('already_in_room', {'message': 'You are already in the room.'})
-        return
-    
-    join_room(room)
-    print(f"{room}방에 연결되었습니다.")
-    user_data = [{'username': user_name,'usersid': session_id }]  # 유저 데이터를 리스트로 생성
-    if room in user_dict:
-        user_dict[room].append(user_data)  # 이미 등록된 방이라면 유저 데이터 리스트에 추가
-    else:
-        user_dict[room] = user_data  # 새로운 방이라면 유저 데이터 리스트를 생성하여 저장
-    join_room(room)
-    update_room_player_count(room)
-    print(f"{room}방에 연결되었습니다.")
 
-@socketio.on('connect')
-def handle_connect():
-    # 소켓이 연결되면 실행되는 함수
-    num_connected = len(socketio.server.eio.sockets)
-    print(f"현재 연결된 소켓 수: {num_connected}")
 
 @socketio.on('disconnect')
 def disconnect():
@@ -252,16 +264,22 @@ def handle_request_room_players_update(data):
 
     # 방마다 인원 수를 클라이언트에게 전달
 def update_room_player_count(room_name):
-    player_count = len(user_dict.get(room_name, []))
-    print("player_count",user_dict)
-    emit('room_players_update', {'room_name': room_name, 'player_count': player_count}, broadcast=True)
+    key = find_key_by_room_name(room_dict,room_name)
+    print("유저 딕셔너리 확인",user_dict)
+    #emit('room_players_update', {'room_name': room_name, 'player_count': len(user_dict[key])}, broadcast=True)
+
+def find_key_by_room_name(dictionary, room_name):
+    for key, val in dictionary.items():
+        if val.get("room_name") == room_name:
+            return key
+    return None
 
     # 방 삭제 함수
 def remove_room(room_name):
     if room_name in room_dict:
         del room_dict[room_name]
         del user_dict[room_name]
-        emit('room_removed', room_name, broadcast=True)
+        emit('room_removed', room_dict[room_name], broadcast=True)
 
 if __name__ == '__main__':
     play_controller.ensure_tables_exist()

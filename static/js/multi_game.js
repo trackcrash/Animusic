@@ -1,5 +1,4 @@
 //multi game js --author: NewKyaru 15/08/2023
-const socket = io.connect(`http://${document.domain}:${location.port}`);
 let totalPlayers = 0;
 let musicData = [];
 let currentIndex = 0;
@@ -22,12 +21,31 @@ const room_name = new URLSearchParams(window.location.search).get('room_name');
 function sendMessage() {
     const content = elements.inputMessage.value.trim();
     if (content) {
+        console.log(content);
         socket.emit('message', { content, room: room_name });
         elements.inputMessage.value = '';
-        checkAnswer(content);
+        //checkAnswer(content);
     }
 }
-
+function checkAnswer(answer) {
+    // 이미 해당 문제의 정답을 맞췄다면 체크하지 않음
+    if(musicData.length >= 1)
+    {
+        if (musicData[currentIndex].is_answered === "true") {
+            return;
+        }
+        //안맞춰졌다면
+    
+        if (musicData[currentIndex].answer_list.includes(answer)) {
+            musicData[currentIndex].is_answered = "true";
+            socket.emit('correctAnswer', { index: currentIndex });
+            playvideo(currentIndex);
+            videoOverlay.style.display = 'none';
+            showSongInfo(currentIndex);
+        }
+    }
+    
+}
 function requiredSkipVotes(players) {
     return players <= 2 ? players : players <= 6 ? Math.ceil(players / 2) : Math.ceil(players * 0.7);
 }
@@ -87,16 +105,13 @@ function initializeSocketEvents() {
         }
     });
 
-    socket.on('connect', () => {
-        console.log('Connected to server');
-    });
-
     socket.on('user_disconnect', data => {
         console.log(`${data} 가Disconnected from the server`);
         socket.emit('request_room_players_update', { room_name });
     });
 
     socket.on('message', data => {
+        console.log(data);
         const item = document.createElement('div');
         item.innerHTML = `<span class="font-semibold">${data.name}:</span> ${data.msg}`;
         elements.messages.appendChild(item);
@@ -105,13 +120,9 @@ function initializeSocketEvents() {
 }
 
 window.onload = function() {
+    socket.emit('join', { room: room_name })
     initEventListeners();
     initializeSocketEvents();
-
-    if (room_name) {
-        console.log(room_name);
-        socket.emit('create_room', { room_name: room_name });
-    }
 };
 
 window.addEventListener('beforeunload', () => {
@@ -131,6 +142,7 @@ socket.on('updateVoteCount', function(data) {
 
 function MapSelectPopUp() {
     createMapSelectModal();
+    
     $('#missionTableModal').modal('show');
 
     $.ajax({
@@ -168,6 +180,7 @@ function populateTableWithMissionData(data) {
 }
 
 function createMapSelectModal() {
+    $('#missionTableModal').remove();
     const modalHtml = `
     <div class="modal fade" id="missionTableModal" tabindex="-1" aria-labelledby="missionTableModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -183,6 +196,5 @@ function createMapSelectModal() {
         </div>
     </div>`;
 
-    $('#missionTableModal').remove();
     $('body').append(modalHtml);
 }
