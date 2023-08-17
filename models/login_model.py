@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from sqlalchemy import Boolean, Column, Integer, String
 from db.database import Base, session, create_tables
 from controllers import play_controller
+from flask_login import current_user
 bcrypt = Bcrypt()
 
 create_tables()
@@ -123,3 +124,5 @@ def account_insert(nickname, password, newpassword):
         userinfo.password = newpassword
 
     session.commit()
+    return True
+

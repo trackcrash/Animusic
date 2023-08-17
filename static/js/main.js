@@ -16,9 +16,9 @@ function loadVideo() {
     videoContainer.appendChild(iframe);
 }
 
-document.getElementById('submission-form').addEventListener('submit', function(e) {
+ document.getElementById('submission-form').addEventListener('submit', function(e) {
     e.preventDefault();
-});
+ });
 
 function createInfoItem(title, song, songURL, thumbnail, answer, hint, id) {
     const box = document.createElement('div');
