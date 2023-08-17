@@ -7,7 +7,7 @@ from flask_login import current_user, login_required, LoginManager, logout_user
 from controllers import login_controller, play_controller
 from models import login_model
 from flask_socketio import SocketIO ,emit, join_room, leave_room
-from chat.chat import chat_bp, make_answer, get_room_dict, get_user,room_dict, user_dict, totalPlayers
+from chat.chat import chat_bp, make_answer, get_room_dict, get_user,is_user_in_room ,room_dict, user_dict, totalPlayers
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
@@ -144,15 +144,17 @@ def send_saved_data(data):
 @socketio.on('message')
 def handle_message(data):
     msg = data['content']
+    room = data.get('room')
+    print(room)
     name = current_user.name
-    #answer_list = [item['answer'] for item in data]
-    emit('message', {'name': name, 'msg': msg}, broadcast=True)
+    emit('message', {'name': name, 'msg': msg}, room=room)
 
 
 @socketio.on('correctAnswer')
 def handle_correct_answer(data):
     # 모든 클라이언트에게 정답을 맞췄다는 정보를 중계합니다.
-    emit('correctAnswer', data, broadcast=True)
+    room = data.get('room')
+    emit('correctAnswer', data, room=room)
 
 vote_counts = {}
 
@@ -204,10 +206,15 @@ def create_room(data):
 @socketio.on('join')
 def join(data):
     room = data['room']
-    print(socketio.server.enter_room[request.sid, room])
+    session_id = request.sid
+    user_name = current_user.name
+    if is_user_in_room(user_name, room):
+        emit('already_in_room', {'message': 'You are already in the room.'})
+        return
+    
     join_room(room)
     print(f"{room}방에 연결되었습니다.")
-    user_data = [{'username': current_user.name,'usersid': session_id }]  # 유저 데이터를 리스트로 생성
+    user_data = [{'username': user_name,'usersid': session_id }]  # 유저 데이터를 리스트로 생성
     if room in user_dict:
         user_dict[room].append(user_data)  # 이미 등록된 방이라면 유저 데이터 리스트에 추가
     else:
