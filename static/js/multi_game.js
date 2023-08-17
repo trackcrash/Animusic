@@ -1,5 +1,5 @@
 //multi game js --author: NewKyaru 15/08/2023
-let totalPlayers = 0;
+let totalPlayers = 2;
 let musicData = [];
 let currentIndex = 0;
 let skipvote = 0;
@@ -24,18 +24,72 @@ function sendMessage() {
         console.log(content);
         socket.emit('message', { content, room: room_name });
         elements.inputMessage.value = '';
-        //checkAnswer(content);
+        checkAnswer(content);
     }
 }
+
+//정답 출력용
+function showSongInfo(index) {
+    const songTitle = document.getElementById('songTitle');
+    const songArtist = document.getElementById('songArtist');
+    songTitle.innerText = musicData[index].title;
+    songArtist.innerText = musicData[index].song;
+}
+
+function nextVideo() {
+    currentIndex += 1;
+    skipvote = 0;
+    updateVoteCountUI(0);
+    const songTitle = document.getElementById('songTitle')
+    const songArtist = document.getElementById('songArtist')
+
+    if (currentIndex < musicData.length) {
+        playvideo(currentIndex);
+        songTitle.style.display = 'none';
+        songArtist.style.display = 'none';
+        songTitle.innerText = "";
+        songArtist.innerText = "";
+        nextButton.disabled = false;
+    } else {
+        songTitle.innerText = "";
+        songArtist.innerText = "";
+        currentIndex = 0;
+        videoOverlay.style.display = 'block';
+        console.log("게임이 끝났습니다.");
+        MapSelect.style.display = "block";
+        // playvideo(currentIndex);
+        nextButton.disabled = true;
+    }
+}
+
+function voteSkip() {
+    console.log("스킵에 투표하셨습니다.")
+    socket.emit('voteSkip', { index: currentIndex });
+}
+
+function playvideo(index) {
+    let embedLink = musicData[index].youtube_embed_url;
+    const iframe = document.createElement("iframe");
+    iframe.src = embedLink;
+    iframe.allow = "autoplay";
+    iframe.width = "100%";
+    iframe.height = "100%";
+
+    const videoFrame = document.getElementById("videoFrame");
+    videoFrame.innerHTML = "";
+    videoFrame.appendChild(iframe);
+    videoOverlay.style.display = 'block';
+}
+
+
+
 function checkAnswer(answer) {
     // 이미 해당 문제의 정답을 맞췄다면 체크하지 않음
-    if(musicData.length >= 1)
-    {
+    if (musicData.length >= 1) {
         if (musicData[currentIndex].is_answered === "true") {
             return;
         }
         //안맞춰졌다면
-    
         if (musicData[currentIndex].answer_list.includes(answer)) {
             musicData[currentIndex].is_answered = "true";
             socket.emit('correctAnswer', { index: currentIndex });
@@ -44,8 +98,9 @@ function checkAnswer(answer) {
             showSongInfo(currentIndex);
         }
     }
-    
+
 }
+
 function requiredSkipVotes(players) {
     return players <= 2 ? players : players <= 6 ? Math.ceil(players / 2) : Math.ceil(players * 0.7);
 }
@@ -117,6 +172,17 @@ function initializeSocketEvents() {
         elements.messages.appendChild(item);
         elements.messages.scrollTop = elements.messages.scrollHeight;
     });
+
+    socket.on('nextVideo', function() {
+        nextVideo();
+    });
+
+    socket.on('updateVoteCount', function(data) {
+        if (data.index === currentIndex) {
+            skipvote = data.count;
+            updateVoteCountUI(skipvote);
+        }
+    });
 }
 
 window.onload = function() {
@@ -129,20 +195,10 @@ window.addEventListener('beforeunload', () => {
     sessionStorage.removeItem('room_name');
 });
 
-socket.on('nextVideo', function() {
-    nextVideo();
-});
-
-socket.on('updateVoteCount', function(data) {
-    if (data.index === currentIndex) {
-        skipvote = data.count;
-        updateVoteCountUI(skipvote);
-    }
-});
 
 function MapSelectPopUp() {
     createMapSelectModal();
-    
+
     $('#missionTableModal').modal('show');
 
     $.ajax({
