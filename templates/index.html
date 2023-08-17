@@ -15,7 +15,7 @@
         <div class="grid grid-cols-5 gap-6">
             <!-- this area -->
             {% for mission in missions %}
-            <a href="/play-test?id={{ mission.id }}" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300">
+            <a href="/multi_game?id={{ mission.id }}" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300">
                 <p>ID: {{ mission.id }}</p>
                 <p>Name: {{ mission.MapName }}</p>
                 <p>Producer: {{ mission.MapProducer }}</p>
@@ -26,6 +26,9 @@
 
             </a>
             {% endfor %}
+            
+            <a href="">싱글플레이</a>
+            <a href="/room_list">멀티플레이</a>
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/main.js')}}"></script>
