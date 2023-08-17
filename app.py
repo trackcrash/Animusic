@@ -79,55 +79,6 @@ def register():
     if request.method == 'POST':
         return login_controller.register()
     return render_template('register.html')
-#----------회원 탈퇴 & 회원 정보수정-----------
-@app.get('/delete_account_confirm')
-def delete_account_confirm():
-    return render_template('account_management/deleteAccountConfirm.html')
-
-@app.get('/delete_account')
-def deleting_account():
-    print(f"\033[92;1m{current_user.name}님의 회원탈퇴 시도중...\033[0m")
-    if play_controller.show_mission_byProducer():
-        play_controller.delete_Mission(current_user.id)
-    result_delete_account = login_model.delete_account()
-    if result_delete_account:
-        print("\033[92;1m회원 탈퇴처리 완료\033[0m")
-        return render_template('account_management/deleteAccountComplete.html')
-    else:
-        print("\033[92;1m회원 탈퇴처리 실패\033[0m")
-        return render_template('account_management/deleteAccountFail.html')
-@app.get('/account_confirm')
-def account_confirm():
-    if current_user.is_authenticated == False:
-        return render_template('account_management/accountConfirm.html')
-    else:
-        return render_template('account_management/managementAccountPage.html')
-@app.route('/get_current_user_is_google_authenticated', methods=['GET'])
-def get_current_user_is_google_authenticated():
-    return jsonify({'check_googleuser': current_user.is_google_authenticated})
-
-@app.route('/update_profile', methods=['POST'])
-def update_profile():
-    data = request.json
-    nickname = data[0]['nickname']
-    password = data[0]['password']
-    newpassword = data[0]['newpassword']
-
-    if current_user.is_google_authenticated: # 구글 유저 인 경우
-        if login_model.account_insert_in_googleuser(nickname):
-            print(f"\033[92;1m사용자의 닉네임이 {nickname}으로 변경되었습니다.\033[0m")
-            return jsonify({'message': '변경이 완료되었습니다.'}), 200
-        else:
-            print("\033[92;1m이미 존재하는 닉네임을 가진 회원이 있으므로 변경할 수 없습니다.\033[0m")
-            return jsonify({'message': '이미 동일한 닉네임이 존재합니다.'}), 400
-    else:
-        if login_model.account_insert(nickname, password, newpassword):
-            print("\033[92;1m사용자의 회원정보가 변경되었습니다.\033[0m")
-            return jsonify({'message': '변경이 완료되었습니다.'}), 200
-        else:
-            print("\033[92;1m사용자의 회원정보 변경이 실패하였습니다.\033[0m")
-            return jsonify({'message': '기존 비밀번호가 일치하지 않거나 동일한 닉네임이 존재합니다.'}), 400
-# -------------------------------------
 
 #----------회원 탈퇴 & 회원 정보수정-----------
 @app.get('/delete_account_confirm')
@@ -138,8 +89,6 @@ def delete_account_confirm():
 def deleting_account():
     print(f"\033[92;1m{current_user.name}님의 회원탈퇴 시도중...\033[0m")
     print("MissionTableTsest",play_controller.show_mission_byProducer())
-    if play_controller.show_mission_byProducer():
-        play_controller.delete_Mission(current_user.id)
     result_delete_account = login_model.delete_account()
     if result_delete_account:
         print("\033[92;1m회원 탈퇴처리 완료\033[0m")
@@ -201,7 +150,7 @@ def deleteMission():
 def room_list():
     if current_user.is_authenticated == False:
         user_id = ""
-        print(f"\033[92;1m로그인 되어있지 않으므로 멀티플레이는 불가합니다.\033[0m")
+        print(f"로그인 되어있지 않으므로 멀티플레이는 불가합니다.")
     else:
         user_id = current_user.name
         print(f"{user_id} 유저 아이디 확인됨.")
@@ -243,19 +192,19 @@ def create_room(data):
     else:
         #방을 생성할 사용자의 정보를 room_dict에 저장
         session_id = request.sid                #해당 사용자의 세션 id
-        print(f"\033[92;1m해당 사용자의 방 생성 정보: {session_id, room_name}\033[0m")
+        print(f"해당 사용자의 방 생성 정보: {session_id, room_name}")
         room_data = {"room_name": room_name}
-        dict_create(room_dict,session_id,room_data)
-
+        dict_create(room_dict,session_id,room_data)      
+        
         #해당 정보를 key : 방 이름, value : sessionID 로 저장
         # user_data = {'username': current_user.name,'usersid': session_id }  # 유저 데이터를 리스트로 생성
         # if room_name in user_dict:
         #     user_dict[room_name].append(user_data)  # 이미 등록된 방이라면 유저 데이터 리스트에 추가
         # else:
         #     user_dict[room_name] = user_data  # 새로운 방이라면 유저 데이터 리스트를 생성하여 저장
-
+        
         #join_room(room_name) # 사용자가 만든 제목으로 방 입장시킴
-        print(f"\033[92;1m{room_name}님이 방을 생성하셨습니다.\033[0m")
+        print(f"{room_name}님이 방을 생성하셨습니다.")
 
         # multi_game.html로 이동
         # 방이 새로 추가된 것을 room_list 페이지에 접속한 모든 사용자에게 채팅방 추가 요청
@@ -263,18 +212,18 @@ def create_room(data):
 @socketio.on('join')
 def join(data):
     room = data['room']
-    print("\033[92;1m확인\033[0m",room)
+    print("확인",room)
     session_id = request.sid
     user_name = current_user.name
     if is_user_in_room(user_name, room):
         emit('already_in_room', {'message': 'You are already in the room.'})
         return
-    print(f"\033[92;1m{room}방에 연결되었습니다.\033[0m")
+    print(f"{room}방에 연결되었습니다.")
     user_data = {'username': user_name,'usersid': session_id }  # 유저 데이터를 리스트로 생성
     dict_join(user_dict, session_id, user_data)
     join_room(room)
     update_room_player_count(room)
-    print(f"\033[92;1m{room}방에 연결되었습니다.\033[0m")
+    print(f"{room}방에 연결되었습니다.")
 
 def dict_join(dict_name,dict_index,dict_value):
     if dict_index in dict_name:
@@ -302,8 +251,8 @@ def playTheGame(room_name):
 
 @socketio.on('MissionSelect')
 def send_saved_data(data):
-    get_music = make_answer(play_controller.get_music_data(data))
-
+    get_music = make_answer(play_controller.get_music_data(data)) 
+    
     response = {
         'get_music': get_music,
         'data': data
@@ -328,10 +277,10 @@ def handle_vote_skip(data):
 
     if index not in vote_counts:
         vote_counts[index] = 0
-
+        
     vote_counts[index] += 1
     required_votes = totalPlayers if totalPlayers <= 2 else math.ceil(totalPlayers / 2)
-
+    
     if vote_counts[index] >= required_votes:
         vote_counts[index] = 0  # 해당 인덱스의 투표 카운트 초기화
         emit('nextVideo', {}, broadcast=True)
