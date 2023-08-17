@@ -4,7 +4,8 @@ from flask_login import current_user
 from controllers.play_controller import show_table_bymissionid
 from models.data_model import Mission, Music
 chat_bp = Blueprint('chat', __name__)
-
+totalPlayers = 0
+room_name = ""
 room_dict = dict()
 user_dict = dict()
 # use to get json

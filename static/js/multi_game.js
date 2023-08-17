@@ -1,5 +1,5 @@
 //play test js --author: NewKyaru 15/08/2023
-let totalPlayers = 2;
+let totalPlayers = 0;
 let musicData = [];
 let currentIndex = 0;
 let skipvote = 0;
@@ -9,21 +9,13 @@ const inputMessage = document.getElementById('inputMessage');
 const sendButton = document.getElementById('sendButton');
 const videoOverlay = document.getElementById('videoOverlay');
 const nextButton = document.getElementById('nextButton');
-const room_name = sessionStorage.getItem('room_name');
 const MapSelect = document.getElementById('MapSelect');
 const StartButton = document.getElementById('StartButton');
-// $(document).ready(function() {
-//     //id는 다른 방식으로 받을 예정
-//     const missionId = new URLSearchParams(window.location.search).get('id');
-//     $.getJSON("/get-music-data?id=" + missionId, function(data) {
-//         musicData = data;
-//         updateVoteCountUI(0);
-//         playvideo(currentIndex);
-//     });
-// });
+const urlSearchParams = new URLSearchParams(window.location.search);
+const room_name = urlSearchParams.get('room_name');
+
 sendButton.addEventListener('click', function() {
     sendMessage();
-    console.log('dd');
 });
 
 inputMessage.addEventListener('keyup', function(event) {
@@ -48,16 +40,19 @@ StartButton.addEventListener("click", function()
     nextButton.disabled = false;
     currentIndex = 0;
     updateVoteCountUI(0);
-    socket.emit('MissionSelect', selectedId, function()
-    {
-        playvideo(currentIndex);
-    });
+    socket.emit('MissionSelect', selectedId);
 })
 
+socket.on("PlayGame", function(totalPlayer) {
+    playvideo(currentIndex);
+    totalPlayers = totalPlayer
+    MapSelect.style.display = "none";
+});
 MapSelect.addEventListener("click",function()
 {
     MapSelectPopUp();
 })
+
 function createMapSelectModal() {
     var modalHtml = '<div class="modal fade" id="missionTableModal" tabindex="-1" aria-labelledby="missionTableModalLabel" aria-hidden="true">';
     modalHtml += '<div class="modal-dialog">';
@@ -181,6 +176,7 @@ socket.on('MissionSelect_get', function(data) {
         musicData.push(receivedMusicData[i]);
     }
     console.log('Received saved data:', musicData, currentIndex);
+    socket.emit("playTheGame", room_name);
     // 여기에서 받은 데이터를 원하는 방식으로 처리
 });
 //수신부
@@ -217,6 +213,7 @@ function requiredSkipVotes(totalPlayers) {
 socket.on('voteSkip', function(data) {
     if (data.index === currentIndex) {
         skipvote++;
+        console.log(skipvote);
         const requiredVotes = requiredSkipVotes(totalPlayers);
         if (skipvote >= requiredVotes) {
             skipvote = 0;
@@ -254,6 +251,7 @@ function nextVideo() {
         currentIndex = 0;
         videoOverlay.style.display = 'block';
         console.log("게임이 끝났습니다.");
+        MapSelect.style.display = "block";
         // playvideo(currentIndex);
         nextButton.disabled = true;
     }
@@ -261,7 +259,7 @@ function nextVideo() {
 
 
 window.onload = function() {
-    const room_name = sessionStorage.getItem('room_name');
+
     if (room_name) {
         console.log(room_name);
         socket.emit('create_room', { room_name: room_name });
@@ -287,6 +285,14 @@ socket.on('updateVoteCount', function(data) {
 socket.on('connect', () => {
     console.log('Connected to server');
 });
+
+
+socket.on('user_disconnect', (data) => {
+    console.log(data,'가Disconnected from the server');
+    // 서버로 유저가 연결을 끊었다는 정보 전달
+    socket.emit('request_room_players_update', { room_name: room_name});
+});
+
 socket.on('message', function(data) {
     const item = document.createElement('div');
     item.innerHTML = `<span class="font-semibold">${data.name}:</span> ${data.msg}`;

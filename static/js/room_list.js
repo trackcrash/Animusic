@@ -1,4 +1,5 @@
 // 페이지가 처음 로드될 때 서버에 있는 채팅방 목록 정보들을 받아서 생성하는 함수
+let room_name = "";
 function get_room_dict(callback) {
     $.getJSON("/get-room-dict", function(data) {
         callback(data); // 호출자에게 데이터를 전달
@@ -70,7 +71,7 @@ socket.on('room_players_update', function(data) {
 function joinChatRoom(roomName) {
     socket.emit('join', { room: roomName }); // 서버로 join 요청, 이때 방 번호 데이터를 송신
     socket.emit('request_room_players_update', { room_name: roomName }); // 방 인원수 업데이트 요청
-    window.location.href = '/multi_game'; // multi_game.html로 이동
+    window.location.href = `/multi_game?room_name=${room_name}`; // multi_game.html로 이동
 }
 
 // 이용자가 방 생성 버튼을 눌렀을 때
@@ -78,9 +79,8 @@ function create_room_button() {
     get_user_info(function(user_id)
     {
         if (user_id != ""&& user_id != null) {
-            const room_name = prompt("room_name");
-            sessionStorage.setItem('room_name', room_name);
-            location.href=`/multi_game?${room_name}`
+            room_name = prompt("room_name");
+            location.href=`/multi_game?room_name=${room_name}`
         }else
         {
             alert("로그인 후 이용해주세요")  

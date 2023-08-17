@@ -7,7 +7,7 @@ from flask_login import current_user, login_required, LoginManager, logout_user
 from controllers import login_controller, play_controller
 from models import login_model
 from flask_socketio import SocketIO ,emit, join_room, leave_room
-from chat.chat import chat_bp, make_answer, get_room_dict, get_user,room_dict, user_dict
+from chat.chat import chat_bp, make_answer, get_room_dict, get_user,room_dict, user_dict, totalPlayers
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
@@ -125,6 +125,12 @@ def get_mission_table():
 
 
 # ------------------------------------
+@socketio.on("playTheGame")
+def playTheGame(room_name):
+    print("start", user_dict)
+    totalPlayers = len(user_dict.get(room_name, []))
+
+    emit('PlayGame', totalPlayers ,broadcast=True)
 @socketio.on('MissionSelect')
 def send_saved_data(data):
     get_music = make_answer(play_controller.get_music_data(data)) 
@@ -154,7 +160,6 @@ vote_counts = {}
 @socketio.on('voteSkip')
 def handle_vote_skip(data):
     index = data.get('index')
-    totalPlayers = 2  # 현재 2명으로 설정되어 있음
 
     if index not in vote_counts:
         vote_counts[index] = 0
@@ -182,13 +187,12 @@ def create_room(data):
         print(f"해당 사용자의 방 생성 정보: {session_id, room_name}")
 
         room_dict[room_name] = session_id       #해당 정보를 key : 방 이름, value : sessionID 로 저장
-        user_data = [{'username': current_user.name}]  # 유저 데이터를 리스트로 생성
+        user_data = [{'username': current_user.name,'usersid': session_id }]  # 유저 데이터를 리스트로 생성
         if room_name in user_dict:
             user_dict[room_name].append(user_data)  # 이미 등록된 방이라면 유저 데이터 리스트에 추가
         else:
             user_dict[room_name] = user_data  # 새로운 방이라면 유저 데이터 리스트를 생성하여 저장
         
-        print(user_data)
         join_room(room_name) # 사용자가 만든 제목으로 방 입장시킴
         print(f"{room_name}님이 방을 생성하셨습니다.")
 
@@ -203,7 +207,7 @@ def join(data):
     print(socketio.server.enter_room[request.sid, room])
     join_room(room)
     print(f"{room}방에 연결되었습니다.")
-    user_data = [{'username': current_user.name}]  # 유저 데이터를 리스트로 생성
+    user_data = [{'username': current_user.name,'usersid': session_id }]  # 유저 데이터를 리스트로 생성
     if room in user_dict:
         user_dict[room].append(user_data)  # 이미 등록된 방이라면 유저 데이터 리스트에 추가
     else:
@@ -218,27 +222,21 @@ def handle_connect():
     num_connected = len(socketio.server.eio.sockets)
     print(f"현재 연결된 소켓 수: {num_connected}")
 
-@socketio.on('leave')
-def leave_room(data):
-    room = data['room']
-    leave_room(room)
-    user_data = [{']username': current_user.name}]
-    if room in user_dict:
-        user_dict[room].remove(user_data)  # 해당 유저 데이터를 제거합니다
-        update_room_player_count(room)
-
 @socketio.on('disconnect')
 def disconnect():
     # 유저가 연결을 끊을 때 방을 나갔다고 처리
     removed_rooms = []
+    user_name = ""
     for room_name, room_users in user_dict.items():
         if request.sid in room_users:
+            user_name = room_users.username
             room_users.remove(request.sid)
             update_room_player_count(room_name)
             if len(room_users) == 0:
                 removed_rooms.append(room_name)
     for room_name in removed_rooms:
         remove_room(room_name)
+    emit('user_disconnect', user_name)
 
 @socketio.on('request_room_players_update')
 def handle_request_room_players_update(data):
