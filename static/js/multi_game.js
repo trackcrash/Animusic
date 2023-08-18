@@ -59,7 +59,7 @@ function nextVideo() {
 
 function voteSkip() {
     console.log("스킵에 투표하셨습니다.")
-    socket.emit('voteSkip', { "index": currentIndex ,"room": room_name,"requiredSkipVotes":requiredSkipVotes(totalPlayers)});
+    socket.emit('voteSkip', { "index": currentIndex, "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
 }
 
 function playvideo(index) {
@@ -115,7 +115,7 @@ function initEventListeners() {
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
         currentIndex = 0;
-        socket.emit('MissionSelect', {"room_name": room_name,"selected_id":selectedId});
+        socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
 }
@@ -170,8 +170,7 @@ function initializeSocketEvents() {
 }
 
 window.onload = function() {
-    socket.emit('join', { room_name: room_name },()=>
-    {
+    socket.emit('join', { room_name: room_name }, () => {
         initEventListeners();
         initializeSocketEvents();
     })
@@ -188,7 +187,7 @@ function MapSelectPopUp() {
         url: '/api/get_mission_table',
         type: 'GET',
         success: function(data) {
-            populateTableWithMissionData(data);
+            populateModalWithMissionData(data);
         },
         error: function(error) {
             console.error('Error fetching mission table data:', error);
@@ -196,26 +195,22 @@ function MapSelectPopUp() {
     });
 }
 
-function populateTableWithMissionData(data) {
-    let tableHtml = '<table><thead><tr><th>ID</th><th>MapName</th><th>MapProducer</th><th>songNum</th></tr></thead><tbody>';
+function populateModalWithMissionData(data) {
+    let contentHtml = '<div class="grid grid-cols-5 gap-6">';
+
     for (let i = 0; i < data.length; i++) {
-        tableHtml += `<tr data-id="${data[i].id}"><td>${data[i].id}</td><td>${data[i].MapName}</td><td>${data[i].MapProducer}</td><td>${data[i].MusicNum}</td></tr>`;
+        contentHtml += `
+            <a href="#" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300" data-id="${data[i].id}" onclick="selectAndClose(${data[i].id})">
+                <p>ID: ${data[i].id}</p>
+                <p>Name: ${data[i].MapName}</p>
+                <p>Producer: ${data[i].MapProducer}</p>
+                <img src="${data[i].Thumbnail}" alt="${data[i].MapName}" />
+                <p>${data[i].MusicNum}곡</p>
+            </a>`;
     }
-    tableHtml += '</tbody></table>';
-    tableHtml += '<button id="saveButton">저장하기</button>';
-    $('#popup-content').html(tableHtml);
 
-    $('#saveButton').click(function() {
-        selectedId = $('#popup-content table tr.selected').data('id');
-        if (selectedId) {
-            console.log('Selected ID:', selectedId);
-            $('#missionTableModal').modal('hide');
-        }
-    });
-
-    $('#popup-content table tbody tr').click(function() {
-        $(this).toggleClass('selected').siblings().removeClass('selected');
-    });
+    contentHtml += '</div>';
+    $('#popup-content').html(contentHtml);
 }
 
 function createMapSelectModal() {
@@ -229,7 +224,15 @@ function createMapSelectModal() {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="popup-content"></div>
+                    <div id="popup-content">
+                        <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 ">
+                            <div class="grid grid-cols-5 gap-6">
+                                <!-- 예시 아이템. 실제 사용 시에는 이 부분을 동적으로 생성해야 합니다. -->
+                                <a href="#" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -238,3 +241,8 @@ function createMapSelectModal() {
     $('body').append(modalHtml);
 }
 
+function selectAndClose(id) {
+    selectedId = id;
+    console.log('Selected ID:', selectedId);
+    $('#missionTableModal').modal('hide');
+}
