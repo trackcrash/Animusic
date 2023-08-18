@@ -247,7 +247,7 @@ def playTheGame(room_name):
     print("start", user_dict)
     totalPlayers = len(user_dict.get(room_name, []))
 
-    emit('PlayGame', totalPlayers ,broadcast=True)
+    emit('PlayGame', totalPlayers ,room = room_name)
 
 @socketio.on('MissionSelect')
 def send_saved_data(data):
@@ -260,9 +260,8 @@ def send_saved_data(data):
 
 @socketio.on('correctAnswer')
 def handle_correct_answer(data):
-    # 모든 클라이언트에게 정답을 맞췄다는 정보를 중계합니다.
     room = data.get('room')
-    emit('correctAnswer', data, room=room)
+    emit('correctAnswer', data, room=data['room'])
 
 vote_counts = {}
 
@@ -279,14 +278,9 @@ def handle_vote_skip(data):
 
     if vote_counts[index] >= required_votes:
         vote_counts[index] = 0  # 해당 인덱스의 투표 카운트 초기화
-        emit('nextVideo', {}, broadcast=True)
+        emit('nextVideo', {}, room=data['room'])
     else:
-        emit('updateVoteCount', {'index': index, 'count': vote_counts[index]}, broadcast=True)
-
-
-
-
-
+        emit('updateVoteCount', {'index': index, 'count': vote_counts[index]}, room=data['room'])
 
 @socketio.on('disconnect')
 def disconnect():

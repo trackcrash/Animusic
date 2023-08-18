@@ -1,5 +1,5 @@
 //multi game js --author: NewKyaru 15/08/2023
-let totalPlayers = 0;
+let totalPlayers = 2;
 let musicData = [];
 let currentIndex = 0;
 let skipvote = 0;
@@ -27,7 +27,6 @@ function sendMessage() {
         checkAnswer(content);
     }
 }
-+
 //정답 출력용
 function showSongInfo(index) {
     const songTitle = document.getElementById('songTitle');
@@ -39,12 +38,13 @@ function showSongInfo(index) {
 function nextVideo() {
     currentIndex += 1;
     skipvote = 0;
-    updateVoteCountUI(0);
+    updateVoteCountUI(skipvote);
     const songTitle = document.getElementById('songTitle')
     const songArtist = document.getElementById('songArtist')
 
     if (currentIndex < musicData.length) {
         playvideo(currentIndex);
+        showSongInfo(currentIndex);
         songTitle.style.display = 'none';
         songArtist.style.display = 'none';
         songTitle.innerText = "";
@@ -85,23 +85,23 @@ function playvideo(index) {
 
 function checkAnswer(answer) {
     // 이미 해당 문제의 정답을 맞췄다면 체크하지 않음
-    if(musicData.length >= 1)
-    {
+    if (musicData.length >= 1) {
         if (musicData[currentIndex].is_answered === "true") {
             return;
         }
         //안맞춰졌다면
-    
+
         if (musicData[currentIndex].answer_list.includes(answer)) {
             musicData[currentIndex].is_answered = "true";
-            socket.emit('correctAnswer', { index: currentIndex });
+            socket.emit('correctAnswer', { index: currentIndex, room: room_name });
             playvideo(currentIndex);
             videoOverlay.style.display = 'none';
             showSongInfo(currentIndex);
         }
     }
-    
+
 }
+
 function requiredSkipVotes(players) {
     return players <= 2 ? players : players <= 6 ? Math.ceil(players / 2) : Math.ceil(players * 0.7);
 }
@@ -118,6 +118,7 @@ function initEventListeners() {
     });
     elements.nextButton.addEventListener('click', () => {
         elements.nextButton.disabled = true;
+        voteSkip();
         socket.emit('voteSkip', { index: currentIndex });
     });
     elements.StartButton.addEventListener('click', () => {
@@ -134,6 +135,7 @@ function initializeSocketEvents() {
         playvideo(currentIndex);
         totalPlayers = totalPlayer;
         elements.MapSelect.style.display = "none";
+        updateVoteCountUI(0);
     });
 
     socket.on('MissionSelect_get', data => {
@@ -152,10 +154,9 @@ function initializeSocketEvents() {
 
     socket.on('voteSkip', data => {
         if (data.index === currentIndex) {
-            skipvote++;
-            const requiredVotes = requiredSkipVotes(totalPlayers);
-            if (skipvote >= requiredVotes) {
-                skipvote = 0;
+            skipvote = data.count;
+            updateVoteCountUI(skipvote);
+            if (skipvote >= requiredSkipVotes(totalPlayers)) {
                 nextVideo();
             }
         }
@@ -176,14 +177,14 @@ function initializeSocketEvents() {
     socket.on('nextVideo', function() {
         nextVideo();
     });
-    
+
     socket.on('updateVoteCount', function(data) {
         if (data.index === currentIndex) {
             skipvote = data.count;
             updateVoteCountUI(skipvote);
         }
     });
-    
+
 }
 
 window.onload = function() {
@@ -198,7 +199,7 @@ window.onload = function() {
 
 function MapSelectPopUp() {
     createMapSelectModal();
-    
+
     $('#missionTableModal').modal('show');
 
     $.ajax({
