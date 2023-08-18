@@ -109,7 +109,8 @@ socket.on('room_players_update', function(data) {;
 socket.on('room_update', function(data) {
     fetchData("/get_user_info", function(user_id) {
         if (!user_id) return;
-        addRoomToList(data.room_name);
+        console.log(data);
+        addRoomToList(data);
     });
 });
 

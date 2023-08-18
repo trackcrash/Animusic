@@ -176,7 +176,7 @@ def create_room(data):
         }
         dict_create(room_dict,room_name,room_data)
         print(f"{room_name}님이 방을 생성하셨습니다.")
-        emit('room_update', room_dict, broadcast=True)
+        emit('room_update', room_name, broadcast=True)
 @socketio.on('join')
 def join(data):
     room_name = data['room_name']
