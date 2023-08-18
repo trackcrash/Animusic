@@ -22,7 +22,6 @@ def make_answer(mission_id):
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
 
         answer_list = item['answer'].split(',')
-
         # JSON 객체 생성
         music_data = {
             'hint': item['hint'],
@@ -39,12 +38,17 @@ def make_answer(mission_id):
 def get_room_dict():
     return jsonify(room_dict)
 
-# def is_user_in_room(user_name, room_name):
+def is_user_in_room(user_name, room_name):
     """Check if user is already in the room."""
-    for user_data in user_dict.get(room_name, []):
-        if user_data['username'] == user_name:
+    dictionaryData = room_dict[room_name]['user']
+    for key, value in dictionaryData.items():
+        if 'username' in value and value['username'] == user_name:
             return True
     return False
+    # for data in room_dict[room_name]:
+        # if user_data == user_name:
+        #     return True
+    
 
 def get_user():
     data = ""

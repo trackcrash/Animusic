@@ -177,11 +177,14 @@ function initializeSocketEvents() {
 }
 
 window.onload = function() {
-    socket.emit('join', { room_name: room_name }, () => {
-        initEventListeners();
-        initializeSocketEvents();
-    })
-    socket.on('player_name', function(data) {player_name = data})
+    socket.emit('create_room', { room_name: room_name },()=>
+    {
+        socket.emit('join', { room_name: room_name }, () => {
+            initEventListeners();
+            initializeSocketEvents();
+            socket.on('player_name', function(data) {player_name = data})
+        })
+    });
 
 };
 
