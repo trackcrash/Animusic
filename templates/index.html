@@ -13,20 +13,6 @@
     {% include "header.html" %}
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 ">
         <div class="grid grid-cols-5 gap-6">
-            <!-- this area -->
-            {% for mission in missions %}
-            <a href="/multi_game?id={{ mission.id }}" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300">
-                <p>ID: {{ mission.id }}</p>
-                <p>Name: {{ mission.MapName }}</p>
-                <p>Producer: {{ mission.MapProducer }}</p>
-                <!-- Thumbnail 이미지가 있다면 추가 -->
-                <img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" />
-                <!--노래 갯수 추가 -->
-                <p>{{ mission.MusicNum }}곡</p>
-
-            </a>
-            {% endfor %}
-            
             <a href="">싱글플레이</a>
             <a href="/room_list">멀티플레이</a>
         </div>
