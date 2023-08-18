@@ -183,7 +183,6 @@ window.onload = function() {
             initEventListeners();
             initializeSocketEvents();
         })
-        socket.on('player_name', function(data) {player_name = data})
     });
 
 };
