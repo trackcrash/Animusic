@@ -3,6 +3,7 @@ from flask import Blueprint, flash, jsonify, redirect, request, url_for
 from flask_login import current_user
 from controllers.play_controller import show_table_bymissionid
 from models.data_model import Mission, Music
+import random
 chat_bp = Blueprint('chat', __name__)
 totalPlayers = 0
 room_name = ""
@@ -33,6 +34,7 @@ def make_answer(mission_id):
             'answer_hint': item['hint']
         }
         result.append(music_data)
+    random.shuffle(result)
     return result
 
 def get_room_dict():
