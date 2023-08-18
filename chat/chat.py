@@ -22,7 +22,6 @@ def make_answer(mission_id):
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
 
         answer_list = item['answer'].split(',')
-
         # JSON 객체 생성
         music_data = {
             'hint': item['hint'],

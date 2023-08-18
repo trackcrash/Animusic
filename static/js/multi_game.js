@@ -51,6 +51,7 @@ function nextVideo() {
         songArtist.innerText = "";
         currentIndex = 0;
         videoOverlay.style.display = 'block';
+        //playvideo(currentIndex);
         console.log("게임이 끝났습니다.");
         MapSelect.style.display = "block";
         nextButton.disabled = true;
