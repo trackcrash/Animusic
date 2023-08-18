@@ -4,7 +4,8 @@ let musicData = [];
 let currentIndex = 0;
 let skipvote = 0;
 let selectedId = 0;
-let player_name = document.getElementById('User_Name');
+let player_name = document.getElementById('User_Name').innerText;
+
 
 // DOM Elements
 const elements = {
@@ -147,6 +148,7 @@ function initializeSocketEvents() {
             musicData[currentIndex].is_answered = "true";
             playvideo(currentIndex);
             elements.videoOverlay.style.display = 'none';
+            console.log(data.correctuser)
             showSongInfo(currentIndex, data.correctuser);
         }
     });
