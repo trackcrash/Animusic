@@ -8,7 +8,6 @@ function createRoomElement(room_name) {
     const roomContainer = document.createElement('div');
     roomContainer.classList.add('room-container', 'grid', 'grid-rows-1', 'gap-4', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition', 'duration-300', 'hover:bg-gray-100');
 
-    
     const button = document.createElement('a');
     button.textContent = room_name;
     button.classList.add('room-button', 'px-4', 'py-2', 'bg-blue-500', 'text-white', 'rounded', 'hover:bg-blue-600', 'hover:text-white');
