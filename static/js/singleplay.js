@@ -54,7 +54,8 @@ function playvideo(index) {
 
 // 사용자의 답안 확인
 function checkAnswer(answer) {
-    if (musicData[currentIndex].answer_list.includes(answer)) {
+    const trimmedAnswerList = musicData[currentIndex].answer_list.map(answer => answer.trim());
+    if (trimmedAnswerList .includes(answer)) {
         playvideo(currentIndex);
         videoOverlay.style.display = 'none';
     }

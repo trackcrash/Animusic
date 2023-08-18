@@ -87,16 +87,20 @@ function playvideo(index) {
 
 function checkAnswer(answer) {
     // 이미 해당 문제의 정답을 맞췄다면 체크하지 않음
+    // answer_list 배열의 각 원소에 trim() 메서드 적용
+
     if (musicData.length >= 1) {
         if (musicData[currentIndex].is_answered === "true") {
             return;
         }
         //안맞춰졌다면
+        const trimmedAnswerList = musicData[currentIndex].answer_list.map(answer => answer.trim());
 
-        if (musicData[currentIndex].answer_list.includes(answer)) {
+        // 이제 trimmedAnswerList 배열에는 앞뒤 공백이 제거된 문자열들이 들어있습니다.
+        // 이 배열을 기반으로 비교를 수행할 수 있습니다.
+        if (trimmedAnswerList.includes(answer)) {
             musicData[currentIndex].is_answered = "true";
             socket.emit('correctAnswer', { index: currentIndex, room: room_name, correctuser: player_name}); // 내가 수정한 부분
-
         }
     }
 
