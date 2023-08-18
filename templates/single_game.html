@@ -1,0 +1,52 @@
+<!-- play test author: NewKyaru 15/08/2023-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/Socket_function.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/singleplay.js') }}" defer></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+    {% include "header.html" %}
+
+    <div class="flex p-4">
+        <!-- 왼쪽 영역 (영상 재생을 위한 iframe) -->
+        <div class="w-3/5 mr-4">
+            <div id="videoContainer" class="w-full h-full relative">
+                <div id="videoFrame" class="absolute top-0 left-0 w-full h-full"></div>
+                <div id="videoOverlay" class="bg-black opacity-100 w-full h-full absolute top-0 left-0 z-10 flex items-center justify-center text-white text-xl">
+                    <span>정답을 맞춰야 영상을 볼 수 있습니다.</span>
+                </div>
+            </div>
+            <div class="p-4">
+                <button id="nextButton" class="bg-green-500 text-white px-4 py-2 rounded">다음 영상</button>
+            </div>
+        </div>
+
+
+        <!-- 오른쪽 영역 (채팅 창) -->
+        <div class="w-2/5">
+            <div class="bg-white rounded shadow">
+                <div class="p-4">
+                    <div class="h-80 overflow-y-scroll" id="messages">
+                        <!-- 채팅 내역 표시 창 -->
+                    </div>
+                </div>
+                <div class="bg-gray-100 p-2">
+                    <!-- 채팅 입력 폼 -->
+                    <input type="text" id="inputMessage" class="w-full border rounded px-2 py-1" placeholder="메시지 입력...">
+                    <button id="sendButton" class="bg-blue-500 text-white px-4 py-1 rounded ml-2">보내기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

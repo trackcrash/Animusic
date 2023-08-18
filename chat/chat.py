@@ -30,8 +30,7 @@ def make_answer(mission_id):
             'answer_list': answer_list,
             'youtube_embed_url': youtube_embed_url,
             'title': item['title'],
-            'song': item['song'],
-            'answer_hint': item['hint']
+            'song': item['song']
         }
         result.append(music_data)
     random.shuffle(result)

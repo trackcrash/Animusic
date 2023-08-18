@@ -18,16 +18,29 @@ login_manager.init_app(app)
 
 socketio = SocketIO(app)
 
+@app.get('/get-music-data')
+def get_music_data():
+    mission_id = request.args.get('id')
+    return make_answer(mission_id)
 
 @login_manager.user_loader
 def load_user(user_id):
     return login_model.get_user_by_id(user_id)
 
+@app.route('/single_list')
+def single_select():
+    missions = play_controller.show_mission()
+    return render_template('single_select.html', current_user=current_user,missions=missions)
+
+@app.route('/single-play', methods=['GET', 'POST'])
+def single_play():
+    mission_id = request.args.get('id')
+    make_answer(mission_id)
+    return render_template('single_game.html',current_user=current_user)
 
 @app.route('/')
 def index():
-    missions = play_controller.show_mission()
-    return render_template('index.html', current_user=current_user, missions=missions)
+    return render_template('index.html', current_user=current_user)
 
 @app.route('/play', methods=['GET', 'POST'])
 def play():
@@ -233,6 +246,13 @@ def get_mission_table():
     return jsonify(mission_table_data)
 
 #socket
+#싱글용 메시지
+@socketio.on('single_message')
+def handle_single_message(data):
+    msg = data['content']
+    name = current_user.name
+    emit('single_message', {'name': name, 'msg': msg})
+
 @socketio.on('message')
 def handle_message(data):
     msg = data['content']
