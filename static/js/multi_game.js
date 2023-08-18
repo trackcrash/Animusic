@@ -4,6 +4,7 @@ let musicData = [];
 let currentIndex = 0;
 let skipvote = 0;
 let selectedId = 0;
+let player_name = 'name_blank';
 
 // DOM Elements
 const elements = {
@@ -28,11 +29,13 @@ function sendMessage() {
     }
 }
 //정답 출력용
-function showSongInfo(index) {
+function showSongInfo(index, correctusername) {
     const songTitle = document.getElementById('songTitle');
     const songArtist = document.getElementById('songArtist');
+    const correctUser = document.getElementById('correctUser');
     songTitle.innerText = musicData[index].title;
     songArtist.innerText = musicData[index].song;
+    correctUser.innerText = "정답자: "+ correctusername;
 }
 
 function nextVideo() {
@@ -41,14 +44,17 @@ function nextVideo() {
     updateVoteCountUI(skipvote);
     const songTitle = document.getElementById('songTitle')
     const songArtist = document.getElementById('songArtist')
+    const correctUser = document.getElementById('correctUser');
     if (currentIndex < musicData.length) {
         playvideo(currentIndex);
         songTitle.innerText = "";
         songArtist.innerText = "";
+        correctUser.innerText = "";
         nextButton.disabled = false;
     } else {
         songTitle.innerText = "";
         songArtist.innerText = "";
+        correctUser.innerText = "";
         currentIndex = 0;
         videoOverlay.style.display = 'block';
         console.log("게임이 끝났습니다.");
@@ -88,7 +94,8 @@ function checkAnswer(answer) {
 
         if (musicData[currentIndex].answer_list.includes(answer)) {
             musicData[currentIndex].is_answered = "true";
-            socket.emit('correctAnswer', { index: currentIndex, room: room_name });
+            socket.emit('correctAnswer', { index: currentIndex, room: room_name, correctuser: player_name}); // 내가 수정한 부분
+
         }
     }
 
@@ -140,7 +147,7 @@ function initializeSocketEvents() {
             musicData[currentIndex].is_answered = "true";
             playvideo(currentIndex);
             elements.videoOverlay.style.display = 'none';
-            showSongInfo(currentIndex);
+            showSongInfo(currentIndex, data.correctuser);
         }
     });
 
@@ -174,6 +181,7 @@ window.onload = function() {
         initEventListeners();
         initializeSocketEvents();
     })
+    socket.on('player_name', function(data) {player_name = data})
 
 };
 
