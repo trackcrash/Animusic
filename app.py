@@ -336,7 +336,6 @@ def join(data):
     print("room_dict2=", room_dict[room_name])
     join_room(room_name)
     update_room_player_count(room_name)
-    emit('player_name', user_name)
 
 def dict_join(dict_name,dict_index,dict_value):
     if dict_index in dict_name:

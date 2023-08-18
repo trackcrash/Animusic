@@ -4,7 +4,7 @@ let musicData = [];
 let currentIndex = 0;
 let skipvote = 0;
 let selectedId = 0;
-let player_name = 'name_blank';
+let player_name = document.getElementById('User_Name');
 
 // DOM Elements
 const elements = {
@@ -182,7 +182,6 @@ window.onload = function() {
         socket.emit('join', { room_name: room_name }, () => {
             initEventListeners();
             initializeSocketEvents();
-            socket.on('player_name', function(data) {player_name = data})
         })
     });
 
