@@ -273,23 +273,24 @@ def send_saved_data(data):
 @socketio.on('correctAnswer')
 def handle_correct_answer(data):
     room = data.get('room')
-    emit('correctAnswer', data, room=data['room'])
+    emit('correctAnswer', data, room=room)
 
 vote_counts = {}
 
 #스킵투표
 @socketio.on('voteSkip')
 def handle_vote_skip(data):
+    room = data.get("room")
     index = data.get('index')
     if index not in vote_counts:
         vote_counts[index] = 0
     vote_counts[index] += 1
-    required_votes = totalPlayers if totalPlayers <= 2 else math.ceil(totalPlayers / 2)
+    required_votes = data['requiredSkipVotes']
     if vote_counts[index] >= required_votes:
         vote_counts[index] = 0  # 해당 인덱스의 투표 카운트 초기화
-        emit('nextVideo', {}, room=data['room'])
+        emit('nextVideo', {}, room=room)
     else:
-        emit('updateVoteCount', {'index': index, 'count': vote_counts[index]}, room=data['room'])
+        emit('updateVoteCount', {'index': index, 'count': vote_counts[index]}, room=room)
 
 ############################################################################################
 #방 리스트 부분

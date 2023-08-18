@@ -41,12 +41,8 @@ function nextVideo() {
     updateVoteCountUI(skipvote);
     const songTitle = document.getElementById('songTitle')
     const songArtist = document.getElementById('songArtist')
-
     if (currentIndex < musicData.length) {
         playvideo(currentIndex);
-        showSongInfo(currentIndex);
-        songTitle.style.display = 'none';
-        songArtist.style.display = 'none';
         songTitle.innerText = "";
         songArtist.innerText = "";
         nextButton.disabled = false;
@@ -64,7 +60,7 @@ function nextVideo() {
 
 function voteSkip() {
     console.log("스킵에 투표하셨습니다.")
-    socket.emit('voteSkip', { index: currentIndex });
+    socket.emit('voteSkip', { "index": currentIndex ,"room": room_name,"requiredSkipVotes":requiredSkipVotes(totalPlayers)});
 }
 
 function playvideo(index) {
@@ -94,9 +90,6 @@ function checkAnswer(answer) {
         if (musicData[currentIndex].answer_list.includes(answer)) {
             musicData[currentIndex].is_answered = "true";
             socket.emit('correctAnswer', { index: currentIndex, room: room_name });
-            playvideo(currentIndex);
-            videoOverlay.style.display = 'none';
-            showSongInfo(currentIndex);
         }
     }
 
@@ -119,10 +112,8 @@ function initEventListeners() {
     elements.nextButton.addEventListener('click', () => {
         elements.nextButton.disabled = true;
         voteSkip();
-        socket.emit('voteSkip', { index: currentIndex });
     });
     elements.StartButton.addEventListener('click', () => {
-        
         elements.nextButton.disabled = false;
         currentIndex = 0;
         socket.emit('MissionSelect', {"room_name": room_name,"selected_id":selectedId});
@@ -154,15 +145,15 @@ function initializeSocketEvents() {
         }
     });
 
-    socket.on('voteSkip', data => {
-        if (data.index === currentIndex) {
-            skipvote = data.count;
-            updateVoteCountUI(skipvote);
-            if (skipvote >= requiredSkipVotes(totalPlayers)) {
-                nextVideo();
-            }
-        }
-    });
+    // socket.on('voteSkip', data => {
+    //     if (data.index === currentIndex) {
+    //         skipvote = data.count;
+    //         updateVoteCountUI(skipvote);
+    //         if (skipvote >= requiredSkipVotes(totalPlayers)) {
+    //             nextVideo();
+    //         }
+    //     }
+    // }); 제거해도 될듯
 
     socket.on('user_disconnect', data => {
         console.log(`${data} 가Disconnected from the server`);
