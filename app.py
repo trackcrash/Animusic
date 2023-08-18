@@ -160,11 +160,17 @@ def deleteMission():
 #######################################################
 #socket 연결부분
 # ------------------------------------
+waitingroom_userlist = {}
 @socketio.on('connect')
 def handle_connect():
     # 소켓이 연결되면 실행되는 함수
     num_connected = len(socketio.server.eio.sockets)
     print(f"현재 연결된 소켓 수: {num_connected}")
+    try:
+        waitingroom_userlist[current_user.name] = None
+        emit('update_waiting_userlist', waitingroom_userlist, broadcast = True)
+    except:
+        pass
 
 @socketio.on('disconnect')
 def disconnect():
@@ -181,6 +187,12 @@ def disconnect():
         remove_room(room_name)  # 방 제거
     if user_name:
         emit('user_disconnect', {'username': user_name})  # 유저 연결 종료 이벤트 전송
+    try:
+        if current_user.name in waitingroom_userlist:
+            del waitingroom_userlist[current_user.name]
+            emit('update_waiting_userlist', waitingroom_userlist, broadcast = True)
+    except:
+        pass
 def remove_room(room_name):
     if room_name in room_dict:
         emit('room_removed', room_name, broadcast=True)
@@ -327,15 +339,19 @@ def create_room(data):
 @socketio.on('join')
 def join(data):
     room_name = data['room_name']
-    print("확인",room_name)
     session_id = request.sid
     user_name = current_user.name
     print(f"{room_name}방에 연결되었습니다.")
     user_data = {'username': user_name }  # 유저 데이터를 리스트로 생성
     dict_join(room_dict[room_name]["user"], session_id, user_data)
-    print("room_dict2=", room_dict[room_name])
     join_room(room_name)
     update_room_player_count(room_name)
+    try:
+        if current_user.name in waitingroom_userlist:
+            del waitingroom_userlist[current_user.name]
+            emit('update_waiting_userlist', waitingroom_userlist, broadcast = True)
+    except:
+        pass
 
 def dict_join(dict_name,dict_index,dict_value):
     if dict_index in dict_name:

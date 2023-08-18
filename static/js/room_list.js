@@ -99,6 +99,7 @@ function removeRoomFromList(room_name) {
 
 window.onload = function() {
     firstCreateRoom();
+    socket.emit('waiting_userlist')
 }
 
 socket.on('room_players_update', function(data) {;
@@ -131,3 +132,8 @@ socket.on('Join_room', (data)=>
     console.log(data);
     joinChatRoom(data);
 })
+
+socket.on('update_waiting_userlist', function(data) {
+    let userlist = document.getElementById("userlist");
+    userlist.innerText = "현재 대기실 인원 수: " + Object.keys(data).length + "명\n" + Object.keys(data).join('\n');
+});
