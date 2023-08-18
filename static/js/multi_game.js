@@ -1,5 +1,5 @@
 //multi game js --author: NewKyaru 15/08/2023
-let totalPlayers = 2;
+let totalPlayers = 0;
 let musicData = [];
 let currentIndex = 0;
 let skipvote = 0;
@@ -122,25 +122,27 @@ function initEventListeners() {
         socket.emit('voteSkip', { index: currentIndex });
     });
     elements.StartButton.addEventListener('click', () => {
+        
         elements.nextButton.disabled = false;
         currentIndex = 0;
-        updateVoteCountUI(0);
-        socket.emit('MissionSelect', selectedId);
+        socket.emit('MissionSelect', {"room_name": room_name,"selected_id":selectedId});
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
 }
 
 function initializeSocketEvents() {
-    socket.on("PlayGame", totalPlayer => {
+    socket.on("PlayGame", data => {
         playvideo(currentIndex);
-        totalPlayers = totalPlayer;
+        totalPlayers = data;
+        console.log(data);
         elements.MapSelect.style.display = "none";
         updateVoteCountUI(0);
     });
 
     socket.on('MissionSelect_get', data => {
         musicData = data.get_music;
-        socket.emit("playTheGame", room_name);
+        console.log(musicData);
+        socket.emit("playTheGame", data.room_name);
     });
 
     socket.on('correctAnswer', data => {
@@ -188,9 +190,12 @@ function initializeSocketEvents() {
 }
 
 window.onload = function() {
-    socket.emit('join', { room: room_name })
-    initEventListeners();
-    initializeSocketEvents();
+    socket.emit('join', { room_name: room_name },()=>
+    {
+        initEventListeners();
+        initializeSocketEvents();
+    })
+
 };
 
 // window.addEventListener('beforeunload', () => {
@@ -255,3 +260,5 @@ function createMapSelectModal() {
 
     $('body').append(modalHtml);
 }
+
+// socket.on('room_removed', removeRoomFromList);

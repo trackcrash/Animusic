@@ -4,32 +4,32 @@ function fetchData(url, callback) {
     $.getJSON(url, callback);
 }
 
-function createRoomElement(roomName) {
+function createRoomElement(room_name) {
     const roomContainer = document.createElement('div');
     roomContainer.classList.add('room-container');
 
     const button = document.createElement('a');
-    button.textContent = roomName;
+    button.textContent = room_name;
     button.classList.add('room-button');
-    button.dataset.roomName = roomName;
+    button.dataset.room_name = room_name;
 
     const roomCountElement = document.createElement('span');
-    roomCountElement.id = `${roomNameElementIdPrefix}${roomName}`;
+    roomCountElement.id = `${roomNameElementIdPrefix}${room_name}`;
     roomCountElement.classList.add('room-count');
     roomCountElement.textContent = "0명";
 
     roomContainer.appendChild(button);
     roomContainer.appendChild(roomCountElement);
     roomContainer.addEventListener('click', function() {
-        joinChatRoom(button.dataset.roomName);
+        joinChatRoom(button.dataset.room_name);
     });
 
     return roomContainer;
 }
 
-function updateRoomCount(roomName, playerCount) {
-    const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${roomName}`);
-    console.log(roomCountElement, roomName, playerCount);
+function updateRoomCount(room_name, playerCount) {
+    const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${room_name}`);
+    console.log(roomCountElement, room_name, playerCount);
     if (roomCountElement) {
         roomCountElement.textContent = `${playerCount}명`;
     }
@@ -56,15 +56,9 @@ function create_room_button() {
     });
 }
 
-function joinChatRoom(roomName) {
-    location.href = `/multi_game?room_name=${roomName}`;
+function joinChatRoom(room_name) {
+    location.href = `/multi_game?room_name=${room_name}`;
 }
-
-
-
-
-
-
 
 function firstCreateRoom() {
     fetchData("/get_user_info", function(user_id) {
@@ -76,12 +70,10 @@ function firstCreateRoom() {
 
         fetchData("/get-room-dict", function(room_dict) {
             const roomButtonsContainer = document.getElementById('room-buttons');
-            for (let roomId in room_dict) {
-                const roomData = room_dict[roomId];
-                const roomName = roomData.room_name;
-                console.log(roomName)
-                roomButtonsContainer.appendChild(createRoomElement(roomName));
-                socket.emit('request_room_players_update', { room_name: roomName });
+            for (let room_name in room_dict) {
+                console.log(room_name)
+                roomButtonsContainer.appendChild(createRoomElement(room_name));
+                socket.emit('request_room_players_update', { room_name: room_name });
             }
         });
     });
@@ -92,13 +84,13 @@ function addRoomToList(room_name) {
     roomButtonsContainer.appendChild(createRoomElement(room_name));
 }
 
-function removeRoomFromList(roomName) {
+function removeRoomFromList(room_name) {
     const roomButtonsContainer = document.getElementById('room-buttons');
     const roomButtons = roomButtonsContainer.getElementsByClassName('room-container');
 
     for (let room of roomButtons) {
         const button = room.getElementsByTagName('a')[0];
-        if (button.textContent === roomName) {
+        if (button.textContent === room_name) {
             roomButtonsContainer.removeChild(room);
             break;
         }
@@ -110,7 +102,8 @@ window.onload = function() {
 }
 
 socket.on('room_players_update', function(data) {;
-    updateRoomCount(data.room[room_name], data.player_count[data.room.room_name].length);
+    console.log(data);
+    updateRoomCount(data.room_name, data.player_count);
 });
 
 socket.on('room_update', function(data) {
@@ -123,5 +116,3 @@ socket.on('room_update', function(data) {
 socket.on('Do_not_create_duplicates', function() {
     alert("방을 중복생성 할 수 없습니다.");
 });
-
-socket.on('room_removed', removeRoomFromList);

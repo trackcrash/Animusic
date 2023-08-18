@@ -7,7 +7,7 @@ chat_bp = Blueprint('chat', __name__)
 totalPlayers = 0
 room_name = ""
 room_dict = dict()
-user_dict = dict()
+#user_dict = dict()
 # use to get json
 def make_answer(mission_id):
     if mission_id is None:
@@ -38,7 +38,7 @@ def make_answer(mission_id):
 def get_room_dict():
     return jsonify(room_dict)
 
-def is_user_in_room(user_name, room_name):
+# def is_user_in_room(user_name, room_name):
     """Check if user is already in the room."""
     for user_data in user_dict.get(room_name, []):
         if user_data['username'] == user_name:
