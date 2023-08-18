@@ -117,3 +117,8 @@ socket.on('room_update', function(data) {
 socket.on('Do_not_create_duplicates', function() {
     alert("방을 중복생성 할 수 없습니다.");
 });
+
+socket.on('room_removed', (data)=>
+{
+    removeRoomFromList(data);
+});

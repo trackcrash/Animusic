@@ -53,7 +53,6 @@ function nextVideo() {
         videoOverlay.style.display = 'block';
         console.log("게임이 끝났습니다.");
         MapSelect.style.display = "block";
-        // playvideo(currentIndex);
         nextButton.disabled = true;
     }
 }
@@ -145,16 +144,6 @@ function initializeSocketEvents() {
         }
     });
 
-    // socket.on('voteSkip', data => {
-    //     if (data.index === currentIndex) {
-    //         skipvote = data.count;
-    //         updateVoteCountUI(skipvote);
-    //         if (skipvote >= requiredSkipVotes(totalPlayers)) {
-    //             nextVideo();
-    //         }
-    //     }
-    // }); 제거해도 될듯
-
     socket.on('user_disconnect', data => {
         console.log(`${data} 가Disconnected from the server`);
         socket.emit('request_room_players_update', { room_name });
@@ -189,9 +178,6 @@ window.onload = function() {
 
 };
 
-// window.addEventListener('beforeunload', () => {
-//     sessionStorage.removeItem('room_name');
-// });
 
 function MapSelectPopUp() {
     createMapSelectModal();
@@ -252,4 +238,3 @@ function createMapSelectModal() {
     $('body').append(modalHtml);
 }
 
-// socket.on('room_removed', removeRoomFromList);

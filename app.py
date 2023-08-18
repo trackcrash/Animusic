@@ -198,21 +198,7 @@ def dict_join(dict_name,dict_index,dict_value):
 
 def dict_create(dict_name,dict_index,dict_value):
         dict_name[dict_index] = dict_value
-@socketio.on('disconnect')
-def disconnect():
-    removed_rooms = []  # 나간 방의 이름을 저장할 리스트
-    user_name = ""  # 유저 이름을 저장할 변수
-    for room_name, room_data in room_dict.items():
-        if 'user' in room_data and request.sid in room_data['user']:
-            user_name = room_data['user'][request.sid]['username']
-            del room_data['user'][request.sid]  # 해당 유저 제거
-            if not room_data['user']:  # 방에 더 이상 유저가 없으면 방 제거
-                removed_rooms.append(room_name)
-            update_room_player_count(room_name)  # 플레이어 수 업데이트
-    for room_name in removed_rooms:
-        remove_room(room_name)  # 방 제거
-    if user_name:
-        emit('user_disconnect', {'username': user_name})  # 유저 연결 종료 이벤트 전송
+
 #############################################################################
 #play 부분
 # -------- 채팅 관련 기능 부분 -----------
@@ -304,11 +290,25 @@ def update_room_player_count(room_name):
     player_count= len(room_dict[room_name]['user'])
     
     emit('room_players_update', {'room_name': room_name, 'player_count':player_count}, broadcast=True)
-
-# def remove_room(room_name):
-#     if room_name in room_dict:
-#         emit('room_removed', room_dict[room_name], broadcast=True)
-#         del room_dict[room_name]
+@socketio.on('disconnect')
+def disconnect():
+    removed_rooms = []  # 나간 방의 이름을 저장할 리스트
+    user_name = ""  # 유저 이름을 저장할 변수
+    for room_name, room_data in room_dict.items():
+        if 'user' in room_data and request.sid in room_data['user']:
+            user_name = room_data['user'][request.sid]['username']
+            del room_data['user'][request.sid]  # 해당 유저 제거
+            if not room_data['user']:  # 방에 더 이상 유저가 없으면 방 제거
+                removed_rooms.append(room_name)
+            update_room_player_count(room_name)  # 플레이어 수 업데이트
+    for room_name in removed_rooms:
+        remove_room(room_name)  # 방 제거
+    if user_name:
+        emit('user_disconnect', {'username': user_name})  # 유저 연결 종료 이벤트 전송
+def remove_room(room_name):
+    if room_name in room_dict:
+        emit('room_removed', room_name, broadcast=True)
+        del room_dict[room_name]
 
 ########################################################################################
 if __name__ == '__main__':
