@@ -182,8 +182,8 @@ window.onload = function() {
         socket.emit('join', { room_name: room_name }, () => {
             initEventListeners();
             initializeSocketEvents();
-            socket.on('player_name', function(data) {player_name = data})
         })
+        socket.on('player_name', function(data) {player_name = data})
     });
 
 };
