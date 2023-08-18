@@ -167,14 +167,18 @@ function initializeSocketEvents() {
         }
     });
 
+
 }
 
 window.onload = function() {
-    socket.emit('join', { room_name: room_name }, () => {
-        initEventListeners();
-        initializeSocketEvents();
-    })
-
+    socket.emit('create_room', { room_name: room_name },()=>
+    {
+        socket.emit('join', { room_name: room_name }, () => {
+            initEventListeners();
+            initializeSocketEvents();
+        })
+    });
+   
 };
 
 

@@ -24,7 +24,8 @@ function createRoomElement(room_name) {
     InnerDivContainer.appendChild(roomCountElement)
     roomContainer.appendChild(InnerDivContainer);
     roomContainer.addEventListener('click', function() {
-        joinChatRoom(button.dataset.room_name);
+        socket.emit('user_check',{"room_name":room_name});
+        // joinChatRoom(button.dataset.room_name);
     });
 
     return roomContainer;
@@ -44,11 +45,7 @@ function create_room_button() {
         if (user_id) { // 사용자가 로그인된 경우
             const room_name = prompt("방 이름을 입력하세요:");
             if (room_name && room_name.trim() !== '') {
-                console.log(room_name);
-                socket.emit('create_room', { room_name: room_name },()=>
-                {
-                    joinChatRoom(room_name);
-                });
+                socket.emit('room_check', {room_name: room_name});
                 // 방 이름이 제대로 입력된 경우 방 생성 및 해당 방으로 리다이렉트
             } else if (room_name !== null) { // 취소 버튼을 클릭하지 않은 경우
                 alert("올바른 방 이름을 입력해주세요.");
@@ -121,7 +118,16 @@ socket.on('Do_not_create_duplicates', function() {
     alert("방을 중복생성 할 수 없습니다.");
 });
 
+socket.on('user_check_not_ok', function() {
+    alert("입장 제한");
+});
+
 socket.on('room_removed', (data)=>
 {
     removeRoomFromList(data);
 });
+socket.on('Join_room', (data)=>
+{
+    console.log(data);
+    joinChatRoom(data);
+})
