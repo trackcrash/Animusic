@@ -16,6 +16,13 @@ inputMessage.addEventListener('keyup', function(event) {
     }
 });
 
+// 키보드 버튼 'End' 키를 눌러도 스킵이 되게끔 하는 동작
+document.addEventListener('keydown', (event) => {
+        if (event.key === 'End') {
+            nextVideo();
+        }
+});
+
 nextButton.addEventListener('click', function() {
     nextVideo();
 });

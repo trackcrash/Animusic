@@ -124,6 +124,13 @@ function initEventListeners() {
         elements.nextButton.disabled = true;
         voteSkip();
     });
+    // 키보드의 end 버튼을 눌러도 nextButton이 눌리게끔 하는 동작
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'End' && elements.nextButton.disabled === false) {
+            elements.nextButton.disabled = true;
+            voteSkip();
+        }
+    });
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
         currentIndex = 0;
