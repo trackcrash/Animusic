@@ -249,7 +249,7 @@ def send_saved_data(data):
         'data': data.get("selected_id"),
         'room_name': room_name
     }
-    emit('MissionSelect_get', response, room=room)
+    emit('MissionSelect_get', response, room=room_name)
 
 @socketio.on('correctAnswer')
 def handle_correct_answer(data):

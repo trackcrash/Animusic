@@ -64,7 +64,7 @@ function firstCreateRoom() {
     fetchData("/get_user_info", function(user_id) {
         if (!user_id) {
             alert("로그인 후에 이용가능합니다.");
-            location.href = "/";
+            location.href = "/login";
             return;
         }
 
