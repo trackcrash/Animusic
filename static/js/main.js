@@ -3,8 +3,8 @@
  let endTime = "";
  // 동영상 링크를 VideoId, startTime, endTime 을 분리하는 함수
 function split_ytLink(ytLink) {
-    const chanegedLink = ytLink.replace('?', '&');
-    const split_text = chanegedLink.split(/(&v=|&start=|&end=|&t=|\.be\/)/);
+    const changedLink = ytLink.replace('?', '&');
+    const split_text = changedLink.split(/(&v=|&start=|&end=|&t=|\.be\/)/);
     const find_1 = split_text.indexOf("&v=")
     const find_2 = split_text.indexOf("&t=")
     const find_3 = split_text.indexOf("&start=")
@@ -61,12 +61,12 @@ function createInfoItem(title, song, songURL, thumbnail, answer, hint, id) {
         box.setAttribute('data-id', id);
     }
     const titleElem = document.createElement('h3');
-    titleElem.innerText = "제목: " + title;
+    titleElem.innerText = title;
     titleElem.classList.add('font-bold', 'mb-2');
     box.appendChild(titleElem);
 
     const songElem = document.createElement('p');
-    songElem.innerText = "곡 이름: " + song;
+    songElem.innerText = song;
     songElem.classList.add('mb-2');
     box.appendChild(songElem);
 
