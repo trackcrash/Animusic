@@ -1,41 +1,34 @@
-let videoId = "";
-let startTime = "";
-let endTime = "";
+ let videoId = "";
+ let startTime = "";
+ let endTime = "";
  // 동영상 링크를 VideoId, startTime, endTime 을 분리하는 함수
 function split_ytLink(ytLink) {
-    if (ytLink.split('/')[2] === "www.youtube.com") {
-        if (ytLink.split(/[?&]v=|&t=|&start=|&end=/).length > 3) {
-            videoId = ytLink.split(/[?&]v=|&t=|&start=|&end=/)[1];
-            startTime = ytLink.split(/[?&]v=|&t=|&start=|&end=/)[2].split('s')[0];
-            endTime = ytLink.split(/[?&]v=|&t=|&start=|&end=/)[3].split('s')[0];
-        } else if (ytLink.split(/[?&]v=|&t=|&start=|&end=/).length > 2) {
-            videoId = ytLink.split(/[?&]v=|&t=|&start=|&end=/)[1];
-            startTime = ytLink.split(/[?&]v=|&t=|&start=|&end=/)[2];
-            endTime = "";
-        } else {
-            videoId = ytLink.split(/[?&]v=|&t=|&start=|&end=/)[1];
-            startTime = "";
-            endTime = "";
-        }
-    } else {
-        if (ytLink.split(/[\/?t=]/).length > 9) {
-            videoId = ytLink.split(/[\/?t=]/)[6];
-            startTime = ytLink.split(/[\/?t=]/)[9];
-            endTime = "";
-        } else {
-            videoId = ytLink.split(/[\/?t=]/)[6];
-            startTime = "";
-            endTime = "";
-        };
-    };
-    return {videoId: videoId, startTime: startTime, endTime: endTime};
+    const chanegedLink = ytLink.replace('?', '&');
+    const split_text = chanegedLink.split(/(&v=|&start=|&end=|&t=|\.be\/)/);
+    const find_1 = split_text.indexOf("&v=")
+    const find_2 = split_text.indexOf("&t=")
+    const find_3 = split_text.indexOf("&start=")
+    const find_4 = split_text.indexOf("&end=")
+    const find_5 = split_text.indexOf(".be/")
+    if (find_1 > -1) {
+        videoId = split_text[find_1 + 1];
+    } else if (find_5 > -1) {
+        videoId = split_text[find_5 + 1];
+    } else {videoId = ""};
+    if (find_2 > -1) {
+        startTime = split_text[find_2 + 1];
+    } else if (find_3 > -1) {
+        startTime = split_text[find_3 + 1];
+    } else {startTime = ""};
+    if (find_4 > -1) {
+        endTime = split_text[find_4 + 1];
+    } else {endTime = ""};
+    return {videoId: videoId, startTime: startTime.split('s')[0], endTime: endTime.split('s')[0]};
 };
 
 function loadVideo() {
-    const ytLink = document.getElementById("song-link-input").value;
-    videoId = split_ytLink(ytLink).videoId;
-    console.log(videoId)
-    // videoId = ytLink.split("v=")[1];
+    const ytLink = "https://www.youtube.com/watch?v=" + split_ytLink(document.getElementById("song-link-input").value).videoId;
+    videoId = ytLink.split("v=")[1];
     const embedLink = "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
 
     const iframe = document.createElement("iframe");
@@ -49,9 +42,9 @@ function loadVideo() {
     videoContainer.appendChild(iframe);
 }
 
- document.getElementById('submission-form').addEventListener('submit', function(e) {
+document.getElementById('submission-form').addEventListener('submit', function(e) {
     e.preventDefault();
- });
+});
 
 function createInfoItem(title, song, songURL, thumbnail, answer, hint, id) {
     const box = document.createElement('div');
@@ -110,8 +103,7 @@ document.getElementById("register-btn").addEventListener("click", function(e)
     const title = document.getElementById('title-input').value;
     const song = document.getElementById('song-name-input').value;
     const songURL = document.getElementById('song-link-input').value;
-    const thumbnailLink = "https://img.youtube.com/vi/" + videoId + "/maxresdefault.jpg";
-    console.log(videoId)
+    const thumbnailLink = "https://img.youtube.com/vi/" + videoId + "/sddefault.jpg";
     const answer = document.getElementById('answer-input').value;
     const hint = document.getElementById('hint-input').value;
     const id = document.getElementById('id-input').value;
@@ -191,7 +183,6 @@ function saveBtn()
 {
     const items = document.querySelectorAll('.grid-item.box');
     let data = [];
-    console.log("test");
     items.forEach(item => {
         const title = item.querySelector('h3').innerText.split(": ")[1];
         const song = item.querySelector('p').innerText.split(": ")[1];
@@ -214,7 +205,6 @@ function saveBtn()
         MapProducer: document.querySelector("#User_Name").innerHTML
     })
     data = JSON.stringify(data);
-    console.log(data);
     $.ajax({
         type: "POST",
         url: "/submit-to-db",
@@ -242,7 +232,7 @@ function UpdateBtn()
         const title = item.querySelector('h3').innerText.split(": ")[1];
         const song = item.querySelector('p').innerText.split(": ")[1];
         const thumbnail = item.querySelector('img').src;
-        const songURL = 'https://www.youtube.com/watch?v=' + split_ytLink(item.querySelector('input').value).videoId;
+        const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value).videoId;
         const answer = item.querySelector('h1').innerText;
         const hint = item.querySelector('h2').innerText;
         const id = item.querySelector('h4').innerHTML;
@@ -277,7 +267,6 @@ function UpdateBtn()
         mission_Id : document.querySelector("#Mission_id").innerHTML
     })
     data = JSON.stringify(data);
-    console.log(data);
     $.ajax({
         type: "POST",
         url: "/update-to-db",
@@ -344,3 +333,19 @@ observer.observe(document.getElementById('grid-container'), {childList: true });
 //grid-container 안의 아이템의 가로 세로 길이를 px단위로 정의함
 let box_width = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('width'));
 let box_height = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('height'));
+
+// 공백없는 정답 추가제공하는 기능
+
+const zero_space = document.getElementById('zero_space');
+const answerInput = document.getElementById('answer-input');
+
+function zero_space_text() {
+    const inputText = answerInput.value;
+    const answerList = inputText.split(',');
+    const zeroSpaceList = answerList.map(text => text.replace(/\s+/g, ''));
+    const uniqueList = [...new Set([...answerList, ...zeroSpaceList])];
+
+    answerInput.value = uniqueList.join(',');
+};
+
+zero_space.addEventListener('click', zero_space_text);

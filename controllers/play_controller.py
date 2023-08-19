@@ -31,7 +31,6 @@ def play_controller():
                 </html>
             '''
         data = [mission_data, show_table_bymissionid(id)]
-
     return play_view.play_view(data)
 
 
@@ -66,7 +65,8 @@ def show_table_bymissionid(missionid):
     Music.__table__.create(bind=engine, checkfirst=True)
     if SuchTable("MusicTable"):
         queries = session.query(Music).filter(Music.mission_id==missionid)
-        entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint) for q in queries]
+        # DB상의 썸네일 이미지링크가 전부 바뀌기 전 까지 유지
+        entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url.replace("maxresdefault", "sddefault"), answer= q.answer, hint= q.hint) for q in queries]
         return entries
     
 
