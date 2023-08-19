@@ -1,8 +1,7 @@
 //multi game js --author: NewKyaru 15/08/2023
 let totalPlayers = 0;
-let musicData = [];
-let currentIndex = 0;
 let skipvote = 0;
+let currentvideolink = "";
 let selectedId = 0;
 let player_name = document.getElementById('User_Name').innerText;
 
@@ -23,56 +22,35 @@ const room_name = new URLSearchParams(window.location.search).get('room_name');
 function sendMessage() {
     const content = elements.inputMessage.value.trim();
     if (content) {
-        console.log(content);
         socket.emit('message', { content, room: room_name });
         elements.inputMessage.value = '';
-        checkAnswer(content);
     }
 }
 //정답 출력용
-function showSongInfo(index, correctusername) {
+function showSongInfo(title, song, correctusername) {
     const songTitle = document.getElementById('songTitle');
     const songArtist = document.getElementById('songArtist');
     const correctUser = document.getElementById('correctUser');
-    songTitle.innerText = musicData[index].title;
-    songArtist.innerText = musicData[index].song;
-    correctUser.innerText = "정답자: "+ correctusername;
+    songTitle.innerText = title;
+    songArtist.innerText = song;
+    correctUser.innerText = "정답자: " + correctusername;
 }
 
 function nextVideo() {
-    currentIndex += 1;
-    skipvote = 0;
-    updateVoteCountUI(skipvote);
-    const songTitle = document.getElementById('songTitle')
-    const songArtist = document.getElementById('songArtist')
+    updateVoteCountUI(0);
+    const songTitle = document.getElementById('songTitle');
+    const songArtist = document.getElementById('songArtist');
     const correctUser = document.getElementById('correctUser');
-    if (currentIndex < musicData.length) {
-        playvideo(currentIndex);
-        songTitle.innerText = "";
-        songArtist.innerText = "";
-        correctUser.innerText = "";
-        nextButton.disabled = false;
-    } else {
-        songTitle.innerText = "";
-        songArtist.innerText = "";
-        correctUser.innerText = "";
-        currentIndex = 0;
-        videoOverlay.style.display = 'block';
-        console.log("게임이 끝났습니다.");
-        MapSelect.style.display = "block";
-        nextButton.disabled = true;
-    }
+    socket.emit('requestNextData', room_name);
 }
 
 function voteSkip() {
-    console.log("스킵에 투표하셨습니다.")
-    socket.emit('voteSkip', { "index": currentIndex, "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
+    socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
 }
 
-function playvideo(index) {
-    let embedLink = musicData[index].youtube_embed_url;
+function playvideo(videolink) {
     const iframe = document.createElement("iframe");
-    iframe.src = embedLink;
+    iframe.src = videolink;
     iframe.allow = "autoplay";
     iframe.width = "100%";
     iframe.height = "100%";
@@ -83,28 +61,6 @@ function playvideo(index) {
     videoOverlay.style.display = 'block';
 }
 
-
-
-function checkAnswer(answer) {
-    // 이미 해당 문제의 정답을 맞췄다면 체크하지 않음
-    // answer_list 배열의 각 원소에 trim() 메서드 적용
-
-    if (musicData.length >= 1) {
-        if (musicData[currentIndex].is_answered === "true") {
-            return;
-        }
-        //안맞춰졌다면
-        const trimmedAnswerList = musicData[currentIndex].answer_list.map(answer => answer.trim());
-
-        // 이제 trimmedAnswerList 배열에는 앞뒤 공백이 제거된 문자열들이 들어있습니다.
-        // 이 배열을 기반으로 비교를 수행할 수 있습니다.
-        if (trimmedAnswerList.includes(answer)) {
-            musicData[currentIndex].is_answered = "true";
-            socket.emit('correctAnswer', { index: currentIndex, room: room_name, correctuser: player_name}); // 내가 수정한 부분
-        }
-    }
-
-}
 
 function requiredSkipVotes(players) {
     return players <= 2 ? players : players <= 6 ? Math.ceil(players / 2) : Math.ceil(players * 0.7);
@@ -133,7 +89,6 @@ function initEventListeners() {
     });
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
-        currentIndex = 0;
         socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
@@ -141,36 +96,45 @@ function initEventListeners() {
 
 function initializeSocketEvents() {
     socket.on("PlayGame", data => {
-        playvideo(currentIndex);
-        totalPlayers = data;
-        console.log(data);
+        totalPlayers = data.totalPlayers;
+        currentvideolink = data.youtubeLink;
+        playvideo(currentvideolink);
         elements.MapSelect.style.display = "none";
         updateVoteCountUI(0);
     });
+    socket.on('NextData', function(data) {
+        currentvideolink = data.youtubeLink;
+        playvideo(currentvideolink);
+        songTitle.innerText = "";
+        songArtist.innerText = "";
+        correctUser.innerText = "";
+        nextButton.disabled = false;
+    });
+
+    socket.on('EndOfData', function() {
+        songTitle.innerText = "";
+        songArtist.innerText = "";
+        correctUser.innerText = "";
+        videoOverlay.style.display = 'block';
+        MapSelect.style.display = "block";
+        nextButton.disabled = true;
+    });
 
     socket.on('MissionSelect_get', data => {
-        musicData = data.get_music;
-        console.log(musicData);
-        socket.emit("playTheGame", data.room_name);
+        socket.emit("playTheGame", data);
     });
 
     socket.on('correctAnswer', data => {
-        if (data.index === currentIndex) {
-            musicData[currentIndex].is_answered = "true";
-            playvideo(currentIndex);
-            elements.videoOverlay.style.display = 'none';
-            console.log(data.correctuser)
-            showSongInfo(currentIndex, data.correctuser);
-        }
+        playvideo(currentvideolink);
+        elements.videoOverlay.style.display = 'none';
+        showSongInfo(data.data.title, data.data.song, data.name);
     });
 
     socket.on('user_disconnect', data => {
-        console.log(`${data} 가Disconnected from the server`);
         socket.emit('request_room_players_update', { room_name });
     });
 
     socket.on('message', data => {
-        console.log(data);
         const item = document.createElement('div');
         item.innerHTML = `<span class="font-semibold">${data.name}:</span> ${data.msg}`;
         elements.messages.appendChild(item);
@@ -181,17 +145,14 @@ function initializeSocketEvents() {
     });
 
     socket.on('updateVoteCount', function(data) {
-        if (data.index === currentIndex) {
-            skipvote = data.count;
-            updateVoteCountUI(skipvote);
-        }
+        skipvote = data.count;
+        updateVoteCountUI(skipvote);
     });
 
 }
 
 window.onload = function() {
-    socket.emit('create_room', { room_name: room_name },()=>
-    {
+    socket.emit('create_room', { room_name: room_name }, () => {
         socket.emit('join', { room_name: room_name }, () => {
             initEventListeners();
             initializeSocketEvents();
@@ -266,6 +227,5 @@ function createMapSelectModal() {
 
 function selectAndClose(id) {
     selectedId = id;
-    console.log('Selected ID:', selectedId);
     $('#missionTableModal').modal('hide');
 }
