@@ -12,8 +12,8 @@
         .box {
             border: 1px solid gray;
             overflow: hidden;
-            height: 100%;
-            width: 100%;
+            height: 175px;
+            width: 150px;
             transition: transform 0.3s;
             position: relative;
         }
@@ -23,8 +23,8 @@
             font-size: 100px;
             border: 1px solid gray;
             overflow: hidden;
-            height: 100%;
-            width: 100%;
+            height: 175px;
+            width: 150px;
             transition: transform 0.3s;
             position: relative;
         }
@@ -39,6 +39,7 @@
             grid-gap: 1rem;
             height: 100%;
             width: 100%;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             overflow-y: auto;
             /* Grid container에 스크롤 추가 */
         }
@@ -69,6 +70,11 @@
             justify-content: center;
             height: 100%;
         }
+
+        /* .box가 3~4줄 이상일 경우 box의 크기를 변경함 */
+        .three-or-more-row .box {
+            height: 60px;
+        }
     </style>
 </head>
 
@@ -90,7 +96,7 @@
         <div class="right-side w-1/2">
             <!-- 상단 정보 영역 -->
             <div class="info-section bg-gray-200 rounded p-2 shadow-md mb-4">
-                <div id="grid-container" class="grid grid-cols-3 gap-4 w-full h-full">
+                <div id="grid-container" class="grid gap-4 w-full h-full">
                     <!-- 여기에 .box 아이템들이 추가됩니다 -->
 
                     {% for d in data[1] %}

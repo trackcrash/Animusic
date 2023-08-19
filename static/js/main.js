@@ -302,3 +302,41 @@ function deleteBtn()
 }
 $("#update-btn").on("click", UpdateBtn);
 $("#save-btn").on("click", saveBtn);
+
+/* grid-container 안에 아이템이 3줄 이상일 경우 아이템의 높이를 줄이는 기능 */
+
+// grid-container 가로 세로 길이를 px단위로 정의함
+let container_width = document.getElementById('grid-container').clientWidth;
+let container_height = document.getElementById('grid-container').clientHeight;
+
+// container_width, container_height 를 재 정의함
+function resize_variable_declaration() {
+    container_width = document.getElementById('grid-container').clientWidth;
+    container_height = document.getElementById('grid-container').clientHeight;
+    // 여기에 .box가 3~4줄 이상인 경우( grid-container 스타일에 three-or-more-row 라는 클래스 추가
+    if (Math.floor(container_item / Math.floor(container_width / box_width)) >= 3) {
+        document.getElementById('grid-container').classList.add('three-or-more-row');
+    }
+};
+
+// 윈도우창 크기가 변경될 때 마다 실행됨
+window.addEventListener('resize', resize_variable_declaration);
+
+// grid-container 안의 아이템의 갯수를 정의함 ( + 1 은 추가버튼 아이템)
+let container_item = document.getElementById('grid-container').querySelectorAll('.box').length + 1;
+
+// grid-container 안의 아이템 갯수가 바뀔 때 마다 container_item을 재 정의 함
+const observer = new MutationObserver(() => {
+    container_item = document.getElementById('grid-container').querySelectorAll('.box').length + 1;
+    // 여기에 .box가 3~4줄 이상인 경우( grid-container 스타일에 three-or-more-row 라는 클래스 추가
+    if (Math.floor(container_item / Math.floor(container_width / box_width)) >= 3) {
+        document.getElementById('grid-container').classList.add('three-or-more-row');
+    }
+});
+
+// 어떤 대상의 상태 변화를 감지하는 observer 의 설정값 (대상 : grid-container, childList - true : 대상 내용물의 갯수만 감지)
+observer.observe(document.getElementById('grid-container'), {childList: true });
+
+//grid-container 안의 아이템의 가로 세로 길이를 px단위로 정의함
+let box_width = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('width'));
+let box_height = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('height'));
