@@ -69,8 +69,9 @@ def handle_message(data):
     msg = data['content']
     room = data.get('room')
     name = current_user.name
-    if music_data_manager.check_answer(room, msg):
+    if music_data_manager.check_answer(room, msg) and music_data_manager.retrieve_data(room).get('is_answered') == 'false':
         current_data = music_data_manager.retrieve_data(room)
+        current_data['is_answered'] = 'true'
         emit('message', {'name': name, 'msg': msg}, room=room)
         emit('correctAnswer', {'name':name,'data':current_data}, room=room)
     else:

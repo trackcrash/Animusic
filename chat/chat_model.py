@@ -48,7 +48,7 @@ def make_answer(mission_id, room_name):
 
     for item in data:
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
-        answer_list = item['answer'].split(',')
+        answer_list = [answer.strip() for answer in item['answer'].split(',')]
         music_data = {
             'hint': item['hint'],
             'is_answered': 'false',
