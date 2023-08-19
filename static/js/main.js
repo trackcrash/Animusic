@@ -316,6 +316,8 @@ function resize_variable_declaration() {
     // 여기에 .box가 3~4줄 이상인 경우( grid-container 스타일에 three-or-more-row 라는 클래스 추가
     if (Math.floor(container_item / Math.floor(container_width / box_width)) >= 3) {
         document.getElementById('grid-container').classList.add('three-or-more-row');
+    } else {
+        document.getElementById('grid-container').classList.remove('three-or-more-row');
     }
 };
 
@@ -331,6 +333,8 @@ const observer = new MutationObserver(() => {
     // 여기에 .box가 3~4줄 이상인 경우( grid-container 스타일에 three-or-more-row 라는 클래스 추가
     if (Math.floor(container_item / Math.floor(container_width / box_width)) >= 3) {
         document.getElementById('grid-container').classList.add('three-or-more-row');
+    } else {
+        document.getElementById('grid-container').classList.remove('three-or-more-row');
     }
 });
 
