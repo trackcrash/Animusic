@@ -6,6 +6,7 @@ function fetchData(url, callback) {
 
 function createRoomElement(room_name) {
     const roomContainer = document.createElement('div');
+    roomContainer.id = 'roomContainer_' + room_name;
     roomContainer.classList.add('room-container', 'grid', 'grid-rows-1', 'gap-4', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition', 'duration-300', 'hover:bg-gray-100');
 
     const button = document.createElement('a');
@@ -139,14 +140,10 @@ socket.on('update_waiting_userlist', function(data) {
 
 // 해당 방을 안보이게 처리함
 socket.on('request_room_hidden', function(data) {
-    const roomButton = document.querySelector(`.room-button[data-room_name=${data}]`);
-    const roomContainer = roomButton.closest('.room-container');
-    roomContainer.classList.add('hidden');
+    document.getElementById('roomContainer_' + data).classList.add('hidden');
 });
 
 // 해당 방을 보이게 처리함
 socket.on('request_room_show', function(data) {
-    const roomButton = document.querySelector(`.room-button[data-room_name=${data}]`);
-    const roomContainer = roomButton.closest('.room-container');
-    roomContainer.classList.remove('hidden');
+    document.getElementById('roomContainer_' + data).classList.remove('hidden');
 });
