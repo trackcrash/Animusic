@@ -1,5 +1,91 @@
 import random
 from controllers.play_controller import show_table_bymissionid
+
+
+
+
+class RoomDataManger:
+    def __init__(self):
+        self._data_store = dict()
+    def remove_room(self, room_name):
+        if room_name in self._data_store:
+            del self._data_store[room_name]
+    def user_left(self, room_name, user_id):
+        if room_name in self._data_store and "user" in self._data_store[room_name]:
+            users = self._data_store[room_name]["user"]
+        
+            
+        if len(users) > 0:
+            if user_id in users and users[user_id]["host"] == 1:
+            # 가장 오랜 시간 동안 머문 사용자를 새로운 방장으로 설정
+                longest_present_user = max(users, key=lambda user: users[user]["joined_time"])
+                users[longest_present_user]["host"] = 1
+                return longest_present_user
+    def room_check(self, room_name):
+        if room_name in self._data_store:
+            print("True",room_name)
+            return True
+        else:
+            print("False",room_name)
+            return False
+    def create_room(self,room_name,session_id):
+            if room_name in self._data_store:
+                return False
+            
+            # 방 중복생성 금지 (클라이언트에 해당 이벤트 요청)
+            #방을 생성할 사용자의 정보를 room_data_manager에 저장
+            #해당 사용자의 세션 id
+            print(f"해당 사용자의 방 생성 정보: {session_id, room_name}")
+            #방 정보 room_data_manager에 담기 위한 data
+            room_data = {
+                "room_info":{
+                    "session_id":session_id,
+                    #room_password, room_status, playing\
+                    "room_status" : False
+                },
+                "user":
+                {
+
+                }
+            }
+            dict_create(self._data_store,room_name,room_data)
+            print(f"{room_name}님이 방을 생성하셨습니다.")
+            return True
+    def join(self, room_name, session_id, current_user,time):
+        user_name = current_user.name
+        print(f"{room_name}방에 연결되었습니다.")
+        user_data = {'username': user_name , 'host':0 , 'joined_time' : time.time()}  # 유저 데이터를 리스트로 생성
+        dict_join(self._data_store[room_name]["user"], session_id, user_data)
+    def host_setting(self,room_name, callback=None):  
+        if room_name in self._data_store and "user" in self._data_store[room_name]:
+            users = self._data_store[room_name]["user"]
+            if users:  # 유저 정보가 있는 경우
+                first_user_key = next(iter(users))  # 첫 번째 유저의 키를 가져옵니다.
+                if first_user_key in users:
+                    users[first_user_key]["host"] = 1  # host를 1로 변경합니다.
+                    # 변경된 정보 출력
+                    print("First user's data after modification:", users[first_user_key])
+                    return first_user_key
+                else:
+                    print("First user not found in the user dictionary.")
+            else:
+                print("No user data in the room.")
+                return ""
+        else:
+            print("Room not found or no user data in the room.")
+            return ""
+        if callback:
+            callback()  # 콜백 함수 호출
+    def is_user_in_room(self, user_name, room_name):
+        dictionaryData = self._data_store[room_name]['user']
+        for key, value in dictionaryData.items():
+            if 'username' in value and value['username'] == user_name:
+                return True
+        return False
+    def game_status(self, room_name):
+        self._data_store[room_name]['room_info']['room_status'] = not self._data_store[room_name]['room_info']['room_status']
+        
+room_data_manager = RoomDataManger()
 class MusicDataManager:
     def __init__(self):
         self._data_store = dict()
@@ -64,9 +150,13 @@ def make_answer(mission_id, room_name):
     music_data_manager.store_data(room_name, result)
     return room_name
 
-def is_user_in_room(user_name, room_name, room_dict):
-    dictionaryData = room_dict[room_name]['user']
-    for key, value in dictionaryData.items():
-        if 'username' in value and value['username'] == user_name:
-            return True
-    return False
+
+
+def dict_join(dict_name,dict_index,dict_value):
+    if dict_index in dict_name:
+        dict_name[dict_index].update(dict_value)
+    else :
+        dict_name[dict_index] = dict_value
+
+def dict_create(dict_name,dict_index,dict_value):
+        dict_name[dict_index] = dict_value

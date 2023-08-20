@@ -100,7 +100,6 @@ function removeRoomFromList(room_name) {
 
 window.onload = function() {
     firstCreateRoom();
-    socket.emit('waiting_userlist')
 }
 
 socket.on('room_players_update', function(data) {;

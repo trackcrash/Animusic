@@ -172,6 +172,7 @@ def room_list():
 
 @app.get("/get-room-dict")
 def get_room_dictAll():
+    print(get_room_dict())
     return get_room_dict()
 
 @app.get("/get_user_info")

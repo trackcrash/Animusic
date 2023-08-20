@@ -4,8 +4,7 @@ let skipvote = 0;
 let currentvideolink = "";
 let selectedId = 0;
 let player_name = document.getElementById('User_Name').innerText;
-
-
+let isHost = false; 
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -83,8 +82,10 @@ function initEventListeners() {
     });
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
-        socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId });
-        socket.emit('playingRoom_hidden', room_name);
+        socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId },function()
+        {
+            socket.emit('playingRoom_hidden', room_name);
+        });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
 }
@@ -124,6 +125,7 @@ function initializeSocketEvents() {
         playvideo("");
         nextButton.style.display = "none";
         socket.emit('playingRoom_show', room_name);
+        showHostContent(false);
     });
 
     socket.on('MissionSelect_get', data => {
@@ -152,7 +154,14 @@ function initializeSocketEvents() {
         skipvote = data.count;
         updateVoteCountUI(skipvote);
     });
-
+    socket.on("new_host_message", (data) => {
+        // data.message를 이용하여 새로운 방장 알림을 처리
+        elements.nextButton.style.display= "block";
+        elements.MapSelect.style.display= "block";
+        elements.nextButton.disabled = true;
+        elements.MapSelect.disabled = true;
+        console.log(data.message);
+    });
 }
 
 window.onload = function() {
@@ -164,8 +173,47 @@ window.onload = function() {
     });
     nextButton.style.display = "none";
 };
+socket.on("user_change", (data)=>
+{
+    let count = data["count"];
+    totalPlayers = data["totalPlayers"];
+    updateVoteCountUI(count);
+})
 
+socket.on('host_updated', (data) => {
+    // 방장 정보가 업데이트되었을 때 클라이언트에서 수행할 동작
+    console.log(`New host: ${data.user}`);
+    const game_status = data['game_status'];
+    if (data.user === socket.id) {
+        isHost = true;  // 방장이면 isHost를 true로 설정
+    }
+    showHostContent(game_status); 
+});
+function showHostContent(game_status) {
+    if (isHost) {
+        if(game_status == false)
+        {
+            elements.StartButton.style.display= "block";
+            elements.MapSelect.style.display= "block";
+            elements.StartButton.disabled = false;
+            elements.MapSelect.disabled = false;
+        }
+        if(game_status == true)
+        {
+            elements.nextButton.style.display = "block";
+        }
+    } else {
+        elements.StartButton.style.display= "none";
+        elements.MapSelect.style.display= "none";
+        elements.StartButton.disabled = true;
+        elements.MapSelect.disabled = true;
+        if(game_status == true)
+        {
+            elements.nextButton.style.display = "block";
+        }
 
+    }
+}
 function MapSelectPopUp() {
     createMapSelectModal();
 
