@@ -260,6 +260,7 @@ function saveBtn()
             hint: hint
         });
     });
+    console.log(data);
     data.push({
         MapName: document.querySelector("#MapName-input").value,
         MapProducer: document.querySelector("#User_Name").innerHTML
@@ -276,9 +277,9 @@ function saveBtn()
 
         },
         success: function(data) {
-            console.log("통신데이터 값 : " + data);
+            console.log("통신데이터 값 : ", data);
             alert("등록 완료되었습니다.");
-            location.reload();
+            // location.reload();
         }
     });
 }
@@ -287,7 +288,6 @@ function UpdateBtn()
 {
     const items = document.querySelectorAll('.grid-item.box');
     let data = [];
-
     items.forEach(item => {
         const title = item.querySelector('h3').innerText;
         const song = item.querySelector('p').innerText;
@@ -326,7 +326,9 @@ function UpdateBtn()
         MapProducer: document.querySelector("#User_Name").innerHTML,
         mission_Id : document.querySelector("#Mission_id").innerHTML
     })
+    console.log("변환 전: ", data);
     data = JSON.stringify(data);
+    console.log("변환 후: ", data);
     $.ajax({
         type: "POST",
         url: "/update-to-db",
@@ -335,12 +337,11 @@ function UpdateBtn()
         data: data,
         error: function(request, status, error) {
             console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
-
         },
         success: function(data) {
-            console.log("통신데이터 값 : " + data);
+            console.log("통신데이터 값 : ", data);
             alert("등록 완료되었습니다.");
-            location.reload();
+            // location.reload();
         }
     });
 }
@@ -393,6 +394,4 @@ observer.observe(document.getElementById('grid-container'), {childList: true });
 //grid-container 안의 아이템의 가로 세로 길이를 px단위로 정의함
 let box_width = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('width'));
 let box_height = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('height'));
-
-// 공백없는 정답 추가제공하는 기능
 
