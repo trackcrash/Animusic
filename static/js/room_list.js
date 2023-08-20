@@ -139,12 +139,14 @@ socket.on('update_waiting_userlist', function(data) {
 
 // 해당 방을 안보이게 처리함
 socket.on('request_room_hidden', function(data) {
-    let room_name = "room-count-" + data;
-    document.getElementById(room_name).classList.add('hidden');
+    const roomButton = document.querySelector(`.room-button[data-room_name=${data}]`);
+    const roomContainer = roomButton.closest('.room-container');
+    roomContainer.classList.add('hidden');
 });
 
-//해당 방을 보이게 처리함
+// 해당 방을 보이게 처리함
 socket.on('request_room_show', function(data) {
-    let room_name = "room-count-" + data;
-    document.getElementById(room_name).classList.remove('hidden');
+    const roomButton = document.querySelector(`.room-button[data-room_name=${data}]`);
+    const roomContainer = roomButton.closest('.room-container');
+    roomContainer.classList.remove('hidden');
 });
