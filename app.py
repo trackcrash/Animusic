@@ -200,3 +200,4 @@ def get_mission_table():
 if __name__ == '__main__':
     play_controller.ensure_tables_exist()
     socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+

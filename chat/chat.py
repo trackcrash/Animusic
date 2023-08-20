@@ -114,6 +114,7 @@ def handle_vote_skip(data):
     voted_users[room].append(user)
     required_votes = data['requiredSkipVotes']
     if vote_counts[room] >= required_votes:
+        player_count = vote_counts[room]
         vote_counts[room] = 0
         voted_users[room] = [] #초기화
         next_data = music_data_manager.retrieve_next_data(room)
@@ -122,6 +123,9 @@ def handle_vote_skip(data):
             emit('NextData', {'youtubeLink': youtube_embed_url}, room=room_name)
         else:
             emit('EndOfData', {}, room=room_name)
+
+
+
     else:
         emit('updateVoteCount', {'count': vote_counts[room]}, room=room)
 
@@ -222,3 +226,13 @@ def get_user():
     if current_user.is_authenticated:
         data = current_user.name
     return jsonify(data)
+
+# 게임중인 방 room_list.html 에서 안보이게 하기
+@socketio.on('playingRoom_hidden')
+def playingroom_hidden(room_name):
+    emit('request_room_hidden', room_name, broadcast = True)
+
+# 게임이 끝난 방 room_list.html 에서 보이게 하기
+@socketio.on('playingRoom_show')
+def playingRoom_show(room_name):
+    emit('request_room_show', room_name, broadcast = True)

@@ -110,7 +110,6 @@ socket.on('room_players_update', function(data) {;
 socket.on('room_update', function(data) {
     fetchData("/get_user_info", function(user_id) {
         if (!user_id) return;
-        console.log(data);
         addRoomToList(data);
     });
 });
@@ -136,4 +135,16 @@ socket.on('Join_room', (data)=>
 socket.on('update_waiting_userlist', function(data) {
     let userlist = document.getElementById("userlist");
     userlist.innerText = "현재 대기실 인원 수: " + Object.keys(data).length + "명\n" + Object.keys(data).join('\n');
+});
+
+// 해당 방을 안보이게 처리함
+socket.on('request_room_hidden', function(data) {
+    let room_name = "room-count-" + data;
+    document.getElementById(room_name).classList.add('hidden');
+});
+
+//해당 방을 보이게 처리함
+socket.on('request_room_show', function(data) {
+    let room_name = "room-count-" + data;
+    document.getElementById(room_name).classList.remove('hidden');
 });

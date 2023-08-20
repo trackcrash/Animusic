@@ -229,8 +229,8 @@ function UpdateBtn()
     let data = [];
 
     items.forEach(item => {
-        const title = item.querySelector('h3').innerText.split(": ")[1];
-        const song = item.querySelector('p').innerText.split(": ")[1];
+        const title = item.querySelector('h3').innerText;
+        const song = item.querySelector('p').innerText;
         const thumbnail = item.querySelector('img').src;
         const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value).videoId;
         const answer = item.querySelector('h1').innerText;
