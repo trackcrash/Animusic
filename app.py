@@ -22,7 +22,7 @@ socketio.init_app(app)
 @app.get('/get-music-data')
 def get_music_data():
     mission_id = request.args.get('id')
-    return make_answer(mission_id)
+    return play_controller.single_make_answer(mission_id)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -35,8 +35,6 @@ def single_select():
 
 @app.route('/single-play', methods=['GET', 'POST'])
 def single_play():
-    mission_id = request.args.get('id')
-    make_answer(mission_id)
     return render_template('single_game.html',current_user=current_user)
 
 @app.route('/')

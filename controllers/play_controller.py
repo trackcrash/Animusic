@@ -1,3 +1,4 @@
+import random
 from flask import jsonify, request
 from flask_login import current_user
 from sqlalchemy import func, inspect
@@ -33,6 +34,25 @@ def play_controller():
         data = [mission_data, show_table_bymissionid(id)]
     return play_view.play_view(data)
 
+def single_make_answer(mission_id):
+    data = show_table_bymissionid(mission_id)
+    result = []
+
+    for item in data:
+        youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
+        answer_list = [answer.strip() for answer in item['answer'].split(',')]
+        music_data = {
+            'hint': item['hint'],
+            'is_answered': 'false',
+            'answer_list': answer_list,
+            'youtube_embed_url': youtube_embed_url,
+            'title': item['title'],
+            'song': item['song']
+        }
+        result.append(music_data)
+
+    random.shuffle(result)
+    return result
 
 def SuchTable(table_Name):
     inspector = inspect(engine)

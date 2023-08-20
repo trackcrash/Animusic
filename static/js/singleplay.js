@@ -18,9 +18,9 @@ inputMessage.addEventListener('keyup', function(event) {
 
 // 키보드 버튼 'End' 키를 눌러도 스킵이 되게끔 하는 동작
 document.addEventListener('keydown', (event) => {
-        if (event.key === 'End') {
-            nextVideo();
-        }
+    if (event.key === 'End') {
+        nextVideo();
+    }
 });
 
 nextButton.addEventListener('click', function() {
@@ -62,22 +62,28 @@ function playvideo(index) {
 // 사용자의 답안 확인
 function checkAnswer(answer) {
     const trimmedAnswerList = musicData[currentIndex].answer_list.map(answer => answer.trim());
-    if (trimmedAnswerList .includes(answer)) {
+    if (trimmedAnswerList.includes(answer)) {
         playvideo(currentIndex);
         videoOverlay.style.display = 'none';
+        showSongInfo(currentIndex);
     }
 }
 
+function showSongInfo(index) {
+    const songTitle = document.getElementById('songTitle');
+    const songArtist = document.getElementById('songArtist');
+    songTitle.innerText = "정답: " + musicData[index].title;
+    songArtist.innerText = "곡 제목: " + musicData[index].song;
+}
 // 다음 영상 재생
 function nextVideo() {
     currentIndex += 1;
     if (currentIndex < musicData.length) {
         playvideo(currentIndex);
+        songTitle.innerText = "";
+        songArtist.innerText = "";
     } else {
-        // 끝났을 때 처리 임시로 그냥냅둠
-        currentIndex = 0;
-        videoOverlay.style.display = 'block';
-        playvideo(currentIndex);
+        window.location.href = '/single_list';
     }
 }
 
