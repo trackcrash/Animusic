@@ -99,6 +99,7 @@ function initializeSocketEvents() {
         elements.MapSelect.style.display = "none";
         elements.nextButton.style.display = "block";
         elements.StartButton.style.display = "none";
+        nextButton.disabled = false;
         updateVoteCountUI(0);
     });
     //다음 곡 진행
