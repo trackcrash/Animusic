@@ -7,6 +7,7 @@ from sqlalchemy.sql.schema import Column
 from db.database import Base, engine, session
 from flask_login import current_user
 
+from collections import deque
 
 class Music(Base):
     __tablename__ = 'MusicTable'
@@ -32,7 +33,7 @@ class Music(Base):
         self.mission_id = mission_id
 
     def __repr__(self):
-        return "<Music(", self.title, self.song, self.youtube_url, self.thumbnail_url, self.answer, self.hint, self.mission_id, ">"
+        return f"title='{self.title}', song='{self.song}', youtube_url='{self.youtube_url}', thumbnail_url='{self.thumbnail_url}', answer='{self.answer}', hint='{self.hint}', mission_id='{self.mission_id}'"
 
 
 class Mission(Base):
@@ -54,6 +55,7 @@ class Mission(Base):
 
 # 코드 구조개선 --kyaru 16/08/23 12:00
 def save_to_db(data):
+    print(data)
     try:
         MissionMapName = data[-1]['MapName']
         MissionMapProducer = data[-1]['MapProducer']
@@ -84,11 +86,13 @@ def save_to_db(data):
 
 
 # 코드 구조개선 --kyaru 16/08/23 12:00
+'''
 def update_to_db(data):
     try:
-        mission_id = data[-1]['mission_Id']
+        mission_id = int(data[-1]['mission_Id'])
         existing_music_ids = [item.id for item in session.query(Music).filter_by(mission_id=mission_id).all()]
-        ids_to_keep = {item['Music_id'] for item in data if 'Music_id' in item}
+        ids_to_keep = {int(item['Music_id']) for item in data if 'Music_id' in item}
+
         for music_id in existing_music_ids:
             if music_id not in ids_to_keep:
                 session.query(Music).filter_by(id=music_id).delete()
@@ -102,13 +106,15 @@ def update_to_db(data):
                     mission_query.Thumbnail = item.get('Thumbnail', mission_query.Thumbnail)
 
             if 'Music_id' in item:
-                music_id = item['Music_id']
+                music_id = int(item['Music_id'])
                 music_query = session.query(Music).filter_by(id=music_id).first()
                 if music_query:
                     music_query.title = item.get('title', music_query.title)
                     music_query.song = item.get('song', music_query.song)
-                    music_query.songURL = item.get('songURL', music_query.songURL)
-                    music_query.thumbnail = item.get('thumbnail', music_query.thumbnail)
+                    music_query.youtube_url = item.get('songURL',
+                                                       music_query.youtube_url)  # Note the change in attribute name
+                    music_query.thumbnail_url = item.get('thumbnail',
+                                                         music_query.thumbnail_url)  # Note the change in attribute name
                     music_query.answer = item.get('answer', music_query.answer)
                     music_query.hint = item.get('hint', music_query.hint)
                 else:
@@ -119,11 +125,46 @@ def update_to_db(data):
                     )
                     session.add(new_music)
 
+
         session.commit()
     except SQLAlchemyError as e:
         session.rollback()
-        print(f'Error saving data: {str(e)}')
-        return f'Error saving data: {str(e)}'
-    # 세션닫기 추가
+        error_msg = f'Error saving data: {str(e)}'
+        print(error_msg)
+        return error_msg
+    finally:
+        session.close()
+'''
+def update_to_db(data):
+    try:
+        data = deque(data)
+        mission_id = data.pop()['mission_Id']
+        for item in data:
+            if 'Music_id' in item:
+                now_music_info = session.query(Music).filter_by(id=item['Music_id']).first()
+                now_music_info.title = item.get('title')
+                now_music_info.song = item.get('song')
+                now_music_info.youtube_url = item.get('songURL')
+                now_music_info.thumbnail_url = item.get('thumbnail')
+                now_music_info.answer = item.get('answer')
+                now_music_info.hint = item.get('hint')
+                session.commit()
+            else:
+                new_music_info = Music(
+                    title = item.get('title'),
+                    song = item.get('song'),
+                    youtube_url = item.get('songURL'),
+                    thumbnail_url = item.get('thumbnail'),
+                    answer = item.get('answer'),
+                    hint = item.get('hint'),
+                    mission_id = mission_id
+                )
+                session.add(new_music_info)
+                session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        error_msg = f'Error saving data: {str(e)}'
+        print(error_msg)
+        return error_msg
     finally:
         session.close()
