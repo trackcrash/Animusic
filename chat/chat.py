@@ -77,14 +77,7 @@ def handle_message(data):
     else:
         emit('message', {'name': name, 'msg': msg}, room=room)
 #다음 데이터 요청
-@socketio.on('requestNextData')
-def request_next_data(room_name):
-    next_data = music_data_manager.retrieve_next_data(room_name)
-    if next_data:
-        youtube_embed_url = next_data['youtube_embed_url']
-        emit('NextData', {'youtubeLink': youtube_embed_url}, room=room_name)
-    else:
-        emit('EndOfData', {}, room=room_name)
+
 
 @socketio.on("playTheGame")
 def playTheGame(room_name):
@@ -104,21 +97,33 @@ def send_saved_data(data):
     emit('MissionSelect_get', room_name, room=room_name)
 
 vote_counts = {}
-
+voted_users = {}
 #스킵투표
 @socketio.on('voteSkip')
 def handle_vote_skip(data):
     room = data.get("room")
-    index = music_data_manager.index_data(room)
-    if index not in vote_counts:
-        vote_counts[index] = 0
-    vote_counts[index] += 1
+    user = current_user.name
+    if room not in vote_counts:
+        vote_counts[room] = 0
+    if user not in voted_users:
+        voted_users[room] = []
+    # 이름 기준으로 이미 투표한 사용자는 다시 투표할 수 없도록 처리
+    if user in voted_users[room]:
+        return
+    vote_counts[room] += 1
+    voted_users[room].append(user)
     required_votes = data['requiredSkipVotes']
-    if vote_counts[index] >= required_votes:
-        vote_counts[index] = 0  # 해당 인덱스의 투표 카운트 초기화
-        emit('nextVideo', {}, room=room)
+    if vote_counts[room] >= required_votes:
+        vote_counts[room] = 0
+        voted_users[room] = [] #초기화
+        next_data = music_data_manager.retrieve_next_data(room)
+        if next_data:
+            youtube_embed_url = next_data['youtube_embed_url']
+            emit('NextData', {'youtubeLink': youtube_embed_url}, room=room_name)
+        else:
+            emit('EndOfData', {}, room=room_name)
     else:
-        emit('updateVoteCount', {'count': vote_counts[index]}, room=room)
+        emit('updateVoteCount', {'count': vote_counts[room]}, room=room)
 
 ############################################################################################
 #방 리스트 부분

@@ -36,13 +36,7 @@ function showSongInfo(title, song, correctusername) {
     correctUser.innerText = "정답자: " + correctusername;
 }
 
-function nextVideo() {
-    updateVoteCountUI(0);
-    const songTitle = document.getElementById('songTitle');
-    const songArtist = document.getElementById('songArtist');
-    const correctUser = document.getElementById('correctUser');
-    socket.emit('requestNextData', room_name);
-}
+
 
 function voteSkip() {
     socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
@@ -89,9 +83,7 @@ function initEventListeners() {
     });
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
-        StartButton.style.display = "none";
         socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId });
-        nextButton.style.display = "block";
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
 }
@@ -104,6 +96,8 @@ function initializeSocketEvents() {
         currentvideolink = data.youtubeLink;
         playvideo(currentvideolink);
         elements.MapSelect.style.display = "none";
+        elements.nextButton.style.display = "block";
+        elements.StartButton.style.display = "none";
         updateVoteCountUI(0);
     });
     //다음 곡 진행
@@ -114,6 +108,7 @@ function initializeSocketEvents() {
         songArtist.innerText = "";
         correctUser.innerText = "";
         nextButton.disabled = false;
+        updateVoteCountUI(0);
     });
     //게임 끝났을 때 init
     socket.on('EndOfData', function() {
@@ -149,9 +144,7 @@ function initializeSocketEvents() {
         elements.messages.appendChild(item);
         elements.messages.scrollTop = elements.messages.scrollHeight;
     });
-    socket.on('nextVideo', function() {
-        nextVideo();
-    });
+
 
     socket.on('updateVoteCount', function(data) {
         skipvote = data.count;
