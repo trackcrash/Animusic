@@ -61,8 +61,11 @@ def remove_room(room_name):
 @socketio.on('single_message')
 def handle_single_message(data):
     msg = data['content']
-    name = current_user.name
-    emit('single_message', {'name': name, 'msg': msg})
+    if not current_user.is_authenticated:
+        emit('single_message',{'name': '','msg':msg})
+    else:
+        name = current_user.name
+        emit('single_message', {'name': name, 'msg': msg})
 
 @socketio.on('message')
 def handle_message(data):

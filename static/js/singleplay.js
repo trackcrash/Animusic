@@ -40,6 +40,9 @@ function sendMessage() {
 
 socket.on('single_message', function(data) {
     const item = document.createElement('div');
+    if (data.name == '') {
+        data.name = 'guest'
+    }
     item.innerHTML = `<span class="font-semibold">${data.name}:</span> ${data.msg}`;
     messages.appendChild(item);
     messages.scrollTop = messages.scrollHeight;
