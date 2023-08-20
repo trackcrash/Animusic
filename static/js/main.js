@@ -141,8 +141,8 @@ document.getElementById("register-btn").addEventListener("click", function(e)
 document.getElementById('grid-container').addEventListener('click', function(e) {
     if (e.target.classList.contains('box') || e.target.closest('.box')) {
         const box = e.target.closest('.box');
-        const title = box.querySelector('h3').innerText.split(": ")[1];
-        const song = box.querySelector('p').innerText.split(": ")[1];
+        const title = box.querySelector('h3').innerText;
+        const song = box.querySelector('p').innerText;
         const songURL = box.querySelector('input').value;
         const answer = box.querySelector('h1').innerText;
         const hint = box.querySelector('h2').innerText;
