@@ -77,8 +77,7 @@ function modifyFunction() {
     }
 }
 
-document.querySelector(".add_box.grid-item").addEventListener('cilck',function()
-{
+document.querySelector(".add_box.grid-item").addEventListener('click', function() {
     document.getElementById('title-input').value = "";
     document.getElementById('song-name-input').value = "";
     document.getElementById('song-link-input').value = "";
@@ -86,6 +85,8 @@ document.querySelector(".add_box.grid-item").addEventListener('cilck',function()
     document.getElementById('hint-input').value = "";
     document.getElementById('id-input').value = "";
     document.getElementById('register-btn').innerText = "등록하기"; 
+
+    modifyIndex = null;
 });
 
 function createInfoItem(title, song, songURL, thumbnail, answer, hint, id) {
