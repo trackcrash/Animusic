@@ -1,6 +1,8 @@
  let videoId = "";
  let startTime = "";
  let endTime = "";
+ let modifyIndex = null;
+ modifyFunction();
  // 동영상 링크를 VideoId, startTime, endTime 을 분리하는 함수
 function split_ytLink(ytLink) {
     const changedLink = ytLink.replace('?', '&');
@@ -44,6 +46,46 @@ function loadVideo() {
 
 document.getElementById('submission-form').addEventListener('submit', function(e) {
     e.preventDefault();
+});
+
+
+function modifyFunction() {
+    const boxes = document.querySelectorAll('#grid-container .box');
+
+    for (let i = 0; i < boxes.length; i++) {
+        boxes[i].addEventListener('click', function() {
+            const title = this.querySelector('h3')?.innerText;
+            const song = this.querySelector('p')?.innerText;
+            const songURL = this.querySelector('input')?.value;
+            const answer = this.querySelector('h1')?.innerText;
+            const hint = this.querySelector('h2')?.innerText;
+            const id = this.querySelector('h4')?.innerText;
+            
+            // 정보를 설정하면서 선택적 체이닝 사용
+            document.getElementById('title-input').value = title || ''; // 속성이 없을 때는 빈 문자열
+            document.getElementById('song-name-input').value = song || '';
+            document.getElementById('song-link-input').value = songURL || '';
+            document.getElementById('answer-input').value = answer || '';
+            document.getElementById('hint-input').value = hint || '';
+            document.getElementById('id-input').value = id || '';
+            loadVideo();
+            document.getElementById('register-btn').innerText = "수정하기";
+            
+            modifyIndex = i;
+            console.log(`클릭한 box의 인덱스: ${i}`); 
+        });
+    }
+}
+
+document.querySelector(".add_box.grid-item").addEventListener('cilck',function()
+{
+    document.getElementById('title-input').value = "";
+    document.getElementById('song-name-input').value = "";
+    document.getElementById('song-link-input').value = "";
+    document.getElementById('answer-input').value = "";
+    document.getElementById('hint-input').value = "";
+    document.getElementById('id-input').value = "";
+    document.getElementById('register-btn').innerText = "등록하기"; 
 });
 
 function createInfoItem(title, song, songURL, thumbnail, answer, hint, id) {
@@ -91,8 +133,9 @@ function createInfoItem(title, song, songURL, thumbnail, answer, hint, id) {
     box.appendChild(HintElem);
     HintElem.style.display = "None";
 
+
     const MusicIdElem = document.createElement('h4'); // 사용자에게는 보이지 않도록 hidden 유형으로 설정
-    MusicIdElem.innerText = hint;
+    MusicIdElem.innerText = id;
     box.appendChild(MusicIdElem);
     MusicIdElem.style.display = "None";
     return box;
@@ -118,8 +161,8 @@ document.getElementById("register-btn").addEventListener("click", function(e)
         {
             if(h4List[i].innerText == id)
             {
-                boxList[i].querySelector('h3').innerText = "제목: " + title;
-                boxList[i].querySelector('p').innerText = "곡 이름: " + song;
+                boxList[i].querySelector('h3').innerText = title;
+                boxList[i].querySelector('p').innerText = song;
                 boxList[i].querySelector('img').src = thumbnailLink;
                 boxList[i].querySelector('input').value = songURL;
                 boxList[i].querySelector('h1').innerText = answer;
@@ -129,45 +172,33 @@ document.getElementById("register-btn").addEventListener("click", function(e)
     }
     else
     {
-        const box = createInfoItem(title, song, songURL, thumbnailLink, answer, hint, id);
-        document.querySelector('.add_box').before(box);
-        for(let i = 0; i <inputList.length; i++)
+        if(modifyIndex != null)
         {
-            inputList[i].value = "";
+            for(let i = 0; i < boxList.length; i++)
+            {
+                if(i == modifyIndex)
+                {
+                    boxList[i].querySelector('h3').innerText = title;
+                    boxList[i].querySelector('p').innerText = song;
+                    boxList[i].querySelector('img').src = thumbnailLink;
+                    boxList[i].querySelector('input').value = songURL;
+                    boxList[i].querySelector('h1').innerText = answer;
+                    boxList[i].querySelector('h2').innerText = hint;
+                }
+            }
+        }else
+        {
+            const box = createInfoItem(title, song, songURL, thumbnailLink, answer, hint, id);
+            document.querySelector('.add_box').before(box);
+            for(let i = 0; i <inputList.length; i++)
+            {
+                inputList[i].value = "";
+            }
+            modifyFunction();
         }
     }
-
 })
-document.getElementById('grid-container').addEventListener('click', function(e) {
-    if (e.target.classList.contains('box') || e.target.closest('.box')) {
-        const box = e.target.closest('.box');
-        const title = box.querySelector('h3').innerText;
-        const song = box.querySelector('p').innerText;
-        const songURL = box.querySelector('input').value;
-        const answer = box.querySelector('h1').innerText;
-        const hint = box.querySelector('h2').innerText;
-        const id = box.querySelector('h4').innerText;
-        // 폼에 정보를 설정
-        document.getElementById('title-input').value = title;
-        document.getElementById('song-name-input').value = song;
-        document.getElementById('song-link-input').value = songURL;
-        document.getElementById('answer-input').value = answer;
-        document.getElementById('hint-input').value = hint;
-        document.getElementById('id-input').value = id;
-        loadVideo();
-        document.getElementById('register-btn').innerText = "수정하기";
-    }
-    else if(e.target.classList.contains('add_box'))
-    {
-        document.getElementById('title-input').value = "";
-        document.getElementById('song-name-input').value = "";
-        document.getElementById('song-link-input').value = "";
-        document.getElementById('answer-input').value = "";
-        document.getElementById('hint-input').value = "";
-        document.getElementById('id-input').value = "";
-        document.getElementById('register-btn').innerText = "등록하기";
-    }
-});
+
 document.body.addEventListener('click', function(event) {
     if (event.target && event.target.classList.contains('close-btn')) {
         event.target.parentElement.remove();
@@ -184,8 +215,8 @@ function saveBtn()
     const items = document.querySelectorAll('.grid-item.box');
     let data = [];
     items.forEach(item => {
-        const title = item.querySelector('h3').innerText.split(": ")[1];
-        const song = item.querySelector('p').innerText.split(": ")[1];
+        const title = item.querySelector('h3').innerText;
+        const song = item.querySelector('p').innerText;
         const thumbnail = item.querySelector('img').src;
         const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value).videoId;
         const answer = item.querySelector('h1').innerText;
