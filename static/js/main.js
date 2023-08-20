@@ -2,7 +2,35 @@
  let startTime = "";
  let endTime = "";
  let modifyIndex = null;
- modifyFunction();
+const zero_space = document.getElementById('zero_space');
+const answerInput = document.getElementById('answer-input');
+modifyFunction();
+ 
+function zero_space_text() {
+    const inputText = answerInput.value;
+    const answerList = inputText.split(', ');
+
+    let zeroSpaceList = [];
+    for (const element of answerList) {
+        zeroSpaceList.push(element.replace(/\s+/g, ''));
+    }
+
+    let uniqueList = [];
+
+    for (const element of zeroSpaceList) {
+        if (!uniqueList.includes(element) && !answerList.includes(element) && element !== "") {
+            uniqueList.push(element);
+        }
+    }
+
+    let resultText = answerList.concat(uniqueList).join(', ');
+    
+    answerInput.value = resultText;
+}
+zero_space.addEventListener('click', function()
+{
+    zero_space_text();
+});
  // 동영상 링크를 VideoId, startTime, endTime 을 분리하는 함수
 function split_ytLink(ytLink) {
     const changedLink = ytLink.replace('?', '&');
@@ -191,9 +219,9 @@ document.getElementById("register-btn").addEventListener("click", function(e)
         {
             const box = createInfoItem(title, song, songURL, thumbnailLink, answer, hint, id);
             document.querySelector('.add_box').before(box);
-            for(let i = 0; i <inputList.length; i++)
+            for(const element of inputList)
             {
-                inputList[i].value = "";
+                element.value = "";
             }
             modifyFunction();
         }
@@ -368,16 +396,3 @@ let box_height = parseFloat(window.getComputedStyle(document.querySelector('.box
 
 // 공백없는 정답 추가제공하는 기능
 
-const zero_space = document.getElementById('zero_space');
-const answerInput = document.getElementById('answer-input');
-
-function zero_space_text() {
-    const inputText = answerInput.value;
-    const answerList = inputText.split(',');
-    const zeroSpaceList = answerList.map(text => text.replace(/\s+/g, ''));
-    const uniqueList = [...new Set([...answerList, ...zeroSpaceList])];
-
-    answerInput.value = uniqueList.join(',');
-};
-
-zero_space.addEventListener('click', zero_space_text);
