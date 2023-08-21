@@ -5,6 +5,7 @@ let currentvideolink = "";
 let selectedId = 0;
 let player_name = document.getElementById('User_Name').innerText;
 let isHost = false;
+let player;
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -13,7 +14,8 @@ const elements = {
     nextButton: document.getElementById('nextButton'),
     MapSelect: document.getElementById('MapSelect'),
     StartButton: document.getElementById('StartButton'),
-    sendButton: document.getElementById('sendButton')
+    sendButton: document.getElementById('sendButton'),
+    hintButton: document.getElementById('hintButton')
 };
 
 const room_name = new URLSearchParams(window.location.search).get('room_name');
@@ -35,25 +37,64 @@ function showSongInfo(title, song, correctusername) {
     correctUser.innerText = "정답자: " + correctusername;
 }
 
-
+function showHint(hint) {
+    const songHint = document.getElementById('songHint');
+    songHint.innerText = "힌트: " + hint;
+}
 
 function voteSkip() {
     socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
 }
 
 function playvideo(videolink) {
-    const iframe = document.createElement("iframe");
-    iframe.src = videolink;
-    iframe.allow = "autoplay";
-    iframe.width = "100%";
-    iframe.height = "100%";
-
     const videoFrame = document.getElementById("videoFrame");
     videoFrame.innerHTML = "";
-    videoFrame.appendChild(iframe);
-    videoOverlay.style.display = 'block';
+
+    const videoId = getYoutubeVideoId(videolink);
+
+    if (!videoId) {
+        console.error("Invalid YouTube URL provided");
+        return;
+    }
+
+    if (player) {
+        player.loadVideoById(videoId);
+        videoOverlay.style.display = 'block';
+        return;
+    }
+
+    player = new YT.Player(videoFrame, {
+        height: '100%',
+        width: '100%',
+        videoId: videoId,
+        events: {
+            'onReady': onPlayerReady,
+        }
+    });
 }
 
+function onPlayerReady(event) {
+    videoOverlay.style.display = 'block';
+    event.target.playVideo();
+}
+
+function getYoutubeVideoId(url) {
+    const regex = /(?:https:\/\/www\.youtube\.com\/embed\/)?([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+}
+//볼륨용
+function setVolume(volumeLevel) {
+    if (player && player.setVolume) {
+        player.setVolume(volumeLevel);
+    }
+}
+//재생시간용
+function seekTo(seconds) {
+    if (player && player.seekTo) {
+        player.seekTo(seconds, true);
+    }
+}
 
 function requiredSkipVotes(players) {
     return players <= 2 ? players : players <= 6 ? Math.ceil(players / 2) : Math.ceil(players * 0.7);
@@ -80,6 +121,9 @@ function initEventListeners() {
             voteSkip();
         }
     });
+    elements.hintButton.addEventListener('click', () => {
+        socket.emit('showHint', { "room": room_name });
+    });
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
         socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId }, function() {
@@ -98,6 +142,7 @@ function initializeSocketEvents() {
         playvideo(currentvideolink);
         elements.MapSelect.style.display = "none";
         elements.nextButton.style.display = "block";
+        elements.hintButton.style.display = "block";
         elements.StartButton.style.display = "none";
         nextButton.disabled = false;
         updateVoteCountUI(0);
@@ -110,6 +155,7 @@ function initializeSocketEvents() {
         elements.nextButton.style.display = "block";
         songArtist.innerText = "";
         correctUser.innerText = "";
+        songHint.innerText = "";
         nextButton.disabled = false;
         updateVoteCountUI(0);
     });
@@ -118,16 +164,14 @@ function initializeSocketEvents() {
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
+        songHint.innerText = "";
         videoOverlay.style.display = 'block';
-        if(isHost)
-        {
-            MapSelect.style.display = "block";    
-            StartButton.style.display = "block";
-        }
         nextButton.disabled = true;
         nextButton.style.display = "none";
         document.getElementById('skipVoteCount').innerText = "";
         playvideo("");
+        nextButton.style.display = "none";
+        hintButton.style.display = "none";
         socket.emit('playingStatus_change', room_name);
         showHostContent(false);
     });
@@ -140,6 +184,10 @@ function initializeSocketEvents() {
         playvideo(currentvideolink);
         elements.videoOverlay.style.display = 'none';
         showSongInfo(data.data.title, data.data.song, data.name);
+    });
+
+    socket.on('hint', data => {
+        showHint(data.hint);
     });
 
     socket.on('user_disconnect', data => {
