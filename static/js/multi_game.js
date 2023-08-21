@@ -107,6 +107,7 @@ function initializeSocketEvents() {
         currentvideolink = data.youtubeLink;
         playvideo(currentvideolink);
         songTitle.innerText = "";
+        elements.nextButton.style.display = "block";
         songArtist.innerText = "";
         correctUser.innerText = "";
         nextButton.disabled = false;
@@ -118,12 +119,15 @@ function initializeSocketEvents() {
         songArtist.innerText = "";
         correctUser.innerText = "";
         videoOverlay.style.display = 'block';
-        MapSelect.style.display = "block";
+        if(isHost)
+        {
+            MapSelect.style.display = "block";    
+            StartButton.style.display = "block";
+        }
         nextButton.disabled = true;
-        StartButton.style.display = "block";
+        nextButton.style.display = "none";
         document.getElementById('skipVoteCount').innerText = "";
         playvideo("");
-        nextButton.style.display = "none";
         socket.emit('playingStatus_change', room_name);
         showHostContent(false);
     });
@@ -139,7 +143,7 @@ function initializeSocketEvents() {
     });
 
     socket.on('user_disconnect', data => {
-        socket.emit('request_room_players_update', { room_name });
+        // socket.emit('request_room_players_update', { room_name });
     });
 
     socket.on('message', data => {

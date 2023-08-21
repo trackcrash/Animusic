@@ -4,7 +4,7 @@ function fetchData(url, callback) {
     $.getJSON(url, callback);
 }
 
-function createRoomElement(room_name, room_status) {
+function createRoomElement(room_name, room_status, user_count) {
     const roomContainer = document.createElement('div');
     roomContainer.id = 'roomContainer_' + room_name;
     roomContainer.classList.add('room-container', 'grid', 'grid-rows-1', 'gap-4', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition', 'duration-300', 'hover:bg-gray-100');
@@ -17,7 +17,7 @@ function createRoomElement(room_name, room_status) {
     const roomCountElement = document.createElement('span');
     roomCountElement.id = `${roomNameElementIdPrefix}${room_name}`;
     roomCountElement.classList.add('room-count', 'text-sm', 'text-gray-600');
-    roomCountElement.textContent = "0명";
+    roomCountElement.textContent = user_count ? `${user_count}명` : "0명";
 
     const InnerDivContainer = document.createElement('div');
     InnerDivContainer.classList.add('grid', 'grid-rows-3', 'gap-4', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition', 'duration-300', 'hover:bg-gray-100');
@@ -37,7 +37,6 @@ function createRoomElement(room_name, room_status) {
 
     return roomContainer;
 }
-
 
 function updateRoomCount(room_name, playerCount) {
     const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${room_name}`);
@@ -81,14 +80,10 @@ function firstCreateRoom() {
             for (let room_name in room_dict) {
                 const roomInfo = room_dict[room_name]["room_info"];
                 const roomStatus = roomInfo["room_status"];
-
+                const user_info = room_dict[room_name]["user"];
+                const user_count = Object.keys(user_info).length;
                 // roomStatus를 이용하여 원하는 작업 수행
-                roomButtonsContainer.appendChild(createRoomElement(room_name, roomStatus));
-                if (roomStatus) {
-                    console.log(`${room_name} 방은 현재 활성화 중입니다.`);
-                } else {
-                    console.log(`${room_name} 방은 현재 비활성화 중입니다.`);
-                }
+                roomButtonsContainer.appendChild(createRoomElement(room_name, roomStatus,user_count));
             }
         });
     });
@@ -138,6 +133,7 @@ socket.on('user_check_not_ok', function() {
 
 socket.on('room_removed', (data)=>
 {
+    console.log("삭제되었습니다.");
     removeRoomFromList(data);
 });
 socket.on('Join_room', (data)=>
