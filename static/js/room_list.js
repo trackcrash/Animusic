@@ -4,7 +4,7 @@ function fetchData(url, callback) {
     $.getJSON(url, callback);
 }
 
-function createRoomElement(room_name) {
+function createRoomElement(room_name, room_status) {
     const roomContainer = document.createElement('div');
     roomContainer.id = 'roomContainer_' + room_name;
     roomContainer.classList.add('room-container', 'grid', 'grid-rows-1', 'gap-4', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition', 'duration-300', 'hover:bg-gray-100');
@@ -20,9 +20,15 @@ function createRoomElement(room_name) {
     roomCountElement.textContent = "0명";
 
     const InnerDivContainer = document.createElement('div');
-    InnerDivContainer.classList.add('grid', 'grid-rows-2', 'gap-4', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition', 'duration-300', 'hover:bg-gray-100')
+    InnerDivContainer.classList.add('grid', 'grid-rows-3', 'gap-4', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition', 'duration-300', 'hover:bg-gray-100');
+    
+    const roomStatusElement = document.createElement('span');
+    roomStatusElement.classList.add('room-status', 'text-sm', 'text-gray-600');
+    roomStatusElement.textContent = room_status ? "게임중" : "대기중";
+
     roomContainer.appendChild(button);
-    InnerDivContainer.appendChild(roomCountElement)
+    InnerDivContainer.appendChild(roomCountElement);
+    InnerDivContainer.appendChild(roomStatusElement); // 여기에 roomStatusElement 추가
     roomContainer.appendChild(InnerDivContainer);
     roomContainer.addEventListener('click', function() {
         socket.emit('user_check',{"room_name":room_name});
@@ -31,6 +37,7 @@ function createRoomElement(room_name) {
 
     return roomContainer;
 }
+
 
 function updateRoomCount(room_name, playerCount) {
     const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${room_name}`);
@@ -72,9 +79,16 @@ function firstCreateRoom() {
         fetchData("/get-room-dict", function(room_dict) {
             const roomButtonsContainer = document.getElementById('room-buttons');
             for (let room_name in room_dict) {
-                console.log(room_name)
-                roomButtonsContainer.appendChild(createRoomElement(room_name));
-                socket.emit('request_room_players_update', { room_name: room_name });
+                const roomInfo = room_dict[room_name]["room_info"];
+                const roomStatus = roomInfo["room_status"];
+
+                // roomStatus를 이용하여 원하는 작업 수행
+                roomButtonsContainer.appendChild(createRoomElement(room_name, roomStatus));
+                if (roomStatus) {
+                    console.log(`${room_name} 방은 현재 활성화 중입니다.`);
+                } else {
+                    console.log(`${room_name} 방은 현재 비활성화 중입니다.`);
+                }
             }
         });
     });
@@ -82,7 +96,7 @@ function firstCreateRoom() {
 
 function addRoomToList(room_name) {
     const roomButtonsContainer = document.getElementById('room-buttons');
-    roomButtonsContainer.appendChild(createRoomElement(room_name));
+    roomButtonsContainer.appendChild(createRoomElement(room_name,false));
 }
 
 function removeRoomFromList(room_name) {
@@ -138,11 +152,14 @@ socket.on('update_waiting_userlist', function(data) {
 });
 
 // 해당 방을 안보이게 처리함
-socket.on('request_room_hidden', function(data) {
-    document.getElementById('roomContainer_' + data).classList.add('hidden');
-});
-
-// 해당 방을 보이게 처리함
-socket.on('request_room_show', function(data) {
-    document.getElementById('roomContainer_' + data).classList.remove('hidden');
+socket.on('request_room_changed', function(data) {
+    let playing = data["room_status"];
+    console.log('roomContainer_' + data["room_name"] +' .room_status')
+    if(playing)
+    {
+        document.getElementById('roomContainer_' + data["room_name"]).querySelector('.room-status').innerText = "게임중";
+    }else
+    {
+        document.getElementById('roomContainer_' + data["room_name"]).querySelector('.room-status').innerText = "대기중";
+    }
 });
