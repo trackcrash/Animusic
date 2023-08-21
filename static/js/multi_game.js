@@ -13,7 +13,8 @@ const elements = {
     nextButton: document.getElementById('nextButton'),
     MapSelect: document.getElementById('MapSelect'),
     StartButton: document.getElementById('StartButton'),
-    sendButton: document.getElementById('sendButton')
+    sendButton: document.getElementById('sendButton'),
+    hintButton: document.getElementById('hintButton')
 };
 
 const room_name = new URLSearchParams(window.location.search).get('room_name');
@@ -35,7 +36,10 @@ function showSongInfo(title, song, correctusername) {
     correctUser.innerText = "정답자: " + correctusername;
 }
 
-
+function showHint(hint) {
+    const songHint = document.getElementById('songHint');
+    songHint.innerText = "힌트: " + hint;
+}
 
 function voteSkip() {
     socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
@@ -80,6 +84,9 @@ function initEventListeners() {
             voteSkip();
         }
     });
+    elements.hintButton.addEventListener('click', () => {
+        socket.emit('showHint', { "room": room_name });
+    });
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
         socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId }, function() {
@@ -98,6 +105,7 @@ function initializeSocketEvents() {
         playvideo(currentvideolink);
         elements.MapSelect.style.display = "none";
         elements.nextButton.style.display = "block";
+        elements.hintButton.style.display = "block";
         elements.StartButton.style.display = "none";
         nextButton.disabled = false;
         updateVoteCountUI(0);
@@ -109,6 +117,7 @@ function initializeSocketEvents() {
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
+        songHint.innerText = "";
         nextButton.disabled = false;
         updateVoteCountUI(0);
     });
@@ -117,6 +126,7 @@ function initializeSocketEvents() {
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
+        songHint.innerText = "";
         videoOverlay.style.display = 'block';
         MapSelect.style.display = "block";
         nextButton.disabled = true;
@@ -124,6 +134,7 @@ function initializeSocketEvents() {
         document.getElementById('skipVoteCount').innerText = "";
         playvideo("");
         nextButton.style.display = "none";
+        hintButton.style.display = "none";
         socket.emit('playingStatus_change', room_name);
         showHostContent(false);
     });
@@ -136,6 +147,10 @@ function initializeSocketEvents() {
         playvideo(currentvideolink);
         elements.videoOverlay.style.display = 'none';
         showSongInfo(data.data.title, data.data.song, data.name);
+    });
+
+    socket.on('hint', data => {
+        showHint(data.hint);
     });
 
     socket.on('user_disconnect', data => {

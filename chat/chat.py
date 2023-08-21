@@ -89,6 +89,12 @@ def handle_message(data):
         emit('message', {'name': name, 'msg': msg}, room=room)
 #다음 데이터 요청
 
+@socketio.on('showHint')
+def showHint(data):
+    room_name = data.get("room")
+    current_data = music_data_manager.retrieve_data(room_name)
+    if current_data:
+        emit('hint', {'hint': current_data['hint']}, room=room_name)
 
 @socketio.on("playTheGame")
 def playTheGame(room_name):
