@@ -146,10 +146,12 @@ function initializeSocketEvents() {
         elements.StartButton.style.display = "none";
         nextButton.disabled = false;
         updateVoteCountUI(0);
+        showHostContent(true);
     });
     //다음 곡 진행
     socket.on('NextData', function(data) {
         currentvideolink = data.youtubeLink;
+        totalPlayers = data['totalPlayers'];
         playvideo(currentvideolink);
         songTitle.innerText = "";
         elements.nextButton.style.display = "block";
@@ -158,6 +160,7 @@ function initializeSocketEvents() {
         songHint.innerText = "";
         nextButton.disabled = false;
         updateVoteCountUI(0);
+        showHostContent(true);
     });
     //게임 끝났을 때 init
     socket.on('EndOfData', function() {
@@ -206,14 +209,14 @@ function initializeSocketEvents() {
         skipvote = data.count;
         updateVoteCountUI(skipvote);
     });
-    socket.on("new_host_message", (data) => {
-        // data.message를 이용하여 새로운 방장 알림을 처리
-        elements.nextButton.style.display = "block";
-        elements.MapSelect.style.display = "block";
-        elements.nextButton.disabled = true;
-        elements.MapSelect.disabled = true;
-        console.log(data.message);
-    });
+//     socket.on("new_host_message", (data) => {
+//         // data.message를 이용하여 새로운 방장 알림을 처리
+//         elements.nextButton.style.display = "block";
+//         elements.MapSelect.style.display = "block";
+//         elements.nextButton.disabled = true;
+//         elements.MapSelect.disabled = true;
+//         console.log(data.message);
+//     });
 }
 
 window.onload = function() {
@@ -221,9 +224,10 @@ window.onload = function() {
         socket.emit('join', { room_name: room_name }, () => {
             initEventListeners();
             initializeSocketEvents();
+            showHostContent(false);
         })
     });
-    nextButton.style.display = "none";
+    // nextButton.style.display = "none";
 };
 socket.on("user_change", (data) => {
     let count = data["count"];
@@ -242,23 +246,43 @@ socket.on('host_updated', (data) => {
 });
 
 function showHostContent(game_status) {
+    console.log(isHost, game_status);
     if (isHost) {
         if (game_status == false) {
             elements.StartButton.style.display = "block";
             elements.MapSelect.style.display = "block";
             elements.StartButton.disabled = false;
             elements.MapSelect.disabled = false;
+            elements.hintButton.style.display = "none";
+            elements.nextButton.style.display = "none";
+            elements.hintButton.disabled = true;
+            elements.nextButton.disabled = true;
         }
         if (game_status == true) {
+            elements.hintButton.style.display = "block";
             elements.nextButton.style.display = "block";
+            elements.hintButton.disabled = false;
+            elements.nextButton.disabled = false;
+
         }
     } else {
         elements.StartButton.style.display = "none";
         elements.MapSelect.style.display = "none";
         elements.StartButton.disabled = true;
         elements.MapSelect.disabled = true;
+
         if (game_status == true) {
             elements.nextButton.style.display = "block";
+            elements.nextButton.disabled = false;
+            elements.hintButton.style.display = "block";
+            elements.hintButton.disabled = false;
+        }
+        else
+        {
+            elements.nextButton.style.display = "none";
+            elements.nextButton.disabled = true;
+            elements.hintButton.style.display = "none";
+            elements.hintButton.disabled = true;
         }
 
     }

@@ -134,11 +134,13 @@ def handle_vote_skip(data):
         vote_counts[room] = 0
         voted_users[room] = [] #초기화
         next_data = music_data_manager.retrieve_next_data(room)
+        print(next_data)
         if next_data:
+            totalPlayers = len(room_data_manager._data_store[room]['user'])
             youtube_embed_url = next_data['youtube_embed_url']
-            emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers}, room=room_name)
+            emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers}, room=room)
         else:
-            emit('EndOfData', {}, room=room_name)
+            emit('EndOfData', {}, room=room)
 
 
 
@@ -179,14 +181,13 @@ def join_sock(data):
     update_room_player_count(room_name)
     user_id = room_data_manager.host_setting(room_name)
     game_status = room_data_manager._data_store[room_name]['room_info']['room_status']
-    if game_status :
-        totalPlayers = len(room_data_manager._data_store[room_name]['user'])
+    # if game_status :
+        # totalPlayers = len(room_data_manager._data_store[room_name]['user'])
         # if room_name not in vote_counts:
         #     emit('user_change', {'count': vote_counts[room_name], 'totalPlayers': totalPlayers}, room=room_name)
         # else :
         #     emit("user_change", {'count': 0, 'totalPlayers': totalPlayers}, room=room_name)
     if user_id != "":
-        
         emit("host_updated", {"user":user_id, "game_status":game_status}, room=room_name)
     try:
         if current_user.name in waitingroom_userlist:
