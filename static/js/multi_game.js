@@ -5,6 +5,7 @@ let currentvideolink = "";
 let selectedId = 0;
 let player_name = document.getElementById('User_Name').innerText;
 let isHost = false;
+let player;
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -46,18 +47,54 @@ function voteSkip() {
 }
 
 function playvideo(videolink) {
-    const iframe = document.createElement("iframe");
-    iframe.src = videolink;
-    iframe.allow = "autoplay";
-    iframe.width = "100%";
-    iframe.height = "100%";
-
     const videoFrame = document.getElementById("videoFrame");
     videoFrame.innerHTML = "";
-    videoFrame.appendChild(iframe);
-    videoOverlay.style.display = 'block';
+
+    const videoId = getYoutubeVideoId(videolink);
+
+    if (!videoId) {
+        console.error("Invalid YouTube URL provided");
+        return;
+    }
+
+    if (player) {
+        player.loadVideoById(videoId);
+        videoOverlay.style.display = 'block';
+        return;
+    }
+
+    player = new YT.Player(videoFrame, {
+        height: '100%',
+        width: '100%',
+        videoId: videoId,
+        events: {
+            'onReady': onPlayerReady,
+        }
+    });
 }
 
+function onPlayerReady(event) {
+    videoOverlay.style.display = 'block';
+    event.target.playVideo();
+}
+
+function getYoutubeVideoId(url) {
+    const regex = /(?:https:\/\/www\.youtube\.com\/embed\/)?([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+}
+//볼륨용
+function setVolume(volumeLevel) {
+    if (player && player.setVolume) {
+        player.setVolume(volumeLevel);
+    }
+}
+//재생시간용
+function seekTo(seconds) {
+    if (player && player.seekTo) {
+        player.seekTo(seconds, true);
+    }
+}
 
 function requiredSkipVotes(players) {
     return players <= 2 ? players : players <= 6 ? Math.ceil(players / 2) : Math.ceil(players * 0.7);
