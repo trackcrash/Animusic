@@ -84,7 +84,7 @@ function initEventListeners() {
         elements.nextButton.disabled = false;
         socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId },function()
         {
-            socket.emit('playingRoom_hidden', room_name);
+            socket.emit('playingStatus_change', room_name);
         });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
@@ -125,7 +125,7 @@ function initializeSocketEvents() {
         document.getElementById('skipVoteCount').innerText = "";
         playvideo("");
         nextButton.style.display = "none";
-        socket.emit('playingRoom_show', room_name);
+        socket.emit('playingStatus_change', room_name);
         showHostContent(false);
     });
 
