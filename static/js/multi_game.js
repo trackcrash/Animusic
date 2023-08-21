@@ -172,7 +172,7 @@ function initializeSocketEvents() {
         nextButton.disabled = true;
         nextButton.style.display = "none";
         document.getElementById('skipVoteCount').innerText = "";
-        playvideo("");
+        player.stopVideo();
         nextButton.style.display = "none";
         hintButton.style.display = "none";
         socket.emit('playingStatus_change', room_name);
@@ -209,14 +209,14 @@ function initializeSocketEvents() {
         skipvote = data.count;
         updateVoteCountUI(skipvote);
     });
-//     socket.on("new_host_message", (data) => {
-//         // data.message를 이용하여 새로운 방장 알림을 처리
-//         elements.nextButton.style.display = "block";
-//         elements.MapSelect.style.display = "block";
-//         elements.nextButton.disabled = true;
-//         elements.MapSelect.disabled = true;
-//         console.log(data.message);
-//     });
+    //     socket.on("new_host_message", (data) => {
+    //         // data.message를 이용하여 새로운 방장 알림을 처리
+    //         elements.nextButton.style.display = "block";
+    //         elements.MapSelect.style.display = "block";
+    //         elements.nextButton.disabled = true;
+    //         elements.MapSelect.disabled = true;
+    //         console.log(data.message);
+    //     });
 }
 
 window.onload = function() {
@@ -276,9 +276,7 @@ function showHostContent(game_status) {
             elements.nextButton.disabled = false;
             elements.hintButton.style.display = "block";
             elements.hintButton.disabled = false;
-        }
-        else
-        {
+        } else {
             elements.nextButton.style.display = "none";
             elements.nextButton.disabled = true;
             elements.hintButton.style.display = "none";
