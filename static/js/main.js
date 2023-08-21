@@ -395,3 +395,5 @@ observer.observe(document.getElementById('grid-container'), {childList: true });
 let box_width = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('width'));
 let box_height = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('height'));
 
+//맵 양식 다운로드 기능
+
