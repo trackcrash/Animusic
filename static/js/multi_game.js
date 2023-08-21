@@ -4,7 +4,7 @@ let skipvote = 0;
 let currentvideolink = "";
 let selectedId = 0;
 let player_name = document.getElementById('User_Name').innerText;
-let isHost = false; 
+let isHost = false;
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -13,7 +13,8 @@ const elements = {
     nextButton: document.getElementById('nextButton'),
     MapSelect: document.getElementById('MapSelect'),
     StartButton: document.getElementById('StartButton'),
-    sendButton: document.getElementById('sendButton')
+    sendButton: document.getElementById('sendButton'),
+    hintButton: document.getElementById('hintButton')
 };
 
 const room_name = new URLSearchParams(window.location.search).get('room_name');
@@ -35,7 +36,10 @@ function showSongInfo(title, song, correctusername) {
     correctUser.innerText = "정답자: " + correctusername;
 }
 
-
+function showHint(hint) {
+    const songHint = document.getElementById('songHint');
+    songHint.innerText = "힌트: " + hint;
+}
 
 function voteSkip() {
     socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
@@ -80,11 +84,13 @@ function initEventListeners() {
             voteSkip();
         }
     });
+    elements.hintButton.addEventListener('click', () => {
+        socket.emit('showHint', { "room": room_name });
+    });
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
-        socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId },function()
-        {
-            socket.emit('playingRoom_hidden', room_name);
+        socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId }, function() {
+            socket.emit('playingStatus_change', room_name);
         });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
@@ -99,6 +105,7 @@ function initializeSocketEvents() {
         playvideo(currentvideolink);
         elements.MapSelect.style.display = "none";
         elements.nextButton.style.display = "block";
+        elements.hintButton.style.display = "block";
         elements.StartButton.style.display = "none";
         nextButton.disabled = false;
         updateVoteCountUI(0);
@@ -110,6 +117,7 @@ function initializeSocketEvents() {
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
+        songHint.innerText = "";
         nextButton.disabled = false;
         updateVoteCountUI(0);
     });
@@ -118,6 +126,7 @@ function initializeSocketEvents() {
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
+        songHint.innerText = "";
         videoOverlay.style.display = 'block';
         MapSelect.style.display = "block";
         nextButton.disabled = true;
@@ -125,7 +134,8 @@ function initializeSocketEvents() {
         document.getElementById('skipVoteCount').innerText = "";
         playvideo("");
         nextButton.style.display = "none";
-        socket.emit('playingRoom_show', room_name);
+        hintButton.style.display = "none";
+        socket.emit('playingStatus_change', room_name);
         showHostContent(false);
     });
 
@@ -137,6 +147,10 @@ function initializeSocketEvents() {
         playvideo(currentvideolink);
         elements.videoOverlay.style.display = 'none';
         showSongInfo(data.data.title, data.data.song, data.name);
+    });
+
+    socket.on('hint', data => {
+        showHint(data.hint);
     });
 
     socket.on('user_disconnect', data => {
@@ -157,8 +171,8 @@ function initializeSocketEvents() {
     });
     socket.on("new_host_message", (data) => {
         // data.message를 이용하여 새로운 방장 알림을 처리
-        elements.nextButton.style.display= "block";
-        elements.MapSelect.style.display= "block";
+        elements.nextButton.style.display = "block";
+        elements.MapSelect.style.display = "block";
         elements.nextButton.disabled = true;
         elements.MapSelect.disabled = true;
         console.log(data.message);
@@ -174,8 +188,7 @@ window.onload = function() {
     });
     nextButton.style.display = "none";
 };
-socket.on("user_change", (data)=>
-{
+socket.on("user_change", (data) => {
     let count = data["count"];
     totalPlayers = data["totalPlayers"];
     updateVoteCountUI(count);
@@ -186,45 +199,41 @@ socket.on('host_updated', (data) => {
     console.log(`New host: ${data.user}`);
     const game_status = data['game_status'];
     if (data.user === socket.id) {
-        isHost = true;  // 방장이면 isHost를 true로 설정
+        isHost = true; // 방장이면 isHost를 true로 설정
     }
-    showHostContent(game_status); 
+    showHostContent(game_status);
 });
+
 function showHostContent(game_status) {
     if (isHost) {
-        if(game_status == false)
-        {
-            elements.StartButton.style.display= "block";
-            elements.MapSelect.style.display= "block";
+        if (game_status == false) {
+            elements.StartButton.style.display = "block";
+            elements.MapSelect.style.display = "block";
             elements.StartButton.disabled = false;
             elements.MapSelect.disabled = false;
         }
-        if(game_status == true)
-        {
+        if (game_status == true) {
             elements.nextButton.style.display = "block";
         }
     } else {
-        elements.StartButton.style.display= "none";
-        elements.MapSelect.style.display= "none";
+        elements.StartButton.style.display = "none";
+        elements.MapSelect.style.display = "none";
         elements.StartButton.disabled = true;
         elements.MapSelect.disabled = true;
-        if(game_status == true)
-        {
+        if (game_status == true) {
             elements.nextButton.style.display = "block";
         }
 
     }
 }
+
 function MapSelectPopUp() {
-    createMapSelectModal();
-
-    $('#missionTableModal').modal('show');
-
+    // AJAX 호출로 데이터 가져오기
     $.ajax({
         url: '/api/get_mission_table',
         type: 'GET',
         success: function(data) {
-            populateModalWithMissionData(data);
+            openPopupAndDisplayData(data);
         },
         error: function(error) {
             console.error('Error fetching mission table data:', error);
@@ -232,8 +241,22 @@ function MapSelectPopUp() {
     });
 }
 
-function populateModalWithMissionData(data) {
-    let contentHtml = '<div class="grid grid-cols-5 gap-6">';
+function openPopupAndDisplayData(data) {
+    const popupContent = populatePopupWithMissionData(data);
+    const popupWindow = window.open('', 'mapSelectPopup', 'width=800,height=800,scrollbars=yes');
+    popupWindow.document.write(popupContent);
+    popupWindow.document.close();
+}
+
+function populatePopupWithMissionData(data) {
+    let contentHtml = `
+        <html>
+            <head>
+                <title>Select Map</title>
+                <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+            </head>
+            <body>
+                <div class="grid grid-cols-5 gap-6">`;
 
     for (let i = 0; i < data.length; i++) {
         contentHtml += `
@@ -246,39 +269,20 @@ function populateModalWithMissionData(data) {
             </a>`;
     }
 
-    contentHtml += '</div>';
-    $('#popup-content').html(contentHtml);
+    contentHtml += `
+                </div>
+            </body>
+            <script type="text/javascript">
+                    function selectAndClose(id) {
+                        window.opener.setSelectedId(id);
+                        window.close();
+                    }
+                </script>
+        </html>`;
+
+    return contentHtml;
 }
 
-function createMapSelectModal() {
-    $('#missionTableModal').remove();
-    const modalHtml = `
-    <div class="modal fade" id="missionTableModal" tabindex="-1" aria-labelledby="missionTableModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="missionTableModalLabel"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="popup-content">
-                        <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 ">
-                            <div class="grid grid-cols-5 gap-6">
-                                <!-- 예시 아이템. 실제 사용 시에는 이 부분을 동적으로 생성해야 합니다. -->
-                                <a href="#" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>`;
-
-    $('body').append(modalHtml);
-}
-
-function selectAndClose(id) {
+function setSelectedId(id) {
     selectedId = id;
-    $('#missionTableModal').modal('hide');
 }

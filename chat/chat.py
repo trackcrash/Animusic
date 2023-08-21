@@ -89,6 +89,12 @@ def handle_message(data):
         emit('message', {'name': name, 'msg': msg}, room=room)
 #다음 데이터 요청
 
+@socketio.on('showHint')
+def showHint(data):
+    room_name = data.get("room")
+    current_data = music_data_manager.retrieve_data(room_name)
+    if current_data:
+        emit('hint', {'hint': current_data['hint']}, room=room_name)
 
 @socketio.on("playTheGame")
 def playTheGame(room_name):
@@ -139,13 +145,7 @@ def handle_vote_skip(data):
         emit('updateVoteCount', {'count': vote_counts[room]}, room=room)
 
 ############################################################################################
-#방 리스트 부분
-@socketio.on('request_room_players_update')
-def handle_request_room_players_update(data):
-    room_name = data['room_name']
-    update_room_player_count(room_name)
-
-    # 방마다 인원 수를 클라이언트에게 전달
+# 방마다 인원 수를 클라이언트에게 전달
 def update_room_player_count(room_name):
     player_count= len(room_data_manager._data_store[room_name]['user'])
     emit('room_players_update', {'room_name': room_name, 'player_count':player_count}, broadcast=True)
@@ -220,13 +220,8 @@ def get_user():
     return jsonify(data)
 
 # 게임중인 방 room_list.html 에서 안보이게 하기
-@socketio.on('playingRoom_hidden')
+@socketio.on('playingStatus_change')
 def playingroom_hidden(room_name):
     room_data_manager.game_status(room_name)
-    emit('request_room_hidden', room_name, broadcast = True)
-
-# 게임이 끝난 방 room_list.html 에서 보이게 하기
-@socketio.on('playingRoom_show')
-def playingRoom_show(room_name):
-    room_data_manager.game_status(room_name)
-    emit('request_room_show', room_name, broadcast = True)
+    room_status = room_data_manager._data_store[room_name]["room_info"]["room_status"]
+    emit('request_room_changed', {"room_name":room_name,"room_status":room_status},  broadcast = True)
