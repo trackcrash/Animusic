@@ -1,0 +1,94 @@
+.box {
+    border: 1px solid gray;
+    overflow: hidden;
+    height: 175px;
+    width: 150px;
+    transition: transform 0.3s;
+    position: relative;
+}
+
+.add_box {
+    text-align: center;
+    font-size: 100px;
+    border: 1px solid gray;
+    overflow: hidden;
+    height: 175px;
+    width: 150px;
+    transition: transform 0.3s;
+    position: relative;
+}
+
+.add_box:hover {
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+#grid-container {
+    grid-auto-flow: row;
+    grid-gap: 1rem;
+    width: 100%;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    overflow-y: auto;
+    /* Grid container에 스크롤 추가 */
+}
+
+.box:hover {
+    transform: scale(1.05);
+    z-index: 10;
+}
+/* 추가된 스타일 */
+
+.left-side,
+.right-side {
+    height: 100vh;
+    padding: 2rem;
+}
+
+.info-section {
+    height: 50%;
+}
+
+.input-form-section {
+    height: 50%;
+}
+
+.video-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60%;
+}
+
+/* .box가 3~4줄 이상일 경우 box의 크기를 변경함 */
+.three-or-more-row .box {
+    height: 60px;
+}
+
+.align-right-button {
+    float: right;
+}
+
+.scrolling-text {
+    white-space: nowrap;
+    width: 100%
+}
+
+.scrolling-text:hover {
+    animation: scroll 2s linear infinite;
+}
+@keyframes scroll {
+from { transform: translateX(0); }
+to { transform: translateX(-50%); }
+}
+
+input[type="file"] {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    background-color: white;
+    color: #555;
+    font-size: 1rem;
+}
+input[type="file"]:hover {
+    border-color: #888;
+}

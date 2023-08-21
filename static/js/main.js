@@ -279,7 +279,7 @@ function saveBtn()
         success: function(data) {
             console.log("통신데이터 값 : ", data);
             alert("등록 완료되었습니다.");
-            // location.reload();
+            location.reload();
         }
     });
 }
@@ -341,7 +341,7 @@ function UpdateBtn()
         success: function(data) {
             console.log("통신데이터 값 : ", data);
             alert("등록 완료되었습니다.");
-            // location.reload();
+            location.reload();
         }
     });
 }
@@ -394,4 +394,6 @@ observer.observe(document.getElementById('grid-container'), {childList: true });
 //grid-container 안의 아이템의 가로 세로 길이를 px단위로 정의함
 let box_width = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('width'));
 let box_height = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('height'));
+
+//맵 양식 다운로드 기능
 
