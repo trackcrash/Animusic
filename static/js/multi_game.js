@@ -351,5 +351,19 @@ socket.on('room_players_update', function(data) {;
         item.innerHTML = `<span class="font-semibold">${data.player}</span> ${data.msg}`;
         elements.messages.appendChild(item);
         elements.messages.scrollTop = elements.messages.scrollHeight;
+        playerListGet(data.players);
+
     }
 });
+function playerListGet(players) {
+    // 컨테이너 요소 선택
+    var container = document.getElementById("Players_Box");
+    container.innerHTML = "";
+    // 객체의 키와 값을 순회
+    Object.entries(players).forEach(function([key, value]) {
+        var username = value["username"];
+        var userDiv = document.createElement("div"); // 새 <div> 요소 생성
+        userDiv.textContent = username; // <div> 내용 설정
+        container.appendChild(userDiv); // 컨테이너에 <div> 추가
+    });
+}
