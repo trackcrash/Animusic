@@ -314,29 +314,33 @@ function populatePopupWithMissionData(data) {
                 <title>Select Map</title>
                 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
             </head>
-            <body>
-                <div class="grid grid-cols-5 gap-6">`;
+            <body class="bg-gray-100 font-sans">
+                <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
+                    <h1 class="text-center text-3xl font-bold mb-8 text-gray-700">Select Map</h1>
+                    <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">`;
 
     for (let i = 0; i < data.length; i++) {
         contentHtml += `
-            <a href="#" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300" data-id="${data[i].id}" onclick="selectAndClose(${data[i].id})">
-                <p>ID: ${data[i].id}</p>
-                <p>Name: ${data[i].MapName}</p>
-                <p>Producer: ${data[i].MapProducer}</p>
-                <img src="${data[i].Thumbnail}" alt="${data[i].MapName}" />
-                <p>${data[i].MusicNum}곡</p>
+            <a href="#" class="block bg-white p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300" data-id="${data[i].id}" onclick="selectAndClose(${data[i].id})">
+                <p class="text-xl mb-4 truncate">${data[i].MapName}</p>
+                <div class="mb-4">
+                    <img src="${data[i].Thumbnail}" alt="${data[i].MapName}" class="mx-auto w-full h-56 object-cover rounded-lg" />
+                </div>
+                <p class="text-gray-500 mb-2">제작자: ${data[i].MapProducer}</p>
+                <p class="text-indigo-600">곡수: ${data[i].MusicNum}곡</p>
             </a>`;
     }
 
     contentHtml += `
+                    </div>
                 </div>
-            </body>
-            <script type="text/javascript">
+                <script type="text/javascript">
                     function selectAndClose(id) {
                         window.opener.setSelectedId(id);
                         window.close();
                     }
                 </script>
+            </body>
         </html>`;
 
     return contentHtml;
