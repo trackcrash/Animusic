@@ -126,7 +126,7 @@ def handle_vote_skip(data):
     if room not in vote_counts:
         vote_counts[room] = 0
     if user not in voted_users:
-        voted_users[room] = []
+        voted_users[room] = [] 
     # 이름 기준으로 이미 투표한 사용자는 다시 투표할 수 없도록 처리
     if user in voted_users[room]:
         return
