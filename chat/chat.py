@@ -73,7 +73,6 @@ def disconnect():
 @socketio.on('single_message')
 def handle_single_message(data):
     msg = data['content']
-    name = current_user.name
     if not current_user.is_authenticated:
         emit('single_message',{'name': '','msg':msg})
     else:
