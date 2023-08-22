@@ -193,9 +193,6 @@ function initializeSocketEvents() {
         showHint(data.hint);
     });
 
-    socket.on('user_disconnect', data => {
-        // socket.emit('request_room_players_update', { room_name });
-    });
 
     socket.on('message', data => {
         const item = document.createElement('div');
@@ -349,6 +346,7 @@ function setSelectedId(id) {
 socket.on('room_players_update', function(data) {;
     if(data.room_name == room_name)
     {
+        console.log(room_name)
         const item = document.createElement('div');
         item.innerHTML = `<span class="font-semibold">${data.player}</span> ${data.msg}`;
         elements.messages.appendChild(item);
