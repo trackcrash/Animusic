@@ -15,7 +15,8 @@ const elements = {
     MapSelect: document.getElementById('MapSelect'),
     StartButton: document.getElementById('StartButton'),
     sendButton: document.getElementById('sendButton'),
-    hintButton: document.getElementById('hintButton')
+    hintButton: document.getElementById('hintButton'),
+    textClear: document.getElementById('text_clear')
 };
 
 const room_name = new URLSearchParams(window.location.search).get('room_name');
@@ -127,10 +128,21 @@ function initEventListeners() {
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
         socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId }, function() {
-            socket.emit('playingStatus_change', room_name);
+            socket.emit('playingStatus_change', room_name, function()
+            {
+                let scoreItem = document.querySelectorAll(".ScoreSpan")
+                for(const element of scoreItem)
+                {
+                    element.innerHTML = 0;
+                }
+            });
         });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
+    elements.textClear.addEventListener('click', function()
+    {
+        elements.messages.innerHTML="";
+    })
 }
 
 
@@ -176,6 +188,7 @@ function initializeSocketEvents() {
         nextButton.style.display = "none";
         hintButton.style.display = "none";
         socket.emit('playingStatus_change', room_name);
+
         showHostContent(false);
     });
 
@@ -193,9 +206,6 @@ function initializeSocketEvents() {
         showHint(data.hint);
     });
 
-    socket.on('user_disconnect', data => {
-        // socket.emit('request_room_players_update', { room_name });
-    });
 
     socket.on('message', data => {
         const item = document.createElement('div');
@@ -348,4 +358,31 @@ function populatePopupWithMissionData(data) {
 
 function setSelectedId(id) {
     selectedId = id;
+}
+
+socket.on('room_players_update', function(data) {;
+    if(data.room_name == room_name)
+    {
+        console.log(room_name)
+        const item = document.createElement('div');
+        item.innerHTML = `<span class="font-semibold">${data.player}</span> ${data.msg}`;
+        elements.messages.appendChild(item);
+        elements.messages.scrollTop = elements.messages.scrollHeight;
+        playerListGet(data.players);
+
+    }
+});
+function playerListGet(players) {
+    // 컨테이너 요소 선택
+    let container = document.getElementById("Players_Box");
+    container.innerHTML = "";
+    // 객체의 키와 값을 순회
+    Object.entries(players).forEach(function([key, value]) {
+        let username = value["username"];
+        let score = value['score'];
+        let userDiv = document.createElement("div"); // 새 <div> 요소 생성
+        userDiv.classList.add("w-full","border-black","border-1","flex-col")
+        userDiv.innerHTML ="Name: "+ username + " Score: " + "<span class='ScoreSpan'>"+score+"</span>"; // <div> 내용 설정
+        container.appendChild(userDiv); // 컨테이너에 <div> 추가
+    });
 }

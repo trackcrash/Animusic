@@ -79,10 +79,10 @@ function modifyFunction() {
             document.getElementById('startTime-input-m').value = Math.floor((parseInt(startTime) % 3600) / 60) || "";
             document.getElementById('startTime-input-s').value = Math.floor((parseInt(startTime) % 3600) % 60) || "";
             document.getElementById('startTime-input-ms').value = parseFloat(startTime) % 1 || "";
-            document.getElementById('endTime-input-h').value = Math.floor(parseInt(startTime) / 3600) || "";
-            document.getElementById('endTime-input-m').value = Math.floor((parseInt(startTime) % 3600) / 60) || "";
-            document.getElementById('endTime-input-s').value = Math.floor((parseInt(startTime) % 3600) % 60) || "";
-            document.getElementById('endTime-input-ms').value = parseFloat(startTime) % 1 || "";
+            document.getElementById('endTime-input-h').value = Math.floor(parseInt(endTime) / 3600) || "";
+            document.getElementById('endTime-input-m').value = Math.floor((parseInt(endTime) % 3600) / 60) || "";
+            document.getElementById('endTime-input-s').value = Math.floor((parseInt(endTime) % 3600) % 60) || "";
+            document.getElementById('endTime-input-ms').value = parseFloat(endTime) % 1 || "";
             document.getElementById('id-input').value = id || '';
             loadVideo();
             document.getElementById('register-btn').innerText = "수정하기";
@@ -259,7 +259,8 @@ function saveBtn() {
         const thumbnail = item.querySelector('img').src;
         const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
         const answer = item.querySelector('h1').innerText;
-        const hint = item.querySelector('h2').innerText;
+        let hint = null;
+        if (item.querySelector('h2').innerText !== '') {hint = item.querySelector('h2').innerText};
         let startTime = null;
         if (isNaN(parseFloat(item.querySelector('h5').innerText)) || parseFloat(item.querySelector('h5').innerText) === 0) {
             startTime = null;
@@ -281,7 +282,6 @@ function saveBtn() {
             endTime: endTime
         });
     });
-    console.log(data);
     data.push({
         MapName: document.querySelector("#MapName-input").value,
         MapProducer: document.querySelector("#User_Name").innerHTML
@@ -315,7 +315,8 @@ function UpdateBtn() {
         const thumbnail = item.querySelector('img').src;
         const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
         const answer = item.querySelector('h1').innerText;
-        const hint = item.querySelector('h2').innerText;
+        let hint = null;
+        if (item.querySelector('h2').innerText !== '') {hint = item.querySelector('h2').innerText};
         let startTime = null;
         if (isNaN(parseFloat(item.querySelector('h5').innerText)) || parseFloat(item.querySelector('h5').innerText) === 0) {
             startTime = null;
@@ -360,9 +361,7 @@ function UpdateBtn() {
         MapProducer: document.querySelector("#User_Name").innerHTML,
         mission_Id : document.querySelector("#Mission_id").innerHTML
     })
-    console.log("변환 전: ", data);
     data = JSON.stringify(data);
-    console.log("변환 후: ", data);
     $.ajax({
         type: "POST",
         url: "/update-to-db",
