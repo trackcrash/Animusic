@@ -54,7 +54,7 @@ def disconnect():
 
     if user_name:
         emit('user_disconnect', {'username': user_name})  # 유저 연결 종료 이벤트 전송
-        update_room_player_count(room_name)  # 플레이어 수 업데이트
+        update_room_player_count(room_name, "님이 퇴장 하셨습니다.")  # 플레이어 수 업데이트
     try:
         if current_user.name in waitingroom_userlist:
             del waitingroom_userlist[current_user.name]
@@ -149,9 +149,11 @@ def handle_vote_skip(data):
 
 ############################################################################################
 # 방마다 인원 수를 클라이언트에게 전달
-def update_room_player_count(room_name):
+def update_room_player_count(room_name,msg):
     player_count= len(room_data_manager._data_store[room_name]['user'])
-    emit('room_players_update', {'room_name': room_name, 'player_count':player_count}, broadcast=True)
+    player = room_data_manager._data_store[room_name]['user'][request.sid]["username"]
+    players = room_data_manager._data_store[room_name]['user']
+    emit('room_players_update', {'room_name': room_name, 'player_count':player_count,'player' : player, 'players': players, 'msg': msg}, broadcast=True)
 
 ########################################################################################
 #방 관리
@@ -178,7 +180,7 @@ def join_sock(data):
     session_id = request.sid
     room_data_manager.join(room_name,session_id,current_user,time)
     join_room(room_name)
-    update_room_player_count(room_name)
+    update_room_player_count(room_name, "님이 참가 하셨습니다.")
     user_id = room_data_manager.host_setting(room_name)
     game_status = room_data_manager._data_store[room_name]['room_info']['room_status']
     # if game_status :

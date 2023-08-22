@@ -345,3 +345,13 @@ function populatePopupWithMissionData(data) {
 function setSelectedId(id) {
     selectedId = id;
 }
+
+socket.on('room_players_update', function(data) {;
+    if(data.room_name == room_name)
+    {
+        const item = document.createElement('div');
+        item.innerHTML = `<span class="font-semibold">${data.player}</span> ${data.msg}`;
+        elements.messages.appendChild(item);
+        elements.messages.scrollTop = elements.messages.scrollHeight;
+    }
+});
