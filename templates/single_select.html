@@ -15,11 +15,11 @@
         <div class="grid grid-cols-5 gap-6">
             {% for mission in missions %}
             <a href="/single-play?id={{ mission.id }}" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300">
-                <p>ID: {{ mission.id }}</p>
-                <p>Name: {{ mission.MapName }}</p>
-                <p>Producer: {{ mission.MapProducer }}</p>
-                <img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" />
-                <p>{{ mission.MusicNum }}곡</p>
+                <p>맵 이름: {{ mission.MapName }}</p>
+                <!--<img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" style="width: auto; height: auto;" />-->
+                <img src="/static/img/doge.png" alt="{{ mission.MapName }}" style="width: auto; height: auto;" />
+                <p>제작자: {{ mission.MapProducer }}</p>
+                <p>곡수: {{ mission.MusicNum }}곡</p>
 
             </a>
             {% endfor %}
