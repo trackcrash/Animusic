@@ -377,7 +377,7 @@ function playerListGet(players) {
         let username = value["username"];
         let score = value['score'];
         let userDiv = document.createElement("div"); // 새 <div> 요소 생성
-        userDiv.classList.add("w-full","border-black","border-1","flex-col")
+        userDiv.classList.add("w-full","border-black","border-1")
         userDiv.innerHTML ="Name: "+ username + " Score: " + "<span class='ScoreSpan'>"+score+"</span>"; // <div> 내용 설정
         container.appendChild(userDiv); // 컨테이너에 <div> 추가
     });
