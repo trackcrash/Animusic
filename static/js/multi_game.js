@@ -5,6 +5,7 @@ let currentvideolink = "";
 let selectedId = 0;
 let player_name = document.getElementById('User_Name').innerText;
 let isHost = false;
+let player;
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -46,18 +47,54 @@ function voteSkip() {
 }
 
 function playvideo(videolink) {
-    const iframe = document.createElement("iframe");
-    iframe.src = videolink;
-    iframe.allow = "autoplay";
-    iframe.width = "100%";
-    iframe.height = "100%";
-
     const videoFrame = document.getElementById("videoFrame");
     videoFrame.innerHTML = "";
-    videoFrame.appendChild(iframe);
-    videoOverlay.style.display = 'block';
+
+    const videoId = getYoutubeVideoId(videolink);
+
+    if (!videoId) {
+        console.error("Invalid YouTube URL provided");
+        return;
+    }
+
+    if (player) {
+        player.loadVideoById(videoId);
+        videoOverlay.style.display = 'block';
+        return;
+    }
+
+    player = new YT.Player(videoFrame, {
+        height: '100%',
+        width: '100%',
+        videoId: videoId,
+        events: {
+            'onReady': onPlayerReady,
+        }
+    });
 }
 
+function onPlayerReady(event) {
+    videoOverlay.style.display = 'block';
+    event.target.playVideo();
+}
+
+function getYoutubeVideoId(url) {
+    const regex = /(?:https:\/\/www\.youtube\.com\/embed\/)?([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+}
+//볼륨용
+function setVolume(volumeLevel) {
+    if (player && player.setVolume) {
+        player.setVolume(volumeLevel);
+    }
+}
+//재생시간용
+function seekTo(seconds) {
+    if (player && player.seekTo) {
+        player.seekTo(seconds, true);
+    }
+}
 
 function requiredSkipVotes(players) {
     return players <= 2 ? players : players <= 6 ? Math.ceil(players / 2) : Math.ceil(players * 0.7);
@@ -109,17 +146,21 @@ function initializeSocketEvents() {
         elements.StartButton.style.display = "none";
         nextButton.disabled = false;
         updateVoteCountUI(0);
+        showHostContent(true);
     });
     //다음 곡 진행
     socket.on('NextData', function(data) {
         currentvideolink = data.youtubeLink;
+        totalPlayers = data['totalPlayers'];
         playvideo(currentvideolink);
         songTitle.innerText = "";
+        elements.nextButton.style.display = "block";
         songArtist.innerText = "";
         correctUser.innerText = "";
         songHint.innerText = "";
         nextButton.disabled = false;
         updateVoteCountUI(0);
+        showHostContent(true);
     });
     //게임 끝났을 때 init
     socket.on('EndOfData', function() {
@@ -128,11 +169,10 @@ function initializeSocketEvents() {
         correctUser.innerText = "";
         songHint.innerText = "";
         videoOverlay.style.display = 'block';
-        MapSelect.style.display = "block";
         nextButton.disabled = true;
-        StartButton.style.display = "block";
+        nextButton.style.display = "none";
         document.getElementById('skipVoteCount').innerText = "";
-        playvideo("");
+        player.stopVideo();
         nextButton.style.display = "none";
         hintButton.style.display = "none";
         socket.emit('playingStatus_change', room_name);
@@ -154,7 +194,7 @@ function initializeSocketEvents() {
     });
 
     socket.on('user_disconnect', data => {
-        socket.emit('request_room_players_update', { room_name });
+        // socket.emit('request_room_players_update', { room_name });
     });
 
     socket.on('message', data => {
@@ -169,14 +209,14 @@ function initializeSocketEvents() {
         skipvote = data.count;
         updateVoteCountUI(skipvote);
     });
-    socket.on("new_host_message", (data) => {
-        // data.message를 이용하여 새로운 방장 알림을 처리
-        elements.nextButton.style.display = "block";
-        elements.MapSelect.style.display = "block";
-        elements.nextButton.disabled = true;
-        elements.MapSelect.disabled = true;
-        console.log(data.message);
-    });
+    //     socket.on("new_host_message", (data) => {
+    //         // data.message를 이용하여 새로운 방장 알림을 처리
+    //         elements.nextButton.style.display = "block";
+    //         elements.MapSelect.style.display = "block";
+    //         elements.nextButton.disabled = true;
+    //         elements.MapSelect.disabled = true;
+    //         console.log(data.message);
+    //     });
 }
 
 window.onload = function() {
@@ -184,9 +224,10 @@ window.onload = function() {
         socket.emit('join', { room_name: room_name }, () => {
             initEventListeners();
             initializeSocketEvents();
+            showHostContent(false);
         })
     });
-    nextButton.style.display = "none";
+    // nextButton.style.display = "none";
 };
 socket.on("user_change", (data) => {
     let count = data["count"];
@@ -205,23 +246,41 @@ socket.on('host_updated', (data) => {
 });
 
 function showHostContent(game_status) {
+    console.log(isHost, game_status);
     if (isHost) {
         if (game_status == false) {
             elements.StartButton.style.display = "block";
             elements.MapSelect.style.display = "block";
             elements.StartButton.disabled = false;
             elements.MapSelect.disabled = false;
+            elements.hintButton.style.display = "none";
+            elements.nextButton.style.display = "none";
+            elements.hintButton.disabled = true;
+            elements.nextButton.disabled = true;
         }
         if (game_status == true) {
+            elements.hintButton.style.display = "block";
             elements.nextButton.style.display = "block";
+            elements.hintButton.disabled = false;
+            elements.nextButton.disabled = false;
+
         }
     } else {
         elements.StartButton.style.display = "none";
         elements.MapSelect.style.display = "none";
         elements.StartButton.disabled = true;
         elements.MapSelect.disabled = true;
+
         if (game_status == true) {
             elements.nextButton.style.display = "block";
+            elements.nextButton.disabled = false;
+            elements.hintButton.style.display = "block";
+            elements.hintButton.disabled = false;
+        } else {
+            elements.nextButton.style.display = "none";
+            elements.nextButton.disabled = true;
+            elements.hintButton.style.display = "none";
+            elements.hintButton.disabled = true;
         }
 
     }
