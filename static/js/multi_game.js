@@ -15,7 +15,8 @@ const elements = {
     MapSelect: document.getElementById('MapSelect'),
     StartButton: document.getElementById('StartButton'),
     sendButton: document.getElementById('sendButton'),
-    hintButton: document.getElementById('hintButton')
+    hintButton: document.getElementById('hintButton'),
+    textClear: document.getElementById('text_clear')
 };
 
 const room_name = new URLSearchParams(window.location.search).get('room_name');
@@ -127,10 +128,21 @@ function initEventListeners() {
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
         socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId }, function() {
-            socket.emit('playingStatus_change', room_name);
+            socket.emit('playingStatus_change', room_name, function()
+            {
+                let scoreItem = document.querySelectorAll(".ScoreSpan")
+                for(const element of scoreItem)
+                {
+                    element.innerHTML = 0;
+                }
+            });
         });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
+    elements.textClear.addEventListener('click', function()
+    {
+        elements.messages.innerHTML="";
+    })
 }
 
 
@@ -176,6 +188,7 @@ function initializeSocketEvents() {
         nextButton.style.display = "none";
         hintButton.style.display = "none";
         socket.emit('playingStatus_change', room_name);
+
         showHostContent(false);
     });
 
@@ -311,29 +324,33 @@ function populatePopupWithMissionData(data) {
                 <title>Select Map</title>
                 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
             </head>
-            <body>
-                <div class="grid grid-cols-5 gap-6">`;
+            <body class="bg-gray-100 font-sans">
+                <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
+                    <h1 class="text-center text-3xl font-bold mb-8 text-gray-700">Select Map</h1>
+                    <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">`;
 
     for (let i = 0; i < data.length; i++) {
         contentHtml += `
-            <a href="#" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300" data-id="${data[i].id}" onclick="selectAndClose(${data[i].id})">
-                <p>ID: ${data[i].id}</p>
-                <p>Name: ${data[i].MapName}</p>
-                <p>Producer: ${data[i].MapProducer}</p>
-                <img src="${data[i].Thumbnail}" alt="${data[i].MapName}" />
-                <p>${data[i].MusicNum}곡</p>
+            <a href="#" class="block bg-white p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300" data-id="${data[i].id}" onclick="selectAndClose(${data[i].id})">
+                <p class="text-xl mb-4 truncate">${data[i].MapName}</p>
+                <div class="mb-4">
+                    <img src="${data[i].Thumbnail}" alt="${data[i].MapName}" class="mx-auto w-full h-56 object-cover rounded-lg" />
+                </div>
+                <p class="text-gray-500 mb-2">제작자: ${data[i].MapProducer}</p>
+                <p class="text-indigo-600">곡수: ${data[i].MusicNum}곡</p>
             </a>`;
     }
 
     contentHtml += `
+                    </div>
                 </div>
-            </body>
-            <script type="text/javascript">
+                <script type="text/javascript">
                     function selectAndClose(id) {
                         window.opener.setSelectedId(id);
                         window.close();
                     }
                 </script>
+            </body>
         </html>`;
 
     return contentHtml;
@@ -351,5 +368,21 @@ socket.on('room_players_update', function(data) {;
         item.innerHTML = `<span class="font-semibold">${data.player}</span> ${data.msg}`;
         elements.messages.appendChild(item);
         elements.messages.scrollTop = elements.messages.scrollHeight;
+        playerListGet(data.players);
+
     }
 });
+function playerListGet(players) {
+    // 컨테이너 요소 선택
+    let container = document.getElementById("Players_Box");
+    container.innerHTML = "";
+    // 객체의 키와 값을 순회
+    Object.entries(players).forEach(function([key, value]) {
+        let username = value["username"];
+        let score = value['score'];
+        let userDiv = document.createElement("div"); // 새 <div> 요소 생성
+        userDiv.classList.add("w-full","border-black","border-1")
+        userDiv.innerHTML ="Name: "+ username + " Score: " + "<span class='ScoreSpan'>"+score+"</span>"; // <div> 내용 설정
+        container.appendChild(userDiv); // 컨테이너에 <div> 추가
+    });
+}

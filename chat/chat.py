@@ -89,6 +89,8 @@ def handle_message(data):
         current_data['is_answered'] = 'true'
         emit('message', {'name': name, 'msg': msg}, room=room)
         emit('correctAnswer', {'name':name,'data':current_data}, room=room)
+        room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
+        update_room_player_count(room, "님이 정답을 맞췄습니다.", name)
     else:
         emit('message', {'name': name, 'msg': msg}, room=room)
 #다음 데이터 요청
@@ -183,7 +185,6 @@ def join_sock(data):
     session_id = request.sid
     room_data_manager.join(room_name,session_id,current_user,time)
     join_room(room_name)
-    update_room_player_count(room_name, "님이 참가 하셨습니다.", room_data_manager._data_store[room_name]['user'][session_id]['username'])
     user_id = room_data_manager.host_setting(room_name)
     game_status = room_data_manager._data_store[room_name]['room_info']['room_status']
     # if game_status :
@@ -194,6 +195,7 @@ def join_sock(data):
         #     emit("user_change", {'count': 0, 'totalPlayers': totalPlayers}, room=room_name)
     if user_id != "":
         emit("host_updated", {"user":user_id, "game_status":game_status}, room=room_name)
+    update_room_player_count(room_name, "님이 참가 하셨습니다.", room_data_manager._data_store[room_name]['user'][session_id]['username'])
     try:
         if current_user.name in waitingroom_userlist:
             del waitingroom_userlist[current_user.name]
@@ -231,4 +233,5 @@ def get_user():
 def playingroom_hidden(room_name):
     room_data_manager.game_status(room_name)
     room_status = room_data_manager._data_store[room_name]["room_info"]["room_status"]
+    room_data_manager.game_init(room_name)
     emit('request_room_changed', {"room_name":room_name,"room_status":room_status},  broadcast = True)
