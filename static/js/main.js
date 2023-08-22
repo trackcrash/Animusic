@@ -287,6 +287,7 @@ function saveBtn() {
         MapName: document.querySelector("#MapName-input").value,
         MapProducer: document.querySelector("#User_Name").innerHTML
     })
+    console.log(data);
     data = JSON.stringify(data);
     $.ajax({
         type: "POST",
@@ -301,7 +302,7 @@ function saveBtn() {
         success: function(data) {
             console.log("통신데이터 값 : ", data);
             alert("등록 완료되었습니다.");
-            location.reload();
+            //location.reload();
         }
     });
 };

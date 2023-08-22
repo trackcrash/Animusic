@@ -35,8 +35,11 @@
             <div class="mb-4 py-1">
                 <a href="{{ url_for('static', filename='file_form/MakingMap_form.xlsx') }}" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600" download>양식 다운로드</a>
                 <button id="file_upload_btn" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600">양식 제출하기</button>
-                <a class="spinner-text">요청 처리중...</a>
                 <div id="loading-spinner" class="spinner"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                    <a class="spinner-text">요청 처리중...</a>
+                </div>
             </div>
         </div>
 
