@@ -54,7 +54,7 @@ class RoomDataManger:
     def join(self, room_name, session_id, current_user,time):
         user_name = current_user.name
         print(f"{room_name}방에 연결되었습니다.")
-        user_data = {'username': user_name , 'host':0 , 'joined_time' : time.time()}  # 유저 데이터를 리스트로 생성
+        user_data = {'username': user_name , 'host':0 ,'score':0 ,'joined_time' : time.time()}  # 유저 데이터를 리스트로 생성
         dict_join(self._data_store[room_name]["user"], session_id, user_data)
     def host_setting(self,room_name, callback=None):  
         if room_name in self._data_store and "user" in self._data_store[room_name]:
@@ -84,7 +84,11 @@ class RoomDataManger:
         return False
     def game_status(self, room_name):
         self._data_store[room_name]['room_info']['room_status'] = not self._data_store[room_name]['room_info']['room_status']
-        
+    def game_init(self, room_name):
+        dictionaryData = self._data_store[room_name]['user']
+        for key, value in dictionaryData.items():
+            value['score'] = 0
+
 room_data_manager = RoomDataManger()
 class MusicDataManager:
     def __init__(self):

@@ -89,6 +89,8 @@ def handle_message(data):
         current_data['is_answered'] = 'true'
         emit('message', {'name': name, 'msg': msg}, room=room)
         emit('correctAnswer', {'name':name,'data':current_data}, room=room)
+        room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
+        update_room_player_count(room, "님이 정답을 맞췄습니다.", name)
     else:
         emit('message', {'name': name, 'msg': msg}, room=room)
 #다음 데이터 요청
@@ -231,4 +233,5 @@ def get_user():
 def playingroom_hidden(room_name):
     room_data_manager.game_status(room_name)
     room_status = room_data_manager._data_store[room_name]["room_info"]["room_status"]
+    room_data_manager.game_init(room_name)
     emit('request_room_changed', {"room_name":room_name,"room_status":room_status},  broadcast = True)
