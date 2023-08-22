@@ -1,59 +1,41 @@
 <head>
     <title>Chat Room List</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
-    <script>
-    </script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="{{ url_for('static', filename='js/Socket_function.js') }}"></script>
     <script src="{{ url_for('static', filename='js/room_list.js') }}"></script>
     <style>
-        button {
-            padding: 5px;
-            border: 1px solid rgb(0, 0, 0);
-            cursor: pointer;
-        }
-        .userlist-and-roombuttons {
-            display: flex;
-            align-items: flex-start;
-            width: 100%;
-            padding-top: 20px;
-            padding-bottom: 20px;
-            box-sizing: border-box;
-        }
-        #userlist {
-            padding: 5px;
-            border: 1px solid rgb(0, 0, 0);
-        }
-        #room-buttons {
-            flex-grow: 1;
-            margin-left: 20px;
+        .scrollable {
+            max-height: 300px;
+            overflow-y: auto;
         }
     </style>
 </head>
 
-<body>
+<body class="bg-gray-100 py-8">
     {% include "header.html" %}
-    <h1>Chat Room List</h1>
-    <ul id="room-list" class="grid grid-cols-5 gap-6">
-        {% for mission in missions %}
-        <a href="/play-test?id={{ mission.id }}" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300">
-            <p>ID: {{ mission.id }}</p>
-            <p>Name: {{ mission.MapName }}</p>
-            <p>Producer: {{ mission.MapProducer }}</p>
-            <!-- Thumbnail 이미지가 있다면 추가 -->
-            <img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" />
-            <!--노래 갯수 추가 -->
-            <p>{{ mission.MusicNum }}곡</p>
+    <div class="container mx-auto mb-16">
+        <h1 class="text-center text-3xl font-bold mb-8">대기실</h1>
+        <ul id="room-list" class="grid grid-cols-5 gap-6 scrollable mb-4">
+            {% for mission in missions %}
+            <a href="/play-test?id={{ mission.id }}" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300">
+                <p class="text-sm text-gray-600">ID: {{ mission.id }}</p>
+                <p class="text-xl">{{ mission.MapName }}</p>
+                <p class="text-gray-500">{{ mission.MapProducer }}</p>
+                <img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" class="my-4" />
+                <p class="text-indigo-600">{{ mission.MusicNum }}곡</p>
+            </a>
+            {% endfor %}
+        </ul>
+        <div id="room-buttons" class="grid grid-cols-2 gap-4 scrollable mb-4"></div>
+    </div>
+    <div class="fixed bottom-4 left-4">
+        <div id="userlist" class="bg-white p-4 rounded shadow-md scrollable"></div>
+    </div>
 
-        </a>
-        {% endfor %}
-    </ul>
-    <button onclick="create_room_button()" class="rounded">Create Room</button>
-    <div class="userlist-and-roombuttons">
-        <div id="userlist" class="rounded"></div>
-            <!-- 채 팅방 목록 버튼 생성 -->
-        <div id="room-buttons" class="grid grid-cols-2 gap-4 grid-rows-2"></div>
+    <div class="fixed bottom-4 right-4">
+        <button onclick="create_room_button()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Create Room</button>
     </div>
 </body>
 
