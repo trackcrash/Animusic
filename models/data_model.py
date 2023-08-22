@@ -21,8 +21,8 @@ class Music(Base):
     # 외래 키 설정
     mission_id = Column(Integer, ForeignKey('MissionTable.id', ondelete='CASCADE'), nullable=False)
     # 시작시간, 종료시간 설정
-    startTime = Column(DECIMAL(precision=9, scale=4), nullable=True)
-    endTime = Column(DECIMAL(precision=9, scale=4), nullable=True)
+    startTime = Column(DECIMAL(precision=9, scale=3), nullable=True)
+    endTime = Column(DECIMAL(precision=9, scale=3), nullable=True)
     # ORM 관계 설정
     mission = relationship("Mission", back_populates="musics")
 

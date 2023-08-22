@@ -79,10 +79,10 @@ function modifyFunction() {
             document.getElementById('startTime-input-m').value = Math.floor((parseInt(startTime) % 3600) / 60) || "";
             document.getElementById('startTime-input-s').value = Math.floor((parseInt(startTime) % 3600) % 60) || "";
             document.getElementById('startTime-input-ms').value = parseFloat(startTime) % 1 || "";
-            document.getElementById('endTime-input-h').value = Math.floor(parseInt(startTime) / 3600) || "";
-            document.getElementById('endTime-input-m').value = Math.floor((parseInt(startTime) % 3600) / 60) || "";
-            document.getElementById('endTime-input-s').value = Math.floor((parseInt(startTime) % 3600) % 60) || "";
-            document.getElementById('endTime-input-ms').value = parseFloat(startTime) % 1 || "";
+            document.getElementById('endTime-input-h').value = Math.floor(parseInt(endTime) / 3600) || "";
+            document.getElementById('endTime-input-m').value = Math.floor((parseInt(endTime) % 3600) / 60) || "";
+            document.getElementById('endTime-input-s').value = Math.floor((parseInt(endTime) % 3600) % 60) || "";
+            document.getElementById('endTime-input-ms').value = parseFloat(endTime) % 1 || "";
             document.getElementById('id-input').value = id || '';
             loadVideo();
             document.getElementById('register-btn').innerText = "수정하기";
