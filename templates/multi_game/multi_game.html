@@ -1,4 +1,3 @@
-<!-- play test author: NewKyaru 15/08/2023-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,76 +8,58 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
     <script src="{{ url_for('static', filename='js/Socket_function.js') }}"></script>
 </head>
 
 <body class="bg-gray-100 font-sans">
     {% include "header.html" %}
-    <div class="flex">
-        <div class="flex-col w-4/6 h-full">
-            <div class="flex p-4 h-2/5">
-                <!-- 왼쪽 영역 (영상 재생을 위한 iframe) -->
-                <div class="w-full h-96">
-        
-                    <div id="videoContainer" class="w-full h-full relative">
-                        <div id="videoFrame" class="absolute top-0 left-0 w-full h-full"></div>
-                        <div id="videoOverlay" class="bg-black opacity-100 w-full h-full absolute top-0 left-0 z-10 flex items-center justify-center text-white text-xl">
-                            <span>정답을 맞춰야 영상을 볼 수 있습니다.</span>
-                        </div>
+    <div class="flex mt-6 mx-10">
+        <div class="flex-col w-4/6 h-full pr-6">
+            <div class="bg-white p-4 rounded shadow-lg mb-6">
+                <div id="videoContainer" class="w-full h-96 relative">
+                    <div id="videoFrame" class="absolute top-0 left-0 w-full h-full"></div>
+                    <div id="videoOverlay" class="bg-black opacity-100 w-full h-full absolute top-0 left-0 z-10 flex items-center justify-center text-white text-xl">
+                        <span>정답을 맞춰야 영상을 볼 수 있습니다.</span>
                     </div>
                 </div>
             </div>
-            <div class="p-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <button id="nextButton" class="bg-green-500 text-white px-4 py-2 rounded grid-row-1" style="display: none;">다음 영상</button>
-                    <button id="hintButton" class="bg-green-500 text-white px-4 py-2 rounded grid-row-1" style="display: none;">힌트 보기</button>
-                    <button id="MapSelect" class="bg-yellow-500 text-white px-4 py-2 rounded grid-rows-2"style="display: none;" disabled>
-                        맵선택
-                    </button>
-                    <button id="StartButton" class="bg-yellow-500 text-white px-4 py-2 rounded grid-rows-2" style="display: none;" disabled>
-                        시작하기
-                    </button>
 
-                </div>
-                <div class="p-4">
-                    <div id="songInfo" class="mt-4">
-                        <!--정답 표시용-->
-                        <h1 id="songHint" class="text-lg"></h1>
-                        <h2 id="songTitle" class="text-lg font-bold"></h2>
-                        <p id="songArtist"></p>
-                        <p id="correctUser"></p>
-                        <span id="skipVoteCount" class="grid-row-3"></span>
-                    </div>
+            <div class="flex justify-between items-center mb-6">
+                <div class="grid grid-cols-2 gap-4 w-2/3">
+                    <button id="nextButton" class="bg-green-500 text-white px-4 py-2 rounded" style="display: none;">다음 영상</button>
+                    <button id="hintButton" class="bg-green-500 text-white px-4 py-2 rounded" style="display: none;">힌트 보기</button>
+                    <button id="MapSelect" class="bg-yellow-500 text-white px-4 py-2 rounded" style="display: none;" disabled>맵선택</button>
+                    <button id="StartButton" class="bg-yellow-500 text-white px-4 py-2 rounded" style="display: none;" disabled>시작하기</button>
                 </div>
 
+                <div id="songInfo">
+                    <h1 id="songHint" class="text-lg"></h1>
+                    <h2 id="songTitle" class="text-lg font-bold"></h2>
+                    <p id="songArtist" class="text-gray-600"></p>
+                    <p id="correctUser" class="text-blue-500"></p>
+                    <span id="skipVoteCount"></span>
+                </div>
             </div>
-            <div class="flex p-4 h-2/5">
-                <!-- 오른쪽 영역 (채팅 창) -->
-                <div class="w-full">
-                    <div class="bg-white rounded shadow">
-                        <div class="p-4">
-                            <div class="h-80 overflow-y-scroll" id="messages">
-                                <!-- 채팅 내역 표시 창 -->
-                            </div>
-                        </div>
-                        <div class="bg-gray-100 p-2">
-                            <!-- 채팅 입력 폼 -->
-                            <input type="text" id="inputMessage" class="w-full border rounded px-2 py-1" placeholder="메시지 입력...">
-                            <button id="sendButton" class="bg-blue-500 text-white px-4 py-1 rounded ml-2">보내기</button>
-                        </div>
-                    </div>
-                    <p style="color: gray;">End 키를 눌러 스킵 할 수 있습니다.</p>
-                    <button id = "text_clear">text clear</button>
+
+            <div class="bg-white p-4 rounded shadow-lg">
+                <div class="h-80 overflow-y-scroll mb-4" id="messages"></div>
+                <div class="flex">
+                    <input type="text" id="inputMessage" class="flex-grow border rounded-l px-2 py-1" placeholder="메시지 입력...">
+                    <button id="sendButton" class="flex-shrink bg-blue-500 text-white px-4 py-1 rounded-r">보내기</button>
                 </div>
+                <p class="mt-2 text-gray-600 text-sm">End 키를 눌러 스킵 할 수 있습니다.</p>
+                <button id="text_clear" class="mt-2 bg-red-500 text-white px-4 py-1 rounded">text clear</button>
             </div>
         </div>
-        <div class="flex-col w-2/6 border-2 border-black m-4" id="Players_Box">
-            
+
+        <div class="flex-col w-2/6">
+            <div class="bg-white border-2 border-gray-300 p-4 rounded shadow-lg" id="Players_Box">
+                <h2 class="text-xl font-bold mb-4">Players</h2>
+                <!-- 여기에 플레이어 리스트가 동적으로 채워질 수 있습니다. -->
+            </div>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='js/multi_game.js') }}"></script>
 </body>
-<script src="{{ url_for('static', filename='js/multi_game.js') }}"></script>
-
-</html>
