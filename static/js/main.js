@@ -259,7 +259,8 @@ function saveBtn() {
         const thumbnail = item.querySelector('img').src;
         const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
         const answer = item.querySelector('h1').innerText;
-        const hint = item.querySelector('h2').innerText;
+        let hint = null;
+        if (item.querySelector('h2').innerText !== '') {hint = item.querySelector('h2').innerText};
         let startTime = null;
         if (isNaN(parseFloat(item.querySelector('h5').innerText)) || parseFloat(item.querySelector('h5').innerText) === 0) {
             startTime = null;
@@ -281,7 +282,6 @@ function saveBtn() {
             endTime: endTime
         });
     });
-    console.log(data);
     data.push({
         MapName: document.querySelector("#MapName-input").value,
         MapProducer: document.querySelector("#User_Name").innerHTML
@@ -315,7 +315,8 @@ function UpdateBtn() {
         const thumbnail = item.querySelector('img').src;
         const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
         const answer = item.querySelector('h1').innerText;
-        const hint = item.querySelector('h2').innerText;
+        let hint = null;
+        if (item.querySelector('h2').innerText !== '') {hint = item.querySelector('h2').innerText};
         let startTime = null;
         if (isNaN(parseFloat(item.querySelector('h5').innerText)) || parseFloat(item.querySelector('h5').innerText) === 0) {
             startTime = null;
@@ -360,9 +361,7 @@ function UpdateBtn() {
         MapProducer: document.querySelector("#User_Name").innerHTML,
         mission_Id : document.querySelector("#Mission_id").innerHTML
     })
-    console.log("변환 전: ", data);
     data = JSON.stringify(data);
-    console.log("변환 후: ", data);
     $.ajax({
         type: "POST",
         url: "/update-to-db",
