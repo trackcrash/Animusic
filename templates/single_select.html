@@ -9,18 +9,20 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 </head>
 
-<body class="bg-gray-200 ">
+<body class="bg-gray-100 font-sans">
     {% include "header.html" %}
-    <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 ">
-        <div class="grid grid-cols-5 gap-6">
+    <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
+        <h1 class="text-center text-3xl font-bold mb-8 text-gray-700">맵 선택</h1>
+        <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
             {% for mission in missions %}
-            <a href="/single-play?id={{ mission.id }}" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300">
-                <p>맵 이름: {{ mission.MapName }}</p>
-                <!--<img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" style="width: auto; height: auto;" />-->
-                <img src="/static/img/doge.png" alt="{{ mission.MapName }}" style="width: auto; height: auto;" />
-                <p>제작자: {{ mission.MapProducer }}</p>
-                <p>곡수: {{ mission.MusicNum }}곡</p>
-
+            <a href="/single-play?id={{ mission.id }}" class="block bg-white p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300">
+                <p class="text-xl mb-4 truncate">{{ mission.MapName }}</p>
+                <div class="mb-4">
+                    <!--<img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" class="mx-auto w-full h-56 object-cover rounded-lg" />-->
+                    <img src="/static/img/doge.png" alt="{{ mission.MapName }}" class="mx-auto w-full h-56 object-cover rounded-lg" />
+                </div>
+                <p class="text-gray-500 mb-2">제작자: {{ mission.MapProducer }}</p>
+                <p class="text-indigo-600">곡수: {{ mission.MusicNum }}곡</p>
             </a>
             {% endfor %}
         </div>
