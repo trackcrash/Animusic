@@ -77,7 +77,7 @@ def show_table():
     Music.__table__.create(bind=engine, checkfirst=True)
     if SuchTable("MusicTable"):
         queries = session.query(Music)
-        entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint) for q in queries]
+        entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint, startTime=q.startTime, endTime=q.endTime) for q in queries]
         return entries
 
 
@@ -85,7 +85,7 @@ def show_table_bymissionid(missionid):
     Music.__table__.create(bind=engine, checkfirst=True)
     if SuchTable("MusicTable"):
         queries = session.query(Music).filter(Music.mission_id==missionid)
-        entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint) for q in queries]
+        entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint, startTime=q.startTime, endTime=q.endTime) for q in queries]
         return entries
     
 
@@ -161,3 +161,4 @@ def delete_Mission(id):
             </body>
         </html>
     '''
+

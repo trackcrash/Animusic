@@ -1,5 +1,5 @@
 from sqlalchemy import ForeignKey
-from sqlalchemy import Boolean, Integer, String
+from sqlalchemy import Boolean, Integer, String, DECIMAL
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column
@@ -20,10 +20,13 @@ class Music(Base):
     hint = Column(String(255), nullable=True)
     # 외래 키 설정
     mission_id = Column(Integer, ForeignKey('MissionTable.id', ondelete='CASCADE'), nullable=False)
+    # 시작시간, 종료시간 설정
+    startTime = Column(DECIMAL(precision=9, scale=4), nullable=True)
+    endTime = Column(DECIMAL(precision=9, scale=4), nullable=True)
     # ORM 관계 설정
     mission = relationship("Mission", back_populates="musics")
 
-    def __init__(self, title, song, youtube_url, thumbnail_url, answer, hint, mission_id):
+    def __init__(self, title, song, youtube_url, thumbnail_url, answer, hint, mission_id, startTime, endTime):
         self.title = title
         self.song = song
         self.youtube_url = youtube_url
@@ -31,9 +34,11 @@ class Music(Base):
         self.answer = answer
         self.hint = hint
         self.mission_id = mission_id
+        self.startTime = startTime
+        self.endTime = endTime
 
     def __repr__(self):
-        return f"title='{self.title}', song='{self.song}', youtube_url='{self.youtube_url}', thumbnail_url='{self.thumbnail_url}', answer='{self.answer}', hint='{self.hint}', mission_id='{self.mission_id}'"
+        return f"title='{self.title}', song='{self.song}', youtube_url='{self.youtube_url}', thumbnail_url='{self.thumbnail_url}', answer='{self.answer}', hint='{self.hint}', mission_id='{self.mission_id}', startTime='{self.startTime}', endTime='{self.endTime}'"
 
 
 class Mission(Base):
@@ -71,7 +76,7 @@ def save_to_db(data):
                 new_music = Music(
                     item['title'], item['song'], item['songURL'],
                     item['thumbnail'], item['answer'], item.get('hint'),
-                    mission_id
+                    mission_id, item.get('startTime'), item.get('endTime')
                 )
                 session.add(new_music)
 
@@ -148,6 +153,8 @@ def update_to_db(data):
                 now_music_info.thumbnail_url = item.get('thumbnail')
                 now_music_info.answer = item.get('answer')
                 now_music_info.hint = item.get('hint')
+                now_music_info.startTime = item.get('startTime')
+                now_music_info.endTime = item.get('endTime')
                 session.commit()
             else:
                 new_music_info = Music(
@@ -157,7 +164,9 @@ def update_to_db(data):
                     thumbnail_url = item.get('thumbnail'),
                     answer = item.get('answer'),
                     hint = item.get('hint'),
-                    mission_id = mission_id
+                    mission_id = mission_id,
+                    startTime = item.get('startTime'),
+                    endTime = item.get('endTime')
                 )
                 session.add(new_music_info)
                 session.commit()

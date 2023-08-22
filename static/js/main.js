@@ -1,11 +1,8 @@
  let videoId = "";
- let startTime = "";
- let endTime = "";
  let modifyIndex = null;
 const zero_space = document.getElementById('zero_space');
 const answerInput = document.getElementById('answer-input');
 modifyFunction();
- 
 function zero_space_text() {
     const inputText = answerInput.value;
     const answerList = inputText.split(', ');
@@ -31,34 +28,15 @@ zero_space.addEventListener('click', function()
 {
     zero_space_text();
 });
- // 동영상 링크를 VideoId, startTime, endTime 을 분리하는 함수
+
+ // 유튜브 영상링크 videoId분리 함수(일반링크, 공유링크)
 function split_ytLink(ytLink) {
-    const changedLink = ytLink.replace('?', '&');
-    const split_text = changedLink.split(/(&v=|&start=|&end=|&t=|\.be\/)/);
-    const find_1 = split_text.indexOf("&v=")
-    const find_2 = split_text.indexOf("&t=")
-    const find_3 = split_text.indexOf("&start=")
-    const find_4 = split_text.indexOf("&end=")
-    const find_5 = split_text.indexOf(".be/")
-    if (find_1 > -1) {
-        videoId = split_text[find_1 + 1];
-    } else if (find_5 > -1) {
-        videoId = split_text[find_5 + 1];
-    } else {videoId = ""};
-    if (find_2 > -1) {
-        startTime = split_text[find_2 + 1];
-    } else if (find_3 > -1) {
-        startTime = split_text[find_3 + 1];
-    } else {startTime = ""};
-    if (find_4 > -1) {
-        endTime = split_text[find_4 + 1];
-    } else {endTime = ""};
-    return {videoId: videoId, startTime: startTime.split('s')[0], endTime: endTime.split('s')[0]};
-};
+    if (ytLink.split('v=')[1]) {return ytLink.split('v=')[1].substring(0, 11)}
+    else {return ytLink.split('/')[3].substring(0, 11)}};
 
 function loadVideo() {
-    const ytLink = "https://www.youtube.com/watch?v=" + split_ytLink(document.getElementById("song-link-input").value).videoId;
-    videoId = ytLink.split("v=")[1];
+    videoId = split_ytLink(document.getElementById("song-link-input").value);
+    const ytLink = "https://www.youtube.com/watch?v=" + videoId;
     const embedLink = "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
 
     const iframe = document.createElement("iframe");
@@ -88,6 +66,8 @@ function modifyFunction() {
             const answer = this.querySelector('h1')?.innerText;
             const hint = this.querySelector('h2')?.innerText;
             const id = this.querySelector('h4')?.innerText;
+            const startTime = this.querySelector('h5')?.innerText;
+            const endTime = this.querySelector('h6')?.innerText;
             
             // 정보를 설정하면서 선택적 체이닝 사용
             document.getElementById('title-input').value = title || ''; // 속성이 없을 때는 빈 문자열
@@ -95,6 +75,14 @@ function modifyFunction() {
             document.getElementById('song-link-input').value = songURL || '';
             document.getElementById('answer-input').value = answer || '';
             document.getElementById('hint-input').value = hint || '';
+            document.getElementById('startTime-input-h').value = Math.floor(parseInt(startTime) / 3600) || "";
+            document.getElementById('startTime-input-m').value = Math.floor((parseInt(startTime) % 3600) / 60) || "";
+            document.getElementById('startTime-input-s').value = Math.floor((parseInt(startTime) % 3600) % 60) || "";
+            document.getElementById('startTime-input-ms').value = parseFloat(startTime) % 1 || "";
+            document.getElementById('endTime-input-h').value = Math.floor(parseInt(startTime) / 3600) || "";
+            document.getElementById('endTime-input-m').value = Math.floor((parseInt(startTime) % 3600) / 60) || "";
+            document.getElementById('endTime-input-s').value = Math.floor((parseInt(startTime) % 3600) % 60) || "";
+            document.getElementById('endTime-input-ms').value = parseFloat(startTime) % 1 || "";
             document.getElementById('id-input').value = id || '';
             loadVideo();
             document.getElementById('register-btn').innerText = "수정하기";
@@ -111,13 +99,21 @@ document.querySelector(".add_box.grid-item").addEventListener('click', function(
     document.getElementById('song-link-input').value = "";
     document.getElementById('answer-input').value = "";
     document.getElementById('hint-input').value = "";
+    document.getElementById('startTime-input-h').value = "";
+    document.getElementById('startTime-input-m').value = "";
+    document.getElementById('startTime=input-s').value = "";
+    document.getElementById('startTime=input-ms').value = "";
+    document.getElementById('endTime-input-h').value = "";
+    document.getElementById('endTime-input-m').value = "";
+    document.getElementById('endTime=input-s').value = "";
+    document.getElementById('endTime=input-ms').value = "";
     document.getElementById('id-input').value = "";
     document.getElementById('register-btn').innerText = "등록하기"; 
 
     modifyIndex = null;
 });
 
-function createInfoItem(title, song, songURL, thumbnail, answer, hint, id) {
+function createInfoItem(title, song, songURL, thumbnail, answer, hint, startTime, endTime, id) {
     const box = document.createElement('div');
     box.classList.add('box', 'grid-item');
     const closeBtn = document.createElement('button');
@@ -162,22 +158,33 @@ function createInfoItem(title, song, songURL, thumbnail, answer, hint, id) {
     box.appendChild(HintElem);
     HintElem.style.display = "None";
 
+    const startTimeElem = document.createElement('h5'); // 사용자에게는 보이지 않도록 hidden 유형으로 설정
+    startTimeElem.innerText = startTime;
+    box.appendChild(startTimeElem);
+    startTimeElem.style.display = "None";
+
+    const endTimeElem = document.createElement('h6'); // 사용자에게는 보이지 않도록 hidden 유형으로 설정
+    endTimeElem.innerText = endTime;
+    box.appendChild(endTimeElem);
+    endTimeElem.style.display = "None";
+
 
     const MusicIdElem = document.createElement('h4'); // 사용자에게는 보이지 않도록 hidden 유형으로 설정
     MusicIdElem.innerText = id;
     box.appendChild(MusicIdElem);
     MusicIdElem.style.display = "None";
     return box;
-}
-document.getElementById("register-btn").addEventListener("click", function(e)
-{
+};
 
+document.getElementById("register-btn").addEventListener("click", function(e) {
     const title = document.getElementById('title-input').value;
     const song = document.getElementById('song-name-input').value;
     const songURL = document.getElementById('song-link-input').value;
     const thumbnailLink = "https://img.youtube.com/vi/" + videoId + "/sddefault.jpg";
     const answer = document.getElementById('answer-input').value;
     const hint = document.getElementById('hint-input').value;
+    const startTime = String((parseInt(document.getElementById('startTime-input-h').value || 0) * 3600) + (parseInt(document.getElementById('startTime-input-m').value || 0) * 60) + parseInt(document.getElementById('startTime-input-s').value || 0) + parseFloat("0." + document.getElementById('startTime-input-ms').value) || 0);
+    const endTime = String((parseInt(document.getElementById('endTime-input-h').value || 0) * 3600) + (parseInt(document.getElementById('endTime-input-m').value || 0) * 60) + parseInt(document.getElementById('endTime-input-s').value || 0) + parseFloat("0." + document.getElementById('endTime-input-ms').value) || 0);
     const id = document.getElementById('id-input').value;
 
     const inputList =  document.querySelectorAll('#submission-form input:not([id="MapName-input"])');
@@ -196,6 +203,8 @@ document.getElementById("register-btn").addEventListener("click", function(e)
                 boxList[i].querySelector('input').value = songURL;
                 boxList[i].querySelector('h1').innerText = answer;
                 boxList[i].querySelector('h2').innerText = hint;
+                boxList[i].querySelector('h5').innerText = startTime;
+                boxList[i].querySelector('h6').innerText = endTime;
             }
         }
     }
@@ -213,11 +222,13 @@ document.getElementById("register-btn").addEventListener("click", function(e)
                     boxList[i].querySelector('input').value = songURL;
                     boxList[i].querySelector('h1').innerText = answer;
                     boxList[i].querySelector('h2').innerText = hint;
+                    boxList[i].querySelector('h5').innerText = startTime;
+                    boxList[i].querySelector('h6').innerText = endTime;
                 }
             }
         }else
         {
-            const box = createInfoItem(title, song, songURL, thumbnailLink, answer, hint, id);
+            const box = createInfoItem(title, song, songURL, thumbnailLink, answer, hint, startTime, endTime, id);
             document.querySelector('.add_box').before(box);
             for(const element of inputList)
             {
@@ -226,7 +237,7 @@ document.getElementById("register-btn").addEventListener("click", function(e)
             modifyFunction();
         }
     }
-})
+});
 
 document.body.addEventListener('click', function(event) {
     if (event.target && event.target.classList.contains('close-btn')) {
@@ -239,17 +250,25 @@ document.getElementById('song-link-input').addEventListener('input', function() 
 });
 
 //save이벤트
-function saveBtn()
-{
+function saveBtn() {
     const items = document.querySelectorAll('.grid-item.box');
     let data = [];
     items.forEach(item => {
         const title = item.querySelector('h3').innerText;
         const song = item.querySelector('p').innerText;
         const thumbnail = item.querySelector('img').src;
-        const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value).videoId;
+        const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
         const answer = item.querySelector('h1').innerText;
         const hint = item.querySelector('h2').innerText;
+        let startTime = null;
+        if (isNaN(parseFloat(item.querySelector('h5').innerText)) || parseFloat(item.querySelector('h5').innerText) === 0) {
+            startTime = null;
+        } else {startTime = item.querySelector('h5').innerText};
+
+        let endTime = null;
+        if (isNaN(parseFloat(item.querySelector('h6').innerText)) || parseFloat(item.querySelector('h6').innerText) === 0) {
+            endTime = null;
+        } else {endTime = item.querySelector('h6').innerText};
 
         data.push({
             title: title,
@@ -257,7 +276,9 @@ function saveBtn()
             thumbnail: thumbnail,
             songURL: songURL,
             answer: answer,
-            hint: hint
+            hint: hint,
+            startTime: startTime,
+            endTime: endTime
         });
     });
     console.log(data);
@@ -282,19 +303,28 @@ function saveBtn()
             location.reload();
         }
     });
-}
+};
+
 //update이벤트
-function UpdateBtn()
-{
+function UpdateBtn() {
     const items = document.querySelectorAll('.grid-item.box');
     let data = [];
     items.forEach(item => {
         const title = item.querySelector('h3').innerText;
         const song = item.querySelector('p').innerText;
         const thumbnail = item.querySelector('img').src;
-        const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value).videoId;
+        const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
         const answer = item.querySelector('h1').innerText;
         const hint = item.querySelector('h2').innerText;
+        let startTime = null;
+        if (isNaN(parseFloat(item.querySelector('h5').innerText)) || parseFloat(item.querySelector('h5').innerText) === 0) {
+            startTime = null;
+        } else {startTime = item.querySelector('h5').innerText};
+
+        let endTime = null;
+        if (isNaN(parseFloat(item.querySelector('h6').innerText)) || parseFloat(item.querySelector('h6').innerText) === 0) {
+            endTime = null;
+        } else {endTime = item.querySelector('h6').innerText};
         const id = item.querySelector('h4').innerHTML;
         if(id == "" || id == null)
         {
@@ -304,7 +334,9 @@ function UpdateBtn()
                 thumbnail: thumbnail,
                 songURL: songURL,
                 answer: answer,
-                hint: hint
+                hint: hint,
+                startTime: startTime,
+                endTime: endTime
             });
         }
         else
@@ -316,7 +348,9 @@ function UpdateBtn()
                 thumbnail: thumbnail,
                 songURL: songURL,
                 answer: answer,
-                hint: hint
+                hint: hint,
+                startTime: startTime,
+                endTime: endTime
             });
         }
 
@@ -344,15 +378,10 @@ function UpdateBtn()
             location.reload();
         }
     });
-}
+};
 
-function deleteBtn()
-{
-
-}
 $("#update-btn").on("click", UpdateBtn);
 $("#save-btn").on("click", saveBtn);
-
 /* grid-container 안에 아이템이 3줄 이상일 경우 아이템의 높이를 줄이는 기능 */
 
 // grid-container 가로 세로 길이를 px단위로 정의함
@@ -361,6 +390,11 @@ let container_height = document.getElementById('grid-container').clientHeight;
 
 // container_width, container_height 를 재 정의함
 function resize_variable_declaration() {
+
+    //grid-container 안의 아이템의 가로 세로 길이를 px단위로 정의함
+    let box_width = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('width'));
+    let box_height = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('height'));
+
     container_width = document.getElementById('grid-container').clientWidth;
     container_height = document.getElementById('grid-container').clientHeight;
     // 여기에 .box가 3~4줄 이상인 경우( grid-container 스타일에 three-or-more-row 라는 클래스 추가
@@ -391,9 +425,8 @@ const observer = new MutationObserver(() => {
 // 어떤 대상의 상태 변화를 감지하는 observer 의 설정값 (대상 : grid-container, childList - true : 대상 내용물의 갯수만 감지)
 observer.observe(document.getElementById('grid-container'), {childList: true });
 
-//grid-container 안의 아이템의 가로 세로 길이를 px단위로 정의함
-let box_width = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('width'));
-let box_height = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('height'));
-
-//맵 양식 다운로드 기능
-
+// 시작시간 & 종료시간 최대값 검증 함수
+function number_max(number_object) {
+    let number = parseInt(number_object.value);
+    const max_number = parseInt(number_object.getAttribute("max"));
+    if (number > max_number) {number_object.value = number_object.getAttribute("max")}};
