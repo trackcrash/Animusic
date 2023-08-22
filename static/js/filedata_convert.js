@@ -38,6 +38,7 @@ async function data_convert() {
         };
     });
 
+    // 양식 파일이 맞는지 확인하는 부분
     if (!workbook['Workbook'] || !workbook['Styles'] || !workbook['Directory'] || !excelFile_data) {
         document.querySelector('.spinner-text').style.display = 'none';
         document.querySelector('.spinner').style.display = 'none';
@@ -54,8 +55,12 @@ async function data_convert() {
             song_info.push(excelFile_data[i]['__EMPTY_1'])
             song_info.push(excelFile_data[i]['__EMPTY_2'])
             song_info.push(excelFile_data[i]['__EMPTY_3'])
-            if (song_info[0] === undefined || song_info[1] === undefined || song_info[2] === undefined || song_info[4] === undefined)
-               {break} else if (song_info[3] === undefined) {song_info[3] = ""};
+            song_info.push(excelFile_data[i]['__EMPTY_4'])
+            song_info.push(excelFile_data[i]['__EMPTY_5'])
+            if (song_info[0] === undefined || song_info[1] === undefined || song_info[2] === undefined || song_info[4] === undefined) {break};
+            if (song_info[3] === undefined) {song_info[3] = ""};
+            if (song_info[5] === undefined) {song_info[5] = ""};
+            if (song_info[6] === undefined) {song_info[6] = ""};
             check_array.push(song_info);
             song_info = [];
         };

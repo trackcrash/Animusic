@@ -65,6 +65,7 @@ function modifyFunction() {
             const songURL = this.querySelector('input')?.value;
             const answer = this.querySelector('h1')?.innerText;
             const hint = this.querySelector('h2')?.innerText;
+            console.log("체크중: ", hint);
             const id = this.querySelector('h4')?.innerText;
             const startTime = this.querySelector('h5')?.innerText;
             const endTime = this.querySelector('h6')?.innerText;
@@ -361,7 +362,9 @@ function UpdateBtn() {
         MapProducer: document.querySelector("#User_Name").innerHTML,
         mission_Id : document.querySelector("#Mission_id").innerHTML
     })
+    console.log(data);
     data = JSON.stringify(data);
+    console.log(data);
     $.ajax({
         type: "POST",
         url: "/update-to-db",
@@ -374,7 +377,7 @@ function UpdateBtn() {
         success: function(data) {
             console.log("통신데이터 값 : ", data);
             alert("등록 완료되었습니다.");
-            location.reload();
+            //location.reload();
         }
     });
 };
