@@ -40,7 +40,6 @@ function createRoomElement(room_name, room_status, user_count) {
 
 function updateRoomCount(room_name, playerCount) {
     const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${room_name}`);
-    console.log(roomCountElement, room_name, playerCount);
     if (roomCountElement) {
         roomCountElement.textContent = `${playerCount}명`;
     }
@@ -112,7 +111,6 @@ window.onload = function() {
 }
 
 socket.on('room_players_update', function(data) {;
-    console.log(data);
     updateRoomCount(data.room_name, data.player_count);
 });
 
@@ -138,7 +136,6 @@ socket.on('room_removed', (data)=>
 });
 socket.on('Join_room', (data)=>
 {
-    console.log(data);
     joinChatRoom(data);
 })
 
@@ -150,7 +147,6 @@ socket.on('update_waiting_userlist', function(data) {
 // 해당 방을 안보이게 처리함
 socket.on('request_room_changed', function(data) {
     let playing = data["room_status"];
-    console.log('roomContainer_' + data["room_name"] +' .room_status')
     if(playing)
     {
         document.getElementById('roomContainer_' + data["room_name"]).querySelector('.room-status').innerText = "게임중";

@@ -247,7 +247,6 @@ socket.on("user_change", (data) => {
 
 socket.on('host_updated', (data) => {
     // 방장 정보가 업데이트되었을 때 클라이언트에서 수행할 동작
-    console.log(`New host: ${data.user}`);
     const game_status = data['game_status'];
     if (data.user === socket.id) {
         isHost = true; // 방장이면 isHost를 true로 설정
@@ -256,7 +255,6 @@ socket.on('host_updated', (data) => {
 });
 
 function showHostContent(game_status) {
-    console.log(isHost, game_status);
     if (isHost) {
         if (game_status == false) {
             elements.StartButton.style.display = "block";
@@ -363,7 +361,6 @@ function setSelectedId(id) {
 socket.on('room_players_update', function(data) {;
     if(data.room_name == room_name)
     {
-        console.log(room_name)
         const item = document.createElement('div');
         item.innerHTML = `<span class="font-semibold">${data.player}</span> ${data.msg}`;
         elements.messages.appendChild(item);

@@ -1,7 +1,4 @@
 #flask main --author: NewKyaru 11/08/2023
-import os
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
 from decouple import config
 from flask import Flask,render_template, request, redirect, url_for, jsonify, flash
 from flask_login import LoginManager, current_user, login_required, logout_user
@@ -100,7 +97,6 @@ def delete_account_confirm():
 @app.get('/delete_account')
 def deleting_account():
     print(f"\033[92;1m{current_user.name}님의 회원탈퇴 시도중...\033[0m")
-    print("MissionTableTsest",play_controller.show_mission_byProducer())
     result_delete_account = login_model.delete_account()
     if result_delete_account:
         print("\033[92;1m회원 탈퇴처리 완료\033[0m")
@@ -172,7 +168,6 @@ def room_list():
 
 @app.get("/get-room-dict")
 def get_room_dictAll():
-    print(get_room_dict())
     return get_room_dict()
 
 @app.get("/get_user_info")
@@ -186,7 +181,6 @@ def chat():
 @app.post('/multi_game')
 def chat_post():
     mission_id = request.args.get('id')
-    print(f"mission_id : {mission_id}, room_name : {request.args.get('room_name')}")
     make_answer(mission_id, request.args.get('room_name'))
     return render_template('multi_game/multi_game.html',current_user=current_user)
 

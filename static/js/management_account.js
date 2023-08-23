@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function () {
             newpassword: newPassword
         });
         data = JSON.stringify(data);
-        console.log(data);
         $.ajax({
             type: "POST",
             url: "/update_profile",
