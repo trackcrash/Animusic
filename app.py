@@ -7,7 +7,6 @@ from chat.chat_model import make_answer
 from controllers import play_controller, login_controller
 from models import login_model
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 
