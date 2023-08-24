@@ -113,9 +113,8 @@ def show_mission_byProducer():
     Mission.__table__.create(bind=engine, checkfirst=True)
     if SuchTable("MissionTable"):
         queries = session.query(Mission).filter(Mission.MapProducer_id == current_user.id)
-        entries = [dict(id=q.id, MapName=q.MapName, MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id) for q in queries]
+        entries = [dict(id=q.id, MapName=q.MapName, MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id,MusicNum=session.query(Music).filter(Music.mission_id == q.id).count()) for q in queries]
         return entries
-
 
 def show_mission_byid(id):
     Mission.__table__.create(bind=engine, checkfirst=True)
