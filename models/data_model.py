@@ -16,7 +16,7 @@ class Music(Base):
     song = Column(String(255), nullable=False)
     youtube_url = Column(String(255), nullable=False)
     thumbnail_url = Column(String(255), nullable=False)
-    answer = Column(String(1000), nullable=False)
+    answer = Column(String(1024), nullable=False)
     hint = Column(String(255), nullable=True)
     # 외래 키 설정
     mission_id = Column(Integer, ForeignKey('MissionTable.id', ondelete='CASCADE'), nullable=False)
