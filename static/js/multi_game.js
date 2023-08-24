@@ -392,16 +392,20 @@ function playerListGet(players) {
     Object.entries(players).forEach(function([key, value]) {
         let username = value["username"];
         let score = value['score'];
-
-        // 캐릭터 이미지 URL
         let characterImageUrl = value['character'];
 
         let userDiv = document.createElement("div");
-        userDiv.classList.add("w-full", "border-black", "border-1", "player-space");
+        userDiv.classList.add(
+            "bg-white", "border-2", "border-gray-300", "p-4",
+            "rounded", "shadow-lg", "opacity-100",
+            "flex", "flex-col", "items-center", "justify-center"
+        );
         userDiv.innerHTML = `
-            Name: ${username} 
-            <img src="${characterImageUrl}" alt="Character Image" width="50" height="50"> 
-            Score: <span class='ScoreSpan'>${score}</span>
+            <div class="space-y-3 text-center">
+                <p class="font-semibold text-lg text-gray-800">${username}</p>
+                <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
+                <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
+            </div>
         `;
 
         if (index % 2 === 0) {
