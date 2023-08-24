@@ -89,7 +89,6 @@ function modifyFunction() {
             document.getElementById('register-btn').innerText = "수정하기";
             
             modifyIndex = i;
-            console.log(`클릭한 box의 인덱스: ${i}`); 
         });
     }
 }
@@ -287,7 +286,6 @@ function saveBtn() {
         MapName: document.querySelector("#MapName-input").value,
         MapProducer: document.querySelector("#User_Name").innerHTML
     })
-    console.log(data);
     data = JSON.stringify(data);
     $.ajax({
         type: "POST",
@@ -363,9 +361,7 @@ function UpdateBtn() {
         MapProducer: document.querySelector("#User_Name").innerHTML,
         mission_Id : document.querySelector("#Mission_id").innerHTML
     })
-    console.log(data);
     data = JSON.stringify(data);
-    console.log(data);
     $.ajax({
         type: "POST",
         url: "/update-to-db",

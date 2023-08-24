@@ -60,7 +60,6 @@ class Mission(Base):
 
 # 코드 구조개선 --kyaru 16/08/23 12:00
 def save_to_db(data):
-    print(data)
     try:
         MissionMapName = data[-1]['MapName']
         MissionMapProducer = data[-1]['MapProducer']

@@ -23,10 +23,8 @@ class RoomDataManger:
                 return longest_present_user
     def room_check(self, room_name):
         if room_name in self._data_store:
-            print("True",room_name)
             return True
         else:
-            print("False",room_name)
             return False
     def create_room(self,room_name,session_id):
             if room_name in self._data_store:

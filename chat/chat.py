@@ -43,17 +43,17 @@ def disconnect():
                 removed_rooms.append(room_name)
                 room_data_manager.remove_room(room_name)  # 방 제거 메서드 호출
                 emit('room_removed', room_name, broadcast=True)  # 방 제거 이벤트 전송
-
-            if room_data_manager._data_store[room_name]['room_info']['room_status']:
-                totalPlayers = len(room_data_manager._data_store[room_name]['user'])
-                
-                if user_name in voted_users[room_name]:
-                    vote_counts[room_name] = vote_counts[room_name] - 1
-                    voted_users[room_name].remove(user_name)
-                if room_name not in vote_counts:
-                    emit('user_change', {'count': vote_counts[room_name], 'totalPlayers': totalPlayers}, room=room_name)
-                else:
-                    emit("user_change", {'count': 0, 'totalPlayers': totalPlayers}, room=room_name)
+            else:
+                if room_data_manager._data_store[room_name]['room_info']['room_status']:
+                    totalPlayers = len(room_data_manager._data_store[room_name]['user'])
+                    
+                    if user_name in voted_users[room_name]:
+                        vote_counts[room_name] = vote_counts[room_name] - 1
+                        voted_users[room_name].remove(user_name)
+                    if room_name not in vote_counts:
+                        emit('user_change', {'count': vote_counts[room_name], 'totalPlayers': totalPlayers}, room=room_name)
+                    else:
+                        emit("user_change", {'count': 0, 'totalPlayers': totalPlayers}, room=room_name)
                 
     try:
         if current_user.name in waitingroom_userlist:
