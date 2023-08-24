@@ -284,7 +284,8 @@ function saveBtn() {
     });
     data.push({
         MapName: document.querySelector("#MapName-input").value,
-        MapProducer: document.querySelector("#User_Name").innerHTML
+        MapProducer: document.querySelector("#User_Name").innerHTML,
+        Thumbnail: data[0].thumbnail || 'basic'
     })
     data = JSON.stringify(data);
     $.ajax({
@@ -359,7 +360,8 @@ function UpdateBtn() {
     data.push({
         MapName: document.querySelector("#MapName-input").value,
         MapProducer: document.querySelector("#User_Name").innerHTML,
-        mission_Id : document.querySelector("#Mission_id").innerHTML
+        mission_Id : document.querySelector("#Mission_id").innerHTML,
+        Thumbnail : data[0].thumbnail || 'basic'
     })
     data = JSON.stringify(data);
     $.ajax({

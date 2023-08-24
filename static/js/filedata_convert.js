@@ -188,7 +188,9 @@ async function data_convert() {
         });
     }
     data.push({
-        MapName: excelFile.name,
+        split_file_name = excelFile.name.split('.')
+        split_file_name.pop()
+        MapName:split_file_name.join('.')
         MapProducer: document.querySelector("#User_Name").innerHTML
     });
     data = JSON.stringify(data);

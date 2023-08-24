@@ -63,7 +63,7 @@ def save_to_db(data):
     try:
         MissionMapName = data[-1]['MapName']
         MissionMapProducer = data[-1]['MapProducer']
-        MissionThumbnail = data[-1].get('Thumbnail', "basic")
+        MissionThumbnail = data[-1]['Thumbnail']
         new_mission = Mission(MissionMapName, MissionMapProducer, MissionThumbnail, current_user.id)
         new_mission.active = True
         session.add(new_mission)
@@ -142,7 +142,10 @@ def update_to_db(data):
 def update_to_db(data):
     try:
         data = deque(data)
-        mission_id = data.pop()['mission_Id']
+        mission_data = data.pop()
+        mission_id = mission_data['mission_Id']
+        now_mission_info = session.query(Mission).filter_by(id=mission_id).first()
+        now_mission_info.Thumbnail = mission_data['Thumbnail']
         for item in data:
             if 'Music_id' in item:
                 now_music_info = session.query(Music).filter_by(id=item['Music_id']).first()
@@ -154,7 +157,6 @@ def update_to_db(data):
                 now_music_info.hint = item.get('hint')
                 now_music_info.startTime = item.get('startTime')
                 now_music_info.endTime = item.get('endTime')
-                session.commit()
             else:
                 new_music_info = Music(
                     title = item.get('title'),
@@ -168,7 +170,7 @@ def update_to_db(data):
                     endTime = item.get('endTime')
                 )
                 session.add(new_music_info)
-                session.commit()
+        session.commit()
     except SQLAlchemyError as e:
         session.rollback()
         error_msg = f'Error saving data: {str(e)}'
