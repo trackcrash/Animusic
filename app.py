@@ -1,4 +1,5 @@
 #flask main --author: NewKyaru 11/08/2023
+import os
 from decouple import config
 from flask import Flask,render_template, request, redirect, url_for, jsonify, flash
 from flask_login import LoginManager, current_user, login_required, logout_user
@@ -6,7 +7,7 @@ from chat.chat import socketio, get_room_dict, get_user
 from chat.chat_model import make_answer
 from controllers import play_controller, login_controller
 from models import login_model
-
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 
