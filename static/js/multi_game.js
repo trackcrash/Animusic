@@ -54,7 +54,7 @@ function playvideo(videolink) {
         // 이미 비디오를 재생 중인 경우 아무 작업도 하지 않음
         return;
     }
-    isPlayingVideo =true;
+    isPlayingVideo = true;
     const videoFrame = document.getElementById("videoFrame");
     videoFrame.innerHTML = "";
 
@@ -84,6 +84,7 @@ function playvideo(videolink) {
 function onPlayerReady(event) {
     event.target.playVideo();
 }
+
 function getYoutubeVideoId(url) {
     const regex = /(?:https:\/\/www\.youtube\.com\/embed\/)?([a-zA-Z0-9_-]{11})/;
     const match = url.match(regex);
@@ -381,22 +382,29 @@ function playerListGet(players) {
     leftContainer.innerHTML = "";
     rightContainer.innerHTML = "";
 
-    let index = 0; // 플레이어의 인덱스를 추적하기 위한 변수
+    let index = 0;
 
     Object.entries(players).forEach(function([key, value]) {
         let username = value["username"];
         let score = value['score'];
-        let userDiv = document.createElement("div"); // 새 <div> 요소 생성
-        userDiv.classList.add("w-full", "border-black", "border-1");
-        userDiv.innerHTML = "Name: " + username + " Score: " + "<span class='ScoreSpan'>" + score + "</span>"; // <div> 내용 설정
 
-        // 홀수 번째 플레이어는 오른쪽에, 짝수 번째 플레이어는 왼쪽에 추가
+        // 캐릭터 이미지 URL
+        let characterImageUrl = value['character'];
+
+        let userDiv = document.createElement("div");
+        userDiv.classList.add("w-full", "border-black", "border-1", "player-space");
+        userDiv.innerHTML = `
+            Name: ${username} 
+            <img src="${characterImageUrl}" alt="Character Image" width="50" height="50"> 
+            Score: <span class='ScoreSpan'>${score}</span>
+        `;
+
         if (index % 2 === 0) {
-            leftContainer.appendChild(userDiv); // 왼쪽 컨테이너에 <div> 추가
+            leftContainer.appendChild(userDiv);
         } else {
-            rightContainer.appendChild(userDiv); // 오른쪽 컨테이너에 <div> 추가
+            rightContainer.appendChild(userDiv);
         }
 
-        index++; // 인덱스 증가
+        index++;
     });
 }
