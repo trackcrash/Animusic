@@ -6,6 +6,8 @@ let selectedId = 0;
 let player_name = document.getElementById('User_Name').innerText;
 let isHost = false;
 let player;
+let isPlayingVideo = false;
+
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -48,6 +50,11 @@ function voteSkip() {
 }
 
 function playvideo(videolink) {
+    if (isPlayingVideo) {
+        // 이미 비디오를 재생 중인 경우 아무 작업도 하지 않음
+        return;
+    }
+    isPlayingVideo =true;
     const videoFrame = document.getElementById("videoFrame");
     videoFrame.innerHTML = "";
 
@@ -58,27 +65,25 @@ function playvideo(videolink) {
         return;
     }
 
-    if (player) {
+    if (!player) {
+        player = new YT.Player(videoFrame, {
+            height: '100%',
+            width: '100%',
+            videoId: videoId,
+            events: {
+                'onReady': onPlayerReady,
+            }
+        });
+    } else {
         player.loadVideoById(videoId);
-        videoOverlay.style.display = 'block';
-        return;
     }
 
-    player = new YT.Player(videoFrame, {
-        height: '100%',
-        width: '100%',
-        videoId: videoId,
-        events: {
-            'onReady': onPlayerReady,
-        }
-    });
+    videoOverlay.style.display = 'block';
 }
 
 function onPlayerReady(event) {
-    videoOverlay.style.display = 'block';
     event.target.playVideo();
 }
-
 function getYoutubeVideoId(url) {
     const regex = /(?:https:\/\/www\.youtube\.com\/embed\/)?([a-zA-Z0-9_-]{11})/;
     const match = url.match(regex);
@@ -126,6 +131,7 @@ function initEventListeners() {
         socket.emit('showHint', { "room": room_name });
     });
     elements.StartButton.addEventListener('click', () => {
+        isPlayingVideo = false;
         elements.nextButton.disabled = false;
         socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId }, function() {
             socket.emit('playingStatus_change', room_name, function() {
@@ -161,6 +167,7 @@ function initializeSocketEvents() {
     socket.on('NextData', function(data) {
         currentvideolink = data.youtubeLink;
         totalPlayers = data['totalPlayers'];
+        isPlayingVideo = false;
         playvideo(currentvideolink);
         songTitle.innerText = "";
         elements.nextButton.style.display = "block";
@@ -194,6 +201,7 @@ function initializeSocketEvents() {
     });
 
     socket.on('correctAnswer', data => {
+        isPlayingVideo = false;
         playvideo(currentvideolink);
         elements.videoOverlay.style.display = 'none';
         showSongInfo(data.data.title, data.data.song, data.name);
