@@ -87,8 +87,9 @@ def handle_message(data):
     if music_data_manager.check_answer(room, msg) and music_data_manager.retrieve_data(room).get('is_answered') == 'false':
         current_data = music_data_manager.retrieve_data(room)
         current_data['is_answered'] = 'true'
+        startTime = float(current_data['startTime'])
         emit('message', {'name': name, 'msg': msg}, room=room)
-        emit('correctAnswer', {'name':name,'data':current_data}, room=room)
+        emit('correctAnswer', {'name':name,'data':current_data,'startTime':startTime}, room=room)
         room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
         update_room_player_count(room, "님이 정답을 맞췄습니다.", name)
     else:
@@ -108,7 +109,11 @@ def playTheGame(room_name):
     first_data = music_data_manager.retrieve_data(room_name)
     if first_data:
         youtube_embed_url = first_data['youtube_embed_url']
-        emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url}, room=room_name)
+        start_time = float(first_data['startTime'])
+        if start_time:
+            emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time}, room=room_name)
+        else:
+            emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url}, room=room_name)
     else:
         emit('PlayGame', {'totalPlayers': totalPlayers}, room=room_name)
 
@@ -143,7 +148,11 @@ def handle_vote_skip(data):
         if next_data:
             totalPlayers = len(room_data_manager._data_store[room]['user'])
             youtube_embed_url = next_data['youtube_embed_url']
-            emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers}, room=room)
+            startTime = float(next_data['startTime'])
+            if startTime:
+                emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime}, room=room)
+            else:
+                emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers}, room=room)
         else:
             emit('EndOfData', {}, room=room)
 

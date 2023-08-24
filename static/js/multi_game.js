@@ -49,7 +49,7 @@ function voteSkip() {
     socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
 }
 
-function playvideo(videolink) {
+function playvideo(videolink, startTime = 0) {
     if (isPlayingVideo) {
         // 이미 비디오를 재생 중인 경우 아무 작업도 하지 않음
         return;
@@ -57,7 +57,6 @@ function playvideo(videolink) {
     isPlayingVideo = true;
     const videoFrame = document.getElementById("videoFrame");
     videoFrame.innerHTML = "";
-
     const videoId = getYoutubeVideoId(videolink);
 
     if (!videoId) {
@@ -71,18 +70,24 @@ function playvideo(videolink) {
             width: '100%',
             videoId: videoId,
             events: {
-                'onReady': onPlayerReady,
+                'onReady': function(event) {
+                    onPlayerReady(event, startTime);
+                }
             }
         });
     } else {
-        player.loadVideoById(videoId);
+        player.loadVideoById({ videoId: videoId, startSeconds: startTime });
     }
 
     videoOverlay.style.display = 'block';
 }
 
-function onPlayerReady(event) {
+function onPlayerReady(event, startTime) {
+    setVolume(50);
     event.target.playVideo();
+    if (startTime > 0) {
+        seekTo(startTime);
+    }
 }
 
 function getYoutubeVideoId(url) {
@@ -155,7 +160,7 @@ function initializeSocketEvents() {
     socket.on("PlayGame", data => {
         totalPlayers = data.totalPlayers;
         currentvideolink = data.youtubeLink;
-        playvideo(currentvideolink);
+        playvideo(currentvideolink, data.startTime);
         elements.MapSelect.style.display = "none";
         elements.nextButton.style.display = "block";
         elements.hintButton.style.display = "block";
@@ -169,7 +174,7 @@ function initializeSocketEvents() {
         currentvideolink = data.youtubeLink;
         totalPlayers = data['totalPlayers'];
         isPlayingVideo = false;
-        playvideo(currentvideolink);
+        playvideo(currentvideolink, data.startTime);
         songTitle.innerText = "";
         elements.nextButton.style.display = "block";
         songArtist.innerText = "";
@@ -203,7 +208,7 @@ function initializeSocketEvents() {
 
     socket.on('correctAnswer', data => {
         isPlayingVideo = false;
-        playvideo(currentvideolink);
+        playvideo(currentvideolink, data.startTime);
         elements.videoOverlay.style.display = 'none';
         showSongInfo(data.data.title, data.data.song, data.name);
     });

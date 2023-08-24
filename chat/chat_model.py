@@ -101,6 +101,7 @@ class MusicDataManager:
         }
     def index_data(self, room_name):
         return self._data_store.get(room_name, {}).get('current_index', 0)
+    
     def retrieve_data(self, room_name):
         index = self._data_store.get(room_name, {}).get('current_index', 0)
         return self._data_store.get(room_name, {}).get('data', [])[index]
@@ -139,8 +140,10 @@ def make_answer(mission_id, room_name):
     for item in data:
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
         answer_list = [answer.strip() for answer in item['answer'].split(',')]
+        starttime = float(item['startTime'])
         music_data = {
             'hint': item['hint'],
+            'startTime': starttime,
             'is_answered': 'false',
             'answer_list': answer_list,
             'youtube_embed_url': youtube_embed_url,
