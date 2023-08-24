@@ -128,20 +128,17 @@ function initEventListeners() {
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
         socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId }, function() {
-            socket.emit('playingStatus_change', room_name, function()
-            {
+            socket.emit('playingStatus_change', room_name, function() {
                 let scoreItem = document.querySelectorAll(".ScoreSpan")
-                for(const element of scoreItem)
-                {
+                for (const element of scoreItem) {
                     element.innerHTML = 0;
                 }
             });
         });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
-    elements.textClear.addEventListener('click', function()
-    {
-        elements.messages.innerHTML="";
+    elements.textClear.addEventListener('click', function() {
+        elements.messages.innerHTML = "";
     })
 }
 
@@ -247,7 +244,6 @@ socket.on("user_change", (data) => {
 
 socket.on('host_updated', (data) => {
     // 방장 정보가 업데이트되었을 때 클라이언트에서 수행할 동작
-    console.log(`New host: ${data.user}`);
     const game_status = data['game_status'];
     if (data.user === socket.id) {
         isHost = true; // 방장이면 isHost를 true로 설정
@@ -256,7 +252,6 @@ socket.on('host_updated', (data) => {
 });
 
 function showHostContent(game_status) {
-    console.log(isHost, game_status);
     if (isHost) {
         if (game_status == false) {
             elements.StartButton.style.display = "block";
@@ -361,8 +356,7 @@ function setSelectedId(id) {
 }
 
 socket.on('room_players_update', function(data) {;
-    if(data.room_name == room_name)
-    {
+    if (data.room_name == room_name) {
         console.log(room_name)
         const item = document.createElement('div');
         item.innerHTML = `<span class="font-semibold">${data.player}</span> ${data.msg}`;
@@ -372,17 +366,30 @@ socket.on('room_players_update', function(data) {;
 
     }
 });
+
 function playerListGet(players) {
-    // 컨테이너 요소 선택
-    let container = document.getElementById("Players_Box");
-    container.innerHTML = "";
-    // 객체의 키와 값을 순회
+    let leftContainer = document.getElementById("Players_Box_Left");
+    let rightContainer = document.getElementById("Players_Box_Right");
+
+    leftContainer.innerHTML = "";
+    rightContainer.innerHTML = "";
+
+    let index = 0; // 플레이어의 인덱스를 추적하기 위한 변수
+
     Object.entries(players).forEach(function([key, value]) {
         let username = value["username"];
         let score = value['score'];
         let userDiv = document.createElement("div"); // 새 <div> 요소 생성
-        userDiv.classList.add("w-full","border-black","border-1")
-        userDiv.innerHTML ="Name: "+ username + " Score: " + "<span class='ScoreSpan'>"+score+"</span>"; // <div> 내용 설정
-        container.appendChild(userDiv); // 컨테이너에 <div> 추가
+        userDiv.classList.add("w-full", "border-black", "border-1");
+        userDiv.innerHTML = "Name: " + username + " Score: " + "<span class='ScoreSpan'>" + score + "</span>"; // <div> 내용 설정
+
+        // 홀수 번째 플레이어는 오른쪽에, 짝수 번째 플레이어는 왼쪽에 추가
+        if (index % 2 === 0) {
+            leftContainer.appendChild(userDiv); // 왼쪽 컨테이너에 <div> 추가
+        } else {
+            rightContainer.appendChild(userDiv); // 오른쪽 컨테이너에 <div> 추가
+        }
+
+        index++; // 인덱스 증가
     });
 }
