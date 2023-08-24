@@ -187,11 +187,14 @@ async function data_convert() {
             endTime: endTime
         });
     }
+
+    let split_file_name = excelFile.name.split('.')
+    split_file_name.pop()
+
     data.push({
-        split_file_name = excelFile.name.split('.')
-        split_file_name.pop()
-        MapName:split_file_name.join('.')
-        MapProducer: document.querySelector("#User_Name").innerHTML
+        MapName:split_file_name.join('.'),
+        MapProducer: document.querySelector("#User_Name").innerHTML,
+        Thumbnail: data[0].thumbnail || 'basic'
     });
     data = JSON.stringify(data);
     $.ajax({
