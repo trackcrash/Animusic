@@ -8,6 +8,8 @@ let isHost = false;
 let player;
 let isPlayingVideo = false;
 
+let doMessage = true;
+
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -24,11 +26,19 @@ const elements = {
 const room_name = new URLSearchParams(window.location.search).get('room_name');
 
 function sendMessage() {
-    const content = elements.inputMessage.value.trim();
-    if (content) {
-        socket.emit('message', { content, room: room_name });
-        elements.inputMessage.value = '';
+    if(doMessage)
+    {
+        doMessage = false;
+        const content = elements.inputMessage.value.trim();
+        if (content) {
+            socket.emit('message', { content, room: room_name });
+            elements.inputMessage.value = '';
+        }
+        setTimeout(()=>{
+            doMessage = true;
+        }, 200);
     }
+
 }
 //정답 출력용
 function showSongInfo(title, song, correctusername) {
@@ -129,6 +139,7 @@ function initEventListeners() {
     // 키보드의 end 버튼을 눌러도 nextButton이 눌리게끔 하는 동작
     document.addEventListener('keydown', (event) => {
         if (event.key === 'End' && elements.nextButton.disabled === false) {
+
             elements.nextButton.disabled = true;
             voteSkip();
         }
@@ -176,10 +187,10 @@ function initializeSocketEvents() {
         isPlayingVideo = false;
         playvideo(currentvideolink, data.startTime);
         songTitle.innerText = "";
-        elements.nextButton.style.display = "block";
         songArtist.innerText = "";
         correctUser.innerText = "";
         songHint.innerText = "";
+        elements.nextButton.style.display = "block";
         nextButton.disabled = false;
         updateVoteCountUI(0);
         showHostContent(true);
