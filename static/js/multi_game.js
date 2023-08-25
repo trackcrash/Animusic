@@ -66,6 +66,7 @@ function playvideo(videolink, startTime = 0, endTime = 0, callback = null) {
         // 이미 비디오를 재생 중인 경우 아무 작업도 하지 않음
         return;
     }
+    console.log("재생시작");
     isPlayingVideo = true;
     const videoFrame = document.getElementById("videoFrame");
     const videoId = getYoutubeVideoId(videolink);
@@ -245,9 +246,15 @@ function initializeSocketEvents() {
         nextButton.disabled = true;
         nextButton.style.display = "none";
         document.getElementById('skipVoteCount').innerText = "";
-        player.stopVideo();
+        console.log("재생종료");
         nextButton.style.display = "none";
         hintButton.style.display = "none";
+        setTimeout(function()
+        {
+            player.stopVideo();
+
+        },1000)
+
         socket.emit('playingStatus_change', room_name);
 
         showHostContent(false);
@@ -261,12 +268,12 @@ function initializeSocketEvents() {
         isPlayingVideo = false;
         playvideo(currentvideolink, data.startTime, "stop" ,null);
         elements.videoOverlay.style.display = 'none';
+        showSongInfo(data.data.title, data.data.song, data.name);
         if(document.querySelector("#NextVideo").checked)
         {
             elements.nextButton.disabled = true;
             voteSkip();
         }
-        showSongInfo(data.data.title, data.data.song, data.name);
     });
 
     socket.on('hint', data => {
