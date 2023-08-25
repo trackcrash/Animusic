@@ -141,9 +141,11 @@ def make_answer(mission_id, room_name):
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
         answer_list = [answer.strip() for answer in item['answer'].split(',')]
         starttime = float(item['startTime'])
+        endTime = float(item['endTime'])
         music_data = {
             'hint': item['hint'],
             'startTime': starttime,
+            'endTime' : endTime ,
             'is_answered': 'false',
             'answer_list': answer_list,
             'youtube_embed_url': youtube_embed_url,

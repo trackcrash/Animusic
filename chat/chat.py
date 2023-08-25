@@ -110,12 +110,8 @@ def playTheGame(room_name):
     if first_data:
         youtube_embed_url = first_data['youtube_embed_url']
         start_time = float(first_data['startTime'])
-        if start_time:
-            emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time}, room=room_name)
-        else:
-            emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url}, room=room_name)
-    else:
-        emit('PlayGame', {'totalPlayers': totalPlayers}, room=room_name)
+        end_time = float(first_data['endTime'])
+        emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime' : end_time}, room=room_name)
 
 
 @socketio.on('MissionSelect')
@@ -144,15 +140,12 @@ def handle_vote_skip(data):
         vote_counts[room] = 0
         voted_users[room] = [] #초기화
         next_data = music_data_manager.retrieve_next_data(room)
-        print(next_data)
         if next_data:
             totalPlayers = len(room_data_manager._data_store[room]['user'])
             youtube_embed_url = next_data['youtube_embed_url']
             startTime = float(next_data['startTime'])
-            if startTime:
-                emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime}, room=room)
-            else:
-                emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers}, room=room)
+            endTime = float(next_data['endTime'])
+            emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime, "endTime":endTime}, room=room)
         else:
             emit('EndOfData', {}, room=room)
 
@@ -160,7 +153,16 @@ def handle_vote_skip(data):
 
     else:
         emit('updateVoteCount', {'count': vote_counts[room]}, room=room)
-
+@socketio.on("TimeOut")
+def handle_time_out(data):
+    room = data.get("room")
+    next_data = music_data_manager.retrieve_next_data(room)
+    if next_data:
+        totalPlayers = len(room_data_manager._data_store[room]['user'])
+        youtube_embed_url = next_data['youtube_embed_url']
+        startTime = float(next_data['startTime'])
+        endTime = float(next_data['endTime'])
+        emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime, "endTime":endTime}, room=room)
 ############################################################################################
 # 방마다 인원 수를 클라이언트에게 전달
 def update_room_player_count(room_name, msg, player_name):

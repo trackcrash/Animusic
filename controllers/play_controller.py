@@ -85,7 +85,7 @@ def show_table_bymissionid(missionid):
     Music.__table__.create(bind=engine, checkfirst=True)
     if SuchTable("MusicTable"):
         queries = session.query(Music).filter(Music.mission_id==missionid)
-        entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint if q.hint is not None else "", startTime=q.startTime if q.startTime is not None else "0", endTime=q.endTime if q.endTime is not None else "") for q in queries]
+        entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint if q.hint is not None else "", startTime=q.startTime if q.startTime is not None else "0", endTime = q.endTime if q.endTime is not None and (q.startTime is None or q.endTime > q.startTime) else "0") for q in queries]
         return entries
     
 
