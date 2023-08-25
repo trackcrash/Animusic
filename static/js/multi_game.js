@@ -7,9 +7,10 @@ let player_name = document.getElementById('User_Name').innerText;
 let isHost = false;
 let player;
 let isPlayingVideo = false;
-
+let GameTimer = 0;
 let doMessage = true;
-
+let playerStateChangeHandler; // 이벤트 핸들러를 저장할 변수
+let gameTimerInterval; //setInteval 이벤트
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -59,21 +60,19 @@ function voteSkip() {
     socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
 }
 
-function playvideo(videolink, startTime = 0) {
+
+function playvideo(videolink, startTime = 0, endTime = 0, callback = null) {
     if (isPlayingVideo) {
         // 이미 비디오를 재생 중인 경우 아무 작업도 하지 않음
         return;
     }
     isPlayingVideo = true;
     const videoFrame = document.getElementById("videoFrame");
-    videoFrame.innerHTML = "";
     const videoId = getYoutubeVideoId(videolink);
-
     if (!videoId) {
         console.error("Invalid YouTube URL provided");
         return;
     }
-
     if (!player) {
         player = new YT.Player(videoFrame, {
             height: '100%',
@@ -81,25 +80,65 @@ function playvideo(videolink, startTime = 0) {
             videoId: videoId,
             events: {
                 'onReady': function(event) {
-                    onPlayerReady(event, startTime);
-                }
+                    // 비디오 정보를 가져와서 endTime을 설정합니다.
+                    onPlayerReady(event, startTime, endTime, callback); // endTime와 callback 전달
+                },
             }
         });
     } else {
-        player.loadVideoById({ videoId: videoId, startSeconds: startTime });
+        // 기존 플레이어를 사용하여 비디오를 변경합니다.
+        player.cueVideoById({ videoId: videoId, startSeconds: startTime });
+        setTimeout(function()
+        {
+            onNextReady(startTime,endTime,callback)
+        },1000)
     }
-
     videoOverlay.style.display = 'block';
 }
 
-function onPlayerReady(event, startTime) {
+function onPlayerReady(event, startTime, endTime, callback) {
     setVolume(50);
     event.target.playVideo();
     if (startTime > 0) {
         seekTo(startTime);
     }
+    if (callback != null) {
+        callback(startTime,endTime); // endTime을 콜백으로 전달
+    }
 }
-
+function onNextReady( startTime, endTime, callback) {
+    player.playVideo();
+    if (startTime > 0) {
+        seekTo(startTime);
+    }
+    if(endTime == "stop")
+    {
+        console.log("이벤트제거");
+        clearInterval(gameTimerInterval); // 올바른 인터벌 ID 사용하여 중지
+        return;
+    }
+    if (callback != null) {
+        callback(startTime,endTime); // endTime을 콜백으로 전달
+    }
+}
+function EndTimeTest(startTime,fendTime) {
+    let endTime = fendTime;
+    console.log(endTime);
+    if(endTime == 0 || endTime > player.getDuration())
+    {
+        endTime = player.getDuration();
+    }
+    GameTimer = endTime - startTime;
+        gameTimerInterval = setInterval(() => {
+            document.querySelector("#GameTimer span").innerText = GameTimer;
+            if (GameTimer <= 0) {
+                socket.emit("TimeOut", { "room": room_name });
+                clearInterval(gameTimerInterval); // 올바른 인터벌 ID 사용하여 중지
+                return;
+            }
+            GameTimer--;
+        }, 1000);
+}
 function getYoutubeVideoId(url) {
     const regex = /(?:https:\/\/www\.youtube\.com\/embed\/)?([a-zA-Z0-9_-]{11})/;
     const match = url.match(regex);
@@ -150,14 +189,7 @@ function initEventListeners() {
     elements.StartButton.addEventListener('click', () => {
         isPlayingVideo = false;
         elements.nextButton.disabled = false;
-        socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId }, function() {
-            socket.emit('playingStatus_change', room_name, function() {
-                let scoreItem = document.querySelectorAll(".ScoreSpan")
-                for (const element of scoreItem) {
-                    element.innerHTML = 0;
-                }
-            });
-        });
+        socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
     elements.textClear.addEventListener('click', function() {
@@ -171,7 +203,7 @@ function initializeSocketEvents() {
     socket.on("PlayGame", data => {
         totalPlayers = data.totalPlayers;
         currentvideolink = data.youtubeLink;
-        playvideo(currentvideolink, data.startTime);
+        playvideo(currentvideolink, data.startTime, data.endTime, EndTimeTest);
         elements.MapSelect.style.display = "none";
         elements.nextButton.style.display = "block";
         elements.hintButton.style.display = "block";
@@ -179,13 +211,21 @@ function initializeSocketEvents() {
         nextButton.disabled = false;
         updateVoteCountUI(0);
         showHostContent(true);
+    }, ()=>{
+        socket.emit('playingStatus_change', room_name, function() {
+            let scoreItem = document.querySelectorAll(".ScoreSpan")
+            for (const element of scoreItem) {
+                element.innerHTML = 0;
+               }
+           })
     });
     //다음 곡 진행
     socket.on('NextData', function(data) {
         currentvideolink = data.youtubeLink;
         totalPlayers = data['totalPlayers'];
         isPlayingVideo = false;
-        playvideo(currentvideolink, data.startTime);
+        clearInterval(gameTimerInterval);
+        playvideo(currentvideolink, data.startTime, data.endTime, EndTimeTest);
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
@@ -219,8 +259,13 @@ function initializeSocketEvents() {
 
     socket.on('correctAnswer', data => {
         isPlayingVideo = false;
-        playvideo(currentvideolink, data.startTime);
+        playvideo(currentvideolink, data.startTime, "stop" ,null);
         elements.videoOverlay.style.display = 'none';
+        if(document.querySelector("#NextVideo").checked)
+        {
+            elements.nextButton.disabled = true;
+            voteSkip();
+        }
         showSongInfo(data.data.title, data.data.song, data.name);
     });
 
