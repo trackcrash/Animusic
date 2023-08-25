@@ -10,7 +10,8 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/filedata_convert.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/upload_filedata.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/download_filedata.js') }}" defer></script>
 </head>
 
 <body class="font-sans bg-gray-100 text-black h-screen">
@@ -34,7 +35,8 @@
             </div>
             <div class="mb-4 py-1">
                 <a href="{{ url_for('static', filename='file_form/MakingMap_form.xlsx') }}" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600" download>양식 다운로드</a>
-                <button id="file_upload_btn" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600">양식 제출하기</button>
+                <button id="file_save_btn" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600 {% if request.args.get('id') %}hidden{% endif %}" >맵 추가하기</button>
+                <button id="file_insert_btn" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600 {% if not request.args.get('id') %}hidden{% endif %}">맵 수정하기</button>
                 <div id="loading-spinner" class="spinner"></div>
                 <div class="progress-bar">
                     <div class="progress-fill"></div>
@@ -114,11 +116,13 @@
                         <button id="register-btn" class="w-1/2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">등록하기</button>
                         <button id="update-btn" type="button" class="w-1/2 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">정보 수정하기</button>
                     </div>
-                    <script>
-                        let delete_link = "/delete-mission?id={{data[0][0]['id']}}"
-                    </script>
-                    <button onclick="location.href=delete_link" id="delete-btn" type="button" class="w-1/2 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">맵 삭제하기</button>
-
+                    <div class="flex space-x-2">
+                        <script>
+                            let delete_link = "/delete-mission?id={{data[0][0]['id']}}"
+                        </script>
+                        <button onclick="location.href=delete_link" id="delete-btn" type="button" class="w-1/2 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">맵 삭제하기</button>
+                        <button id="download_excelfile" class="w-1/2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">맵 파일 다운로드 받기</button>
+                    </div>
                 </form>
             </div>
         </div>

@@ -50,7 +50,6 @@ def show():
 def submit():
     return play_controller.submit_to_db()
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':

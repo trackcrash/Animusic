@@ -301,7 +301,7 @@ function saveBtn() {
         success: function(data) {
             console.log("통신데이터 값 : ", data);
             alert("등록 완료되었습니다.");
-            //location.reload();
+            window.location.href = '/Map'
         }
     });
 };
@@ -376,7 +376,7 @@ function UpdateBtn() {
         success: function(data) {
             console.log("통신데이터 값 : ", data);
             alert("등록 완료되었습니다.");
-            //location.reload();
+            window.location.href = '/Map'
         }
     });
 };

@@ -123,8 +123,6 @@ def show_mission_byid(id):
         entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail, MapProducer_id=q.MapProducer_id) for q in queries]
         return entries
 
-
-
 def delete_User(id):
     data = session.query(Mission).filter(Mission.MapProducer_id == id).all()
     for mission_item  in data:
