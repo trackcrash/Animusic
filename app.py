@@ -1,7 +1,7 @@
 #flask main --author: NewKyaru 11/08/2023
 import os
 from decouple import config
-from flask import Flask,render_template, request, redirect, url_for, jsonify, flash
+from flask import Flask,render_template, request, redirect, url_for, jsonify, flash, send_file
 from flask_login import LoginManager, current_user, login_required, logout_user
 from chat.chat import socketio, get_room_dict, get_user
 from chat.chat_model import make_answer
@@ -151,6 +151,10 @@ def update():
 @app.get("/delete-mission")
 def deleteMission():
     return play_controller.delete_Mission(request.args.get('id'))
+
+@app.route('/download_excelfile', methods=['GET'])
+def download_template():
+    return send_file('static/file_form/MakingMap_form.xlsx', as_attachment=True)
 
 #########################################################################################
 

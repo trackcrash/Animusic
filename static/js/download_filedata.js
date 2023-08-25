@@ -1,18 +1,9 @@
 document.getElementById('download_excelfile').addEventListener('click', data_convert_download);
 
-function data_convert_download() {
-    let exceldata = [
-        ['맵 제작 프리셋 양식파일'],
-        ['제목은 해당 곡의 출처를 적는곳이라 생각하면 됩니다. ex) 애니메이션 제목, 가수이름'],
-        ['정답은 콤마(,)를 사용하여 한 곡에 여러개의 답을 지정할 수 있습니다. ex) 레몬, lemon'],
-        ['제목, 곡 이름, 정답, 곡 링크 4가지 항목이 필수로 적혀있는 행 정보만 읽습니다. (힌트, 재생 시간은 필수사항이아닙니다.)'],
-        ['곡 링크의 경우 반드시 유효한(계정없이 재생되는지 여부)지 확인하시기 바랍니다.'],
-        ['시간 작성방법 ex)1:2:3.123~1:2:3.124 (1시간 2분 3.123초 부터 1시간 2분 3.124초 까지), 2:3~2:4 (2분3초 부터 2분4초까지)'],
-        ['시간은 최대 100시간을 넘길 수 없으며 시간 작성방법이 지켜지지않는 셀은 \'NULL\' 처리됩니다.'],
-        ['제목', '곡 이름', '정답', '힌트', '곡 링크', '재생 시간']];
+async function data_convert_download() {
 
     const items = document.querySelectorAll('.grid-item.box');
-
+    let exceldata = [];
     for (let item of items) {
         // 웹페이지에 있는 곡 정보를 각각 변수선언 하는 곳
         const title = item.querySelector('h3').innerText;
@@ -91,21 +82,38 @@ function data_convert_download() {
 
         exceldata.push(song_info);
         song_info = [];
-    }
-    console.log(exceldata);
+    };
+    const response = await fetch('/download_excelfile'); // 서버로부터 양식 파일 다운로드 요청
+    const blob = await response.blob();
+    const excelFile = new Uint8Array(await blob.arrayBuffer()); // 받아온 파일을 Uint8Array로 변환
+
+    let workbook = XLSX.read(excelFile, { type: 'array'}); // 기존 서식을 살릴 수가 없음 !
+    let worksheet = workbook.Sheets['시트1']; // 기존 워크시트 선택
+
+    // 웹페이지에서 가져온 데이터를 새로운 열에 추가
+
+    const col_list = ['A', 'B', 'C', 'D', 'E', 'F'];    // 양식 내용이 바뀌면 수정해야 됨
+    const start_row = 9;                                // 양식 내용이 바뀌면 수정해야 됨
+    for (let i = 0; i < exceldata.length; i++) {
+        for (let j = 0; j < col_list.length; j++) {
+            const cell_name = col_list[j] + String(start_row + i);
+            worksheet[cell_name] = {
+                t: 's',
+                v: exceldata[i][j]
+            };
+        };
+    };
+
+    // Blob 생성 및 다운로드 처리
+    const blobToDownload = new Blob([XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blobToDownload);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = document.querySelector("#MapName-input").value + '.xlsx';
+    a.click();
+
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 100);
 };
-/*
-
-    let ws = XLSX.utils.aoa_to_sheet(exceldata);
-
-    ws["!merges"] = [
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }, // A1:F1
-        { s: { r: 1, c: 0 }, e: { r: 1, c: 5 } }, // A2:F2
-        { s: { r: 2, c: 0 }, e: { r: 2, c: 5 } }, // A3:F3
-        { s: { r: 3, c: 0 }, e: { r: 3, c: 5 } }, // A4:F4
-        { s: { r: 4, c: 0 }, e: { r: 4, c: 5 } }, // A5:F5
-        { s: { r: 5, c: 0 }, e: { r: 5, c: 5 } }, // A6:F6
-        { s: { r: 6, c: 0 }, e: { r: 6, c: 5 } }, // A7:F7
-    ];
-}
-*/
