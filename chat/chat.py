@@ -163,6 +163,8 @@ def handle_time_out(data):
         startTime = float(next_data['startTime'])
         endTime = float(next_data['endTime'])
         emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime, "endTime":endTime}, room=room)
+    else:
+        emit('EndOfData', {}, room=room)
 ############################################################################################
 # 방마다 인원 수를 클라이언트에게 전달
 def update_room_player_count(room_name, msg, player_name):
