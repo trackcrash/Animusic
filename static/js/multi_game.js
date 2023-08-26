@@ -67,6 +67,7 @@ function voteSkip() {
 
 function playvideo(videolink, startTime = 0, endTime = 0, totalSong,nowSong,callback = null) {
     if (isPlayingVideo) {
+        console.log("ㅇㅇ");
         // 이미 비디오를 재생 중인 경우 아무 작업도 하지 않음
         return;
     }
@@ -113,6 +114,7 @@ function onPlayerReady(event, startTime, endTime, totalSong,nowSong,callback) {
     }
 }
 function onNextReady( startTime, endTime,totalSong,nowSong,callback) {
+    clearInterval(gameTimerInterval);
     player.playVideo();
     if (startTime > 0) {
         seekTo(startTime);
@@ -138,7 +140,6 @@ function EndTimeTest(startTime,fendTime, totalSong,nowSong) {
             document.querySelector("#GameTimer span").innerText = GameTimer;
             if (GameTimer <= 0) {
                 socket.emit("TimeOut", { "room": room_name });
-                clearInterval(gameTimerInterval); // 올바른 인터벌 ID 사용하여 중지
                 return;
             }
             GameTimer--;
@@ -265,6 +266,7 @@ function initializeSocketEvents() {
         console.log("재생종료");
         nextButton.style.display = "none";
         hintButton.style.display = "none";
+        isPlayingVideo = false;
         setTimeout(function()
         {
             player.stopVideo();
