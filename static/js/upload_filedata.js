@@ -49,7 +49,6 @@ async function data_convert_save() {
     });
 
     // 양식 파일이 맞는지 확인하는 부분
-    console.log(workbook);
     progressBar.style.width = 40 + "%";
 
     document.querySelector('.spinner-text').textContent = '양식 체크중...'
@@ -64,11 +63,11 @@ async function data_convert_save() {
 
         return;
     };
-
     progressBar.style.width = 60 + "%";
 
     document.querySelector('.spinner-text').textContent = '데이터 변환중...'
     let j = 0;
+    let check_videoid_list = [];
     for (let i in excelFile_data) {
         if (j > 6) {
             let song_info = [];
@@ -158,10 +157,60 @@ async function data_convert_save() {
                 song_info.push(null);
             };
 
+            // videoid를 유효성 체크하기위한 데이터를 담는 작업
+            check_videoid_list.push(song_info[4]);
+
+            // 가공된 곡 정보를 담는 작업
             check_array.push(song_info);
             song_info = [];
         };
         j++;
+    };
+
+    //videoid 의 유효성 검사를 위한 데이터 전송
+
+    document.querySelector('.spinner-text').textContent = '영상 주소의 유효성 확인중...'
+
+    const videoid_checking = await fetch('/check_videoid', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(check_videoid_list)
+    });
+
+    //유효성 검사결과를 수신
+
+    const videoid_check_result = await videoid_checking.json();
+
+    // 유효하지 못한 링크 발견 시 해당 곡 정보를 담은 텍스트파일을 다운로드 시킴
+    if (videoid_check_result.length > 0) {
+
+        document.querySelector('.spinner-text').style.display = 'none';
+        document.querySelector('.spinner').style.display = 'none';
+
+        document.querySelector('.progress-bar').style.display = 'none';
+        progressBar.style.width = 0 + "%";
+
+        let textdata = "";
+
+        alert('재생되지 않는 영상링크가 발견되었습니다.');
+        alert('해당링크의 곡정보가 담긴 파일을 다운로드합니다.');
+
+        for (let videoid of videoid_check_result) {
+                textdata += String(check_videoid_list.indexOf(videoid) + 9) + ". ";
+                textdata += check_array[check_videoid_list.indexOf(videoid)].slice(0, 2).join(', ');
+                textdata += "\n";
+        }
+
+        const blob = new Blob([textdata], { type: 'text/plain' });
+        const link = document.createElement('a');
+
+        link.href = URL.createObjectURL(blob);
+        link.download = '잘못된 링크를 가진 곡 목록.txt';
+        link.click();
+
+        URL.revokeObjectURL(link.href);
+
+        location.reload();
     };
 
     progressBar.style.width = 80 + "%";
@@ -302,6 +351,7 @@ async function data_convert_insert() {
 
     document.querySelector('.spinner-text').textContent = '데이터 변환중...'
     let j = 0;
+    let check_videoid_list = [];
     for (let i in excelFile_data) {
         if (j > 6) {
             let song_info = [];
@@ -394,11 +444,57 @@ async function data_convert_insert() {
             if (document.querySelectorAll('h4')[j - 7]) {
                 song_info.push(document.querySelectorAll('h4')[j - 7].innerHTML);
             } else {song_info.push(null)};
-
+            check_videoid_list.push(song_info[4]);
             check_array.push(song_info);
             song_info = [];
         };
         j++;
+    };
+
+    //videoid 의 유효성 검사를 위한 데이터 전송
+
+    document.querySelector('.spinner-text').textContent = '영상 주소의 유효성 확인중...'
+
+    const videoid_checking = await fetch('/check_videoid', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(check_videoid_list)
+    });
+
+    //유효성 검사결과를 수신
+
+    const videoid_check_result = await videoid_checking.json();
+
+    // 유효하지 못한 링크 발견 시 해당 곡 정보를 담은 텍스트파일을 다운로드 시킴
+    if (videoid_check_result.length > 0) {
+
+        document.querySelector('.spinner-text').style.display = 'none';
+        document.querySelector('.spinner').style.display = 'none';
+
+        document.querySelector('.progress-bar').style.display = 'none';
+        progressBar.style.width = 0 + "%";
+
+        let textdata = "";
+
+        alert('재생되지 않는 영상링크가 발견되었습니다.');
+        alert('해당링크의 곡정보가 담긴 파일을 다운로드합니다.');
+
+        for (let videoid of videoid_check_result) {
+                textdata += String(check_videoid_list.indexOf(videoid) + 9) + ". ";
+                textdata += check_array[check_videoid_list.indexOf(videoid)].slice(0, 2).join(', ');
+                textdata += "\n";
+        }
+
+        const blob = new Blob([textdata], { type: 'text/plain' });
+        const link = document.createElement('a');
+
+        link.href = URL.createObjectURL(blob);
+        link.download = '잘못된 링크를 가진 곡 목록.txt';
+        link.click();
+
+        URL.revokeObjectURL(link.href);
+
+        location.reload();
     };
 
     progressBar.style.width = 80 + "%";

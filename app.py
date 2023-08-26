@@ -7,6 +7,7 @@ from chat.chat import socketio, get_room_dict, get_user
 from chat.chat_model import make_answer
 from controllers import play_controller, login_controller
 from models import login_model
+import requests
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
@@ -155,6 +156,15 @@ def deleteMission():
 @app.route('/download_excelfile', methods=['GET'])
 def download_template():
     return send_file('static/file_form/MakingMap_form.xlsx', as_attachment=True)
+
+@app.route('/check_videoid', methods=['POST'])
+# videoid를 받아서 재생여부 확인 후 안되는 id를 담아서 return 함
+def check_videoid():
+    videoid_list = set(request.get_json())
+    convert_list = "".join(map(str, set("&id=" + videoid for videoid in videoid_list)))
+    api_result = requests.get(f'https://www.googleapis.com/youtube/v3/videos?key={config("YOUTUBE_API_KEY")}&part=status{convert_list}')
+    renewable_list = set(item['id'] for item in api_result.json()['items'] if item['status']['embeddable'])
+    return jsonify(list(videoid_list - renewable_list))
 
 #########################################################################################
 
