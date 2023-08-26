@@ -211,6 +211,7 @@ async function data_convert_save() {
         URL.revokeObjectURL(link.href);
 
         location.reload();
+        return;
     };
 
     progressBar.style.width = 80 + "%";
@@ -495,6 +496,7 @@ async function data_convert_insert() {
         URL.revokeObjectURL(link.href);
 
         location.reload();
+        return;
     };
 
     progressBar.style.width = 80 + "%";
