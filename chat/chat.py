@@ -74,10 +74,10 @@ def disconnect():
 def handle_single_message(data):
     msg = data['content']
     if not current_user.is_authenticated:
-        emit('single_message',{'name': '','msg':msg})
+        emit('single_message',{'name': '','msg':msg}, room=request.sid)
     else:
         name = current_user.name
-        emit('single_message', {'name': name, 'msg': msg})
+        emit('single_message', {'name': name, 'msg': msg},room=request.sid)
 
 @socketio.on('message')
 def handle_message(data):
@@ -107,11 +107,13 @@ def showHint(data):
 def playTheGame(room_name):
     totalPlayers = len(room_data_manager._data_store[room_name]['user'])
     first_data = music_data_manager.retrieve_data(room_name)
+    totalSong = len(music_data_manager._data_store[room_name]['data'])
+    nowSong = int(music_data_manager._data_store.get(room_name, {})['current_index'])+1
     if first_data:
         youtube_embed_url = first_data['youtube_embed_url']
         start_time = float(first_data['startTime'])
         end_time = float(first_data['endTime'])
-        emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime' : end_time}, room=room_name)
+        emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime' : end_time, 'totalSong' : totalSong,'nowSong' :nowSong}, room=room_name)
 
 
 @socketio.on('MissionSelect')
@@ -145,7 +147,9 @@ def handle_vote_skip(data):
             youtube_embed_url = next_data['youtube_embed_url']
             startTime = float(next_data['startTime'])
             endTime = float(next_data['endTime'])
-            emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime, "endTime":endTime}, room=room)
+            totalSong = len(music_data_manager._data_store[room]['data'])
+            nowSong = int(music_data_manager._data_store.get(room, {})['current_index'])+1
+            emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime, "endTime":endTime, 'totalSong':totalSong,'nowSong':nowSong}, room=room)
         else:
             emit('EndOfData', {}, room=room)
 
@@ -162,7 +166,9 @@ def handle_time_out(data):
         youtube_embed_url = next_data['youtube_embed_url']
         startTime = float(next_data['startTime'])
         endTime = float(next_data['endTime'])
-        emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime, "endTime":endTime}, room=room)
+        totalSong =len(music_data_manager._data_store[room]['data'])
+        nowSong = int(music_data_manager._data_store.get(room, {})['current_index'])+1
+        emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime, "endTime":endTime,'totalSong':totalSong, 'nowSong':nowSong}, room=room)
     else:
         emit('EndOfData', {}, room=room)
 ############################################################################################

@@ -11,6 +11,7 @@ let GameTimer = 0;
 let doMessage = true;
 let playerStateChangeHandler; // 이벤트 핸들러를 저장할 변수
 let gameTimerInterval; //setInteval 이벤트
+let isSkipFlag = true;
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -56,7 +57,9 @@ function showHint(hint) {
 }
 
 function voteSkip() {
-    socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
+    socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) }, function() {
+        isSkipFlag = true;
+    });
 }
 
 function dummyplay() {
@@ -82,7 +85,7 @@ function dummyplay() {
     }
 }
 
-function playvideo(videolink, startTime = 0, endTime = 0, callback = null) {
+function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, callback = null) {
     if (isPlayingVideo) {
         // 이미 비디오를 재생 중인 경우 아무 작업도 하지 않음
         return;
@@ -107,7 +110,7 @@ function playvideo(videolink, startTime = 0, endTime = 0, callback = null) {
             events: {
                 'onReady': function(event) {
                     // 비디오 정보를 가져와서 endTime을 설정합니다.
-                    onPlayerReady(event, startTime, endTime, callback); // endTime와 callback 전달
+                    onPlayerReady(event, startTime, endTime, totalSong, nowSong, callback); // endTime와 callback 전달
                 },
             }
         });
@@ -115,41 +118,40 @@ function playvideo(videolink, startTime = 0, endTime = 0, callback = null) {
         // 기존 플레이어를 사용하여 비디오를 변경합니다.
         player.cueVideoById({ videoId: videoId, startSeconds: startTime });
         setTimeout(function() {
-            onNextReady(startTime, endTime, callback)
+            onNextReady(startTime, endTime, totalSong, nowSong, callback)
         }, 1000)
-        dummyplay();
     }
     videoOverlay.style.display = 'block';
 }
 
-function onPlayerReady(event, startTime, endTime, callback) {
-    setVolume(50);
+function onPlayerReady(event, startTime, endTime, totalSong, nowSong, callback) {
+    setVolume(document.querySelector("#VolumeBar").value);
+    clearInterval(gameTimerInterval);
     event.target.playVideo();
     if (startTime > 0) {
         seekTo(startTime);
     }
     if (callback != null) {
-        callback(startTime, endTime); // endTime을 콜백으로 전달
+        callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
     }
     dummyplay();
 }
 
-function onNextReady(startTime, endTime, callback) {
+function onNextReady(startTime, endTime, totalSong, nowSong, callback) {
     player.playVideo();
     if (startTime > 0) {
         seekTo(startTime);
     }
     if (endTime == "stop") {
         console.log("이벤트제거");
-        clearInterval(gameTimerInterval); // 올바른 인터벌 ID 사용하여 중지
         return;
     }
     if (callback != null) {
-        callback(startTime, endTime); // endTime을 콜백으로 전달
+        callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
     }
 }
 
-function EndTimeTest(startTime, fendTime) {
+function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
     let endTime = fendTime;
     console.log(endTime);
     if (endTime == 0 || endTime > player.getDuration()) {
@@ -165,6 +167,9 @@ function EndTimeTest(startTime, fendTime) {
         }
         GameTimer--;
     }, 1000);
+    document.querySelector("#AllNumber").innerText = totalSong;
+    document.querySelector("#nowNumber").innerText = nowSong;
+    isSkipFlag = false;
 }
 
 function getYoutubeVideoId(url) {
@@ -200,15 +205,18 @@ function initEventListeners() {
         if (event.key === 'Enter') sendMessage();
     });
     elements.nextButton.addEventListener('click', () => {
-        elements.nextButton.disabled = true;
-        voteSkip();
+        if (!isSkipFlag) {
+            elements.nextButton.disabled = true;
+            voteSkip();
+        }
     });
     // 키보드의 end 버튼을 눌러도 nextButton이 눌리게끔 하는 동작
     document.addEventListener('keydown', (event) => {
         if (event.key === 'End' && elements.nextButton.disabled === false) {
-
-            elements.nextButton.disabled = true;
-            voteSkip();
+            if (!isSkipFlag) {
+                elements.nextButton.disabled = true;
+                voteSkip();
+            }
         }
     });
     elements.hintButton.addEventListener('click', () => {
@@ -231,7 +239,9 @@ function initializeSocketEvents() {
     socket.on("PlayGame", data => {
         totalPlayers = data.totalPlayers;
         currentvideolink = data.youtubeLink;
-        playvideo(currentvideolink, data.startTime, data.endTime, EndTimeTest);
+        totalSong = data.totalSong;
+        nowSong = data.nowSong;
+        playvideo(currentvideolink, data.startTime, data.endTime, totalSong, nowSong, EndTimeTest);
         elements.MapSelect.style.display = "none";
         elements.nextButton.style.display = "block";
         elements.hintButton.style.display = "block";
@@ -253,7 +263,9 @@ function initializeSocketEvents() {
         totalPlayers = data['totalPlayers'];
         isPlayingVideo = false;
         clearInterval(gameTimerInterval);
-        playvideo(currentvideolink, data.startTime, data.endTime, EndTimeTest);
+        nowSong = data.nowSong;
+        totalSong = data.totalSong
+        playvideo(currentvideolink, data.startTime, data.endTime, totalSong, nowSong, EndTimeTest);
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
@@ -278,6 +290,7 @@ function initializeSocketEvents() {
         hintButton.style.display = "none";
         setTimeout(function() {
             player.stopVideo();
+            clearInterval(gameTimerInterval);
 
         }, 1000)
 
@@ -292,12 +305,20 @@ function initializeSocketEvents() {
 
     socket.on('correctAnswer', data => {
         isPlayingVideo = false;
-        playvideo(currentvideolink, data.startTime, "stop", null);
+        nowSong = data.nowSong;
+        totalSong = data.totalSong;
+        playvideo(currentvideolink, data.startTime, "stop", totalSong, nowSong, null);
         elements.videoOverlay.style.display = 'none';
         showSongInfo(data.data.title, data.data.song, data.name);
         if (document.querySelector("#NextVideo").checked) {
-            elements.nextButton.disabled = true;
-            voteSkip();
+            setTimeout(
+                function() {
+                    if (!isSkipFlag) {
+                        elements.nextButton.disabled = true;
+                        voteSkip();
+                    }
+                }, 1000
+            )
         }
     });
 
@@ -392,8 +413,11 @@ function showHostContent(game_status) {
 
     }
 }
-
-
+document.querySelector("#VolumeBar").addEventListener("input", function() {
+    if (player) {
+        player.setVolume(document.querySelector("#VolumeBar").value);
+    }
+})
 
 function MapSelectPopUp() {
     // AJAX 호출로 데이터 가져오기
