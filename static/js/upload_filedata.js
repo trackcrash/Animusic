@@ -224,7 +224,7 @@ async function data_convert_save() {
 
             console.log("통신데이터 값 : ", data);
             alert("등록 완료되었습니다.");
-            // window.location.href = '/Map';
+            window.location.href = '/Map';
         }
     });
 };
