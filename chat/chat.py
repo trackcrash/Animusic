@@ -114,6 +114,7 @@ def playTheGame(room_name):
         start_time = float(first_data['startTime'])
         end_time = float(first_data['endTime'])
         emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime': end_time, 'totalSong': totalSong, 'nowSong': nowSong}, room=room_name)
+
 @socketio.on('MissionSelect')
 def send_saved_data(data):
     room_name = data.get("room_name")
@@ -233,6 +234,22 @@ def user_check(data):
     else :
         emit('Join_room',room_name, room=session_id)
 
+@socketio.on('playingStatus_true')
+def playingroom_hidden(room_name):
+    room_data_manager.game_status(room_name,True)
+    room_status = room_data_manager._data_store[room_name]["room_info"]["room_status"]
+    print("wpqkf",room_status)
+    room_data_manager.game_init(room_name)
+    emit('request_room_changed', {"room_name":room_name,"room_status":room_status},  broadcast = True)
+
+@socketio.on('playingStatus_false')
+def playingroom_hidden(room_name):
+    room_data_manager.game_status(room_name, False)
+    room_status = room_data_manager._data_store[room_name]["room_info"]["room_status"]
+    print("wpqkf",room_status)
+    room_data_manager.game_init(room_name)
+    emit('request_room_changed', {"room_name":room_name,"room_status":room_status},  broadcast = True)
+
 
 def get_room_dict():
     room_dict = room_data_manager._data_store
@@ -246,11 +263,3 @@ def get_user():
     return jsonify(data)
 
 # 게임중인 방 room_list.html 에서 안보이게 하기
-@socketio.on('playingStatus_change')
-def playingroom_hidden(room_name):
-    room_data_manager.game_status(room_name)
-    room_status = room_data_manager._data_store[room_name]["room_info"]["room_status"]
-    print(room_status, "wpqkf")
-
-    room_data_manager.game_init(room_name)
-    emit('request_room_changed', {"room_name":room_name,"room_status":room_status},  broadcast = True)

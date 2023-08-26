@@ -88,7 +88,6 @@ function dummyplay() {
 
 function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, callback = null) {
     if (isPlayingVideo) {
-        console.log("ㅇㅇ");
         // 이미 비디오를 재생 중인 경우 아무 작업도 하지 않음
         return;
     }
@@ -136,7 +135,10 @@ function onPlayerReady(event, startTime, endTime, totalSong, nowSong, callback) 
     if (callback != null) {
         callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
     }
-    dummyplay();
+    setTimeout(function()
+    {
+        dummyplay();
+    },1000)
 }
 function onNextReady( startTime, endTime,totalSong,nowSong,callback) {
     clearInterval(gameTimerInterval);
@@ -250,10 +252,7 @@ function initializeSocketEvents() {
         nextButton.disabled = false;
         updateVoteCountUI(0);
         showHostContent(true);
-        console.log("테스트");
-    }, () => {
-        socket.emit('playingStatus_change', room_name, function() {
-            console.log("테스트")
+        socket.emit('playingStatus_true', room_name, function() {
             let scoreItem = document.querySelectorAll(".ScoreSpan")
             for (const element of scoreItem) {
                 element.innerHTML = 0;
@@ -301,7 +300,7 @@ function initializeSocketEvents() {
 
         }, 1000)
 
-        socket.emit('playingStatus_change', room_name);
+        socket.emit('playingStatus_false', room_name);
 
         showHostContent(false);
     });
@@ -376,7 +375,6 @@ socket.on("user_change", (data) => {
 socket.on('host_updated', (data) => {
     // 방장 정보가 업데이트되었을 때 클라이언트에서 수행할 동작
     const game_status = data['game_status'];
-    console.log("왜받는거지",game_status)
     if (data.user === socket.id) {
         isHost = true; // 방장이면 isHost를 true로 설정
     }
@@ -385,7 +383,6 @@ socket.on('host_updated', (data) => {
 
 function showHostContent(game_status) {
     if (isHost) {
-        console.log("game_Status", game_status);
         if (game_status == false) {
             elements.StartButton.style.display = "block";
             elements.MapSelect.style.display = "block";
