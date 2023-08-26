@@ -47,7 +47,9 @@ def single_make_answer(mission_id):
             'answer_list': answer_list,
             'youtube_embed_url': youtube_embed_url,
             'title': item['title'],
-            'song': item['song']
+            'song': item['song'],
+            'startTime' : item['startTime'],
+            'endTime' : item['endTime']
         }
         result.append(music_data)
 
