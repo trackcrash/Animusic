@@ -34,8 +34,8 @@ def disconnect():
             user_name = room_data['user'][request.sid]['username']
             room = room_data_manager.user_left(room_name, request.sid)
             game_status = room_data_manager._data_store[room_name]['room_info']['room_status']
+            print(game_status,"game_statust")
             emit("host_updated", {"user": room, "game_status": game_status}, room=room)
-            print("disconnect" , user_name)
             del room_data['user'][request.sid]  # 해당 유저 제거
             if user_name:
                 update_room_player_count(room_name, "님이 퇴장 하셨습니다.", user_name)  # 플레이어 수 업데이트
@@ -108,14 +108,12 @@ def playTheGame(room_name):
     totalPlayers = len(room_data_manager._data_store[room_name]['user'])
     first_data = music_data_manager.retrieve_data(room_name)
     totalSong = len(music_data_manager._data_store[room_name]['data'])
-    nowSong = int(music_data_manager._data_store.get(room_name, {})['current_index'])+1
+    nowSong = int(music_data_manager._data_store.get(room_name, {})['current_index']) + 1
     if first_data:
         youtube_embed_url = first_data['youtube_embed_url']
         start_time = float(first_data['startTime'])
         end_time = float(first_data['endTime'])
-        emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime' : end_time, 'totalSong' : totalSong,'nowSong' :nowSong}, room=room_name)
-
-
+        emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime': end_time, 'totalSong': totalSong, 'nowSong': nowSong}, room=room_name)
 @socketio.on('MissionSelect')
 def send_saved_data(data):
     room_name = data.get("room_name")
@@ -252,5 +250,7 @@ def get_user():
 def playingroom_hidden(room_name):
     room_data_manager.game_status(room_name)
     room_status = room_data_manager._data_store[room_name]["room_info"]["room_status"]
+    print(room_status, "wpqkf")
+
     room_data_manager.game_init(room_name)
     emit('request_room_changed', {"room_name":room_name,"room_status":room_status},  broadcast = True)

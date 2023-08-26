@@ -53,6 +53,7 @@ function showSongInfo(title, song, correctusername) {
 
 function showHint(hint) {
     const songHint = document.getElementById('songHint');
+    songHint.style.display= "block"
     songHint.innerText = "힌트: " + hint;
 }
 
@@ -249,8 +250,10 @@ function initializeSocketEvents() {
         nextButton.disabled = false;
         updateVoteCountUI(0);
         showHostContent(true);
+        console.log("테스트");
     }, () => {
         socket.emit('playingStatus_change', room_name, function() {
+            console.log("테스트")
             let scoreItem = document.querySelectorAll(".ScoreSpan")
             for (const element of scoreItem) {
                 element.innerHTML = 0;
@@ -269,6 +272,7 @@ function initializeSocketEvents() {
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
+        songHint.style.display= "none";
         songHint.innerText = "";
         elements.nextButton.style.display = "block";
         nextButton.disabled = false;
@@ -281,6 +285,7 @@ function initializeSocketEvents() {
         songArtist.innerText = "";
         correctUser.innerText = "";
         songHint.innerText = "";
+        songHint.style.display= "none";
         videoOverlay.style.display = 'block';
         nextButton.disabled = true;
         nextButton.style.display = "none";
@@ -362,6 +367,7 @@ window.onload = function() {
     dummyplay();
 };
 socket.on("user_change", (data) => {
+    console.log(data["totalPlayer"]);
     let count = data["count"];
     totalPlayers = data["totalPlayers"];
     updateVoteCountUI(count);
@@ -370,6 +376,7 @@ socket.on("user_change", (data) => {
 socket.on('host_updated', (data) => {
     // 방장 정보가 업데이트되었을 때 클라이언트에서 수행할 동작
     const game_status = data['game_status'];
+    console.log("왜받는거지",game_status)
     if (data.user === socket.id) {
         isHost = true; // 방장이면 isHost를 true로 설정
     }
@@ -378,6 +385,7 @@ socket.on('host_updated', (data) => {
 
 function showHostContent(game_status) {
     if (isHost) {
+        console.log("game_Status", game_status);
         if (game_status == false) {
             elements.StartButton.style.display = "block";
             elements.MapSelect.style.display = "block";
