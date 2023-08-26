@@ -53,7 +53,7 @@ function showSongInfo(title, song, correctusername) {
 
 function showHint(hint) {
     const songHint = document.getElementById('songHint');
-    songHint.style.display= "block"
+    songHint.style.display = "block"
     songHint.innerText = "힌트: " + hint;
 }
 
@@ -74,16 +74,7 @@ function dummyplay() {
     dummy.innerHTML = "";
     dummy.style.display = 'none';
     dummy.appendChild(iframe);
-    if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-            title: "Dummy Video Title",
-            artist: "Dummy Artist",
-            album: "Dummy Album",
-            artwork: [
-                { src: '/static/img/doge.png', sizes: '512x512', type: 'image/jpeg' }
-            ]
-        });
-    }
+    console.log("더미재생중");
 }
 
 function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, callback = null) {
@@ -122,7 +113,9 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
         setTimeout(function() {
             onNextReady(startTime, endTime, totalSong, nowSong, callback)
         }, 1000)
+
     }
+    dummyplay();
     videoOverlay.style.display = 'block';
 }
 
@@ -138,7 +131,8 @@ function onPlayerReady(event, startTime, endTime, totalSong, nowSong, callback) 
     }
     dummyplay();
 }
-function onNextReady( startTime, endTime,totalSong,nowSong,callback) {
+
+function onNextReady(startTime, endTime, totalSong, nowSong, callback) {
     clearInterval(gameTimerInterval);
     player.playVideo();
     if (startTime > 0) {
@@ -160,14 +154,14 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
         endTime = player.getDuration();
     }
     GameTimer = endTime - startTime;
-        gameTimerInterval = setInterval(() => {
-            document.querySelector("#GameTimer span").innerText = GameTimer;
-            if (GameTimer <= 0) {
-                socket.emit("TimeOut", { "room": room_name });
-                return;
-            }
-            GameTimer--;
-        }, 1000);
+    gameTimerInterval = setInterval(() => {
+        document.querySelector("#GameTimer span").innerText = GameTimer;
+        if (GameTimer <= 0) {
+            socket.emit("TimeOut", { "room": room_name });
+            return;
+        }
+        GameTimer--;
+    }, 1000);
     document.querySelector("#AllNumber").innerText = totalSong;
     document.querySelector("#nowNumber").innerText = nowSong;
     isSkipFlag = false;
@@ -272,7 +266,7 @@ function initializeSocketEvents() {
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
-        songHint.style.display= "none";
+        songHint.style.display = "none";
         songHint.innerText = "";
         elements.nextButton.style.display = "block";
         nextButton.disabled = false;
@@ -285,7 +279,7 @@ function initializeSocketEvents() {
         songArtist.innerText = "";
         correctUser.innerText = "";
         songHint.innerText = "";
-        songHint.style.display= "none";
+        songHint.style.display = "none";
         videoOverlay.style.display = 'block';
         nextButton.disabled = true;
         nextButton.style.display = "none";
@@ -294,8 +288,7 @@ function initializeSocketEvents() {
         nextButton.style.display = "none";
         hintButton.style.display = "none";
         isPlayingVideo = false;
-        setTimeout(function()
-        {
+        setTimeout(function() {
             player.stopVideo();
             clearInterval(gameTimerInterval);
 
@@ -376,7 +369,7 @@ socket.on("user_change", (data) => {
 socket.on('host_updated', (data) => {
     // 방장 정보가 업데이트되었을 때 클라이언트에서 수행할 동작
     const game_status = data['game_status'];
-    console.log("왜받는거지",game_status)
+    console.log("왜받는거지", game_status)
     if (data.user === socket.id) {
         isHost = true; // 방장이면 isHost를 true로 설정
     }
