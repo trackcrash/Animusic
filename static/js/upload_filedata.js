@@ -166,7 +166,6 @@ async function data_convert_save() {
         };
         j++;
     };
-
     //videoid 의 유효성 검사를 위한 데이터 전송
 
     document.querySelector('.spinner-text').textContent = '영상 주소의 유효성 확인중...'
@@ -176,7 +175,6 @@ async function data_convert_save() {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(check_videoid_list)
     });
-
     //유효성 검사결과를 수신
 
     const videoid_check_result = await videoid_checking.json();
@@ -211,6 +209,7 @@ async function data_convert_save() {
         URL.revokeObjectURL(link.href);
 
         location.reload();
+        return;
     };
 
     progressBar.style.width = 80 + "%";
@@ -495,6 +494,7 @@ async function data_convert_insert() {
         URL.revokeObjectURL(link.href);
 
         location.reload();
+        return;
     };
 
     progressBar.style.width = 80 + "%";
