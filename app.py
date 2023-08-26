@@ -158,13 +158,24 @@ def download_template():
     return send_file('static/file_form/MakingMap_form.xlsx', as_attachment=True)
 
 @app.route('/check_videoid', methods=['POST'])
-# videoid를 받아서 재생여부 확인 후 안되는 id를 담아서 return 함
+#재생가능한 비디오링크인지 체크해주는 기능(요청 1번에 최대 42개의 비디오링크까지 가능)
 def check_videoid():
-    videoid_list = set(request.get_json())
-    convert_list = "".join(map(str, set("&id=" + videoid for videoid in videoid_list)))
-    api_result = requests.get(f'https://www.googleapis.com/youtube/v3/videos?key={config("YOUTUBE_API_KEY")}&part=status{convert_list}')
-    renewable_list = set(item['id'] for item in api_result.json()['items'] if item['status']['embeddable'])
-    return jsonify(list(videoid_list - renewable_list))
+    videoid_list, convert_list = set(request.get_json()), set()
+    result = videoid_list.copy()
+    for id_count, videoid in enumerate(videoid_list):
+        convert_list.add("&id=" + videoid)
+        if (id_count + 1) % 42 == 0:
+            request_text = "".join(map(str, convert_list))
+            api_result = requests.get(f'https://www.googleapis.com/youtube/v3/videos?key={config("YOUTUBE_API_KEY")}&part=status{request_text}')
+            renewable_list = set(item['id'] for item in api_result.json()['items'] if item['status']['embeddable'])
+            result -= renewable_list
+            convert_list.clear()
+    if len(convert_list) > 0:
+        request_text = "".join(map(str, convert_list))
+        api_result = requests.get(f'https://www.googleapis.com/youtube/v3/videos?key={config("YOUTUBE_API_KEY")}&part=status{request_text}')
+        renewable_list = set(item['id'] for item in api_result.json()['items'] if item['status']['embeddable'])
+        result -= renewable_list
+    return jsonify(list(result))
 
 #########################################################################################
 
