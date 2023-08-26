@@ -34,8 +34,8 @@ def disconnect():
             user_name = room_data['user'][request.sid]['username']
             room = room_data_manager.user_left(room_name, request.sid)
             game_status = room_data_manager._data_store[room_name]['room_info']['room_status']
+            print(game_status,"game_statust")
             emit("host_updated", {"user": room, "game_status": game_status}, room=room)
-            print("disconnect" , user_name)
             del room_data['user'][request.sid]  # 해당 유저 제거
             if user_name:
                 update_room_player_count(room_name, "님이 퇴장 하셨습니다.", user_name)  # 플레이어 수 업데이트
@@ -74,10 +74,10 @@ def disconnect():
 def handle_single_message(data):
     msg = data['content']
     if not current_user.is_authenticated:
-        emit('single_message',{'name': '','msg':msg})
+        emit('single_message',{'name': '','msg':msg}, room=request.sid)
     else:
         name = current_user.name
-        emit('single_message', {'name': name, 'msg': msg})
+        emit('single_message', {'name': name, 'msg': msg},room=request.sid)
 
 @socketio.on('message')
 def handle_message(data):
@@ -107,12 +107,13 @@ def showHint(data):
 def playTheGame(room_name):
     totalPlayers = len(room_data_manager._data_store[room_name]['user'])
     first_data = music_data_manager.retrieve_data(room_name)
+    totalSong = len(music_data_manager._data_store[room_name]['data'])
+    nowSong = int(music_data_manager._data_store.get(room_name, {})['current_index']) + 1
     if first_data:
         youtube_embed_url = first_data['youtube_embed_url']
         start_time = float(first_data['startTime'])
         end_time = float(first_data['endTime'])
-        emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime' : end_time}, room=room_name)
-
+        emit('PlayGame', {'totalPlayers': totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime': end_time, 'totalSong': totalSong, 'nowSong': nowSong}, room=room_name)
 
 @socketio.on('MissionSelect')
 def send_saved_data(data):
@@ -145,7 +146,9 @@ def handle_vote_skip(data):
             youtube_embed_url = next_data['youtube_embed_url']
             startTime = float(next_data['startTime'])
             endTime = float(next_data['endTime'])
-            emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime, "endTime":endTime}, room=room)
+            totalSong = len(music_data_manager._data_store[room]['data'])
+            nowSong = int(music_data_manager._data_store.get(room, {})['current_index'])+1
+            emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime, "endTime":endTime, 'totalSong':totalSong,'nowSong':nowSong}, room=room)
         else:
             emit('EndOfData', {}, room=room)
 
@@ -162,7 +165,9 @@ def handle_time_out(data):
         youtube_embed_url = next_data['youtube_embed_url']
         startTime = float(next_data['startTime'])
         endTime = float(next_data['endTime'])
-        emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime, "endTime":endTime}, room=room)
+        totalSong =len(music_data_manager._data_store[room]['data'])
+        nowSong = int(music_data_manager._data_store.get(room, {})['current_index'])+1
+        emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : totalPlayers, "startTime": startTime, "endTime":endTime,'totalSong':totalSong, 'nowSong':nowSong}, room=room)
     else:
         emit('EndOfData', {}, room=room)
 ############################################################################################
@@ -229,6 +234,22 @@ def user_check(data):
     else :
         emit('Join_room',room_name, room=session_id)
 
+@socketio.on('playingStatus_true')
+def playingroom_hidden(room_name):
+    room_data_manager.game_status(room_name,True)
+    room_status = room_data_manager._data_store[room_name]["room_info"]["room_status"]
+    print("wpqkf",room_status)
+    room_data_manager.game_init(room_name)
+    emit('request_room_changed', {"room_name":room_name,"room_status":room_status},  broadcast = True)
+
+@socketio.on('playingStatus_false')
+def playingroom_hidden(room_name):
+    room_data_manager.game_status(room_name, False)
+    room_status = room_data_manager._data_store[room_name]["room_info"]["room_status"]
+    print("wpqkf",room_status)
+    room_data_manager.game_init(room_name)
+    emit('request_room_changed', {"room_name":room_name,"room_status":room_status},  broadcast = True)
+
 
 def get_room_dict():
     room_dict = room_data_manager._data_store
@@ -242,9 +263,3 @@ def get_user():
     return jsonify(data)
 
 # 게임중인 방 room_list.html 에서 안보이게 하기
-@socketio.on('playingStatus_change')
-def playingroom_hidden(room_name):
-    room_data_manager.game_status(room_name)
-    room_status = room_data_manager._data_store[room_name]["room_info"]["room_status"]
-    room_data_manager.game_init(room_name)
-    emit('request_room_changed', {"room_name":room_name,"room_status":room_status},  broadcast = True)

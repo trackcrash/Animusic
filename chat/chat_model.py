@@ -82,8 +82,8 @@ class RoomDataManger:
             if 'username' in value and value['username'] == user_name:
                 return True
         return False
-    def game_status(self, room_name):
-        self._data_store[room_name]['room_info']['room_status'] = not self._data_store[room_name]['room_info']['room_status']
+    def game_status(self, room_name, booldata):
+        self._data_store[room_name]['room_info']['room_status'] = booldata
     def game_init(self, room_name):
         dictionaryData = self._data_store[room_name]['user']
         for key, value in dictionaryData.items():
