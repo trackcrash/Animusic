@@ -111,10 +111,10 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
         player.cueVideoById({ videoId: videoId, startSeconds: startTime });
         setTimeout(function() {
             onNextReady(startTime, endTime, totalSong, nowSong, callback)
+            dummyplay();
         }, 1000)
 
     }
-    dummyplay();
     videoOverlay.style.display = 'block';
 }
 
@@ -128,10 +128,9 @@ function onPlayerReady(event, startTime, endTime, totalSong, nowSong, callback) 
     if (callback != null) {
         callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
     }
-    setTimeout(function()
-    {
+    setTimeout(function() {
         dummyplay();
-    },1000)
+    }, 1000)
 }
 
 function onNextReady(startTime, endTime, totalSong, nowSong, callback) {
