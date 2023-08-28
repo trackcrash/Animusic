@@ -13,7 +13,7 @@ app.config['SECRET_KEY'] = config('SECRET_KEY')
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-socketio.init_app(app)
+socketio.init_app(app,cors_allowed_origins="*")
 
 @app.get('/get-music-data')
 def get_music_data():

@@ -51,13 +51,20 @@ class User(Base):
     def get_id(self):
         return str(self.id)
 
+def commit_or_rollback():
+    try:
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        print(f"An error occurred: {e}")
+        raise
 
 # 일반 가입
 def save_user(email, name, password=None, is_google_authenticated=False, level=0, exp=0, nextexp=10, character=0):
     user = User(email=email, name=name, password=password, is_google_authenticated=is_google_authenticated,
                 level=level, exp=exp, nextexp=nextexp, character=character)
     session.add(user)
-    session.commit()
+    commit_or_rollback()
     return user
 
 
@@ -66,7 +73,7 @@ def save_google_user(user_info):
     user = session.query(User).filter_by(email=user_info['email']).first()
     if user:
         user.is_google_authenticated = True
-        session.commit()
+        commit_or_rollback()
     else:
         user = save_user(email=user_info['email'], name=user_info.get('name'), is_google_authenticated=True)
     return user
@@ -94,7 +101,7 @@ def delete_account():
         user = session.query(User).filter_by(id=current_user.id).first()
         if user:
             session.delete(user)
-            session.commit()
+            commit_or_rollback()
         return True
     return False
 
@@ -106,7 +113,7 @@ def account_insert_in_googleuser(nickname):
     else:
         userinfo = session.query(User).filter_by(id=current_user.id).first()
         userinfo.name = nickname
-        session.commit()
+        commit_or_rollback()
         return True
 
 #일반 회원용 회원정보 수정
@@ -122,4 +129,4 @@ def account_insert(nickname, password, newpassword):
     if newpassword:
         userinfo.password = newpassword
 
-    session.commit()
+    commit_or_rollback()

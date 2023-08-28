@@ -110,7 +110,7 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
         // 기존 플레이어를 사용하여 비디오를 변경합니다.
         player.cueVideoById({ videoId: videoId, startSeconds: startTime });
         setTimeout(function() {
-            onNextReady(startTime, endTime, totalSong, nowSong, callback)
+            onNextReady(startTime, endTime, totalSong, nowSong, callback);
             dummyplay();
         }, 1000)
 
