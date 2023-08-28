@@ -6,7 +6,7 @@ from chat.chat import socketio, get_room_dict, get_user
 from chat.chat_model import make_answer
 from controllers import play_controller, login_controller
 from models import login_model
-import requests
+import requests, os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 
