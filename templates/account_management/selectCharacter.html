@@ -1,15 +1,23 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>캐릭터 선택</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>캐릭터 선택</h1>
-    <ul>
-        {% for character in character_list %}
-            <img id="{{ character.split('.')[0] }}" src="{{ url_for('static', filename='img/character/' + character) }}" alt="캐릭터 이미지" class="clickable-image">
-        {% endfor %}
-    </ul>
+
+<body class="bg-gray-100 h-screen flex flex-col justify-center">
+    <h1 class="text-center text-3xl font-bold mb-10">캐릭터 선택</h1>
+    <div class="flex justify-center">
+        <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {% for character in character_list %}
+            <li>
+                <img id="{{ character.split('.')[0] }}" src="{{ url_for('static', filename='img/character/' + character) }}" alt="캐릭터 이미지" class="clickable-image block bg-white p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300">
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
+
 </html>
-<script src="{{ url_for('static', filename='js/insertCharacter.js') }}" ></script>
+<script src="{{ url_for('static', filename='js/insertCharacter.js') }}"></script>
