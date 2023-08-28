@@ -63,6 +63,7 @@ function voteSkip() {
     });
 }
 
+
 function dummyplay() {
     let embedLink = "https://www.youtube.com/embed/LN1ASBClb0Q?autoplay=1&loop=1";
     const iframe = document.createElement("iframe");
@@ -111,7 +112,6 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
         player.cueVideoById({ videoId: videoId, startSeconds: startTime });
         setTimeout(function() {
             onNextReady(startTime, endTime, totalSong, nowSong, callback);
-            dummyplay();
         }, 1000)
 
     }
@@ -128,9 +128,7 @@ function onPlayerReady(event, startTime, endTime, totalSong, nowSong, callback) 
     if (callback != null) {
         callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
     }
-    setTimeout(function() {
-        dummyplay();
-    }, 1000)
+    
 }
 
 function onNextReady(startTime, endTime, totalSong, nowSong, callback) {
@@ -150,6 +148,7 @@ function onNextReady(startTime, endTime, totalSong, nowSong, callback) {
 
 function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
     let endTime = fendTime;
+
     console.log(endTime);
     if (endTime == 0 || endTime > player.getDuration()) {
         endTime = player.getDuration();
@@ -158,6 +157,8 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
     gameTimerInterval = setInterval(() => {
         document.querySelector("#GameTimer span").innerText = GameTimer;
         if (GameTimer <= 0) {
+            const dummy = document.getElementById('dummy');
+            dummy.querySelector("iframe").src = "https://www.youtube.com/embed/LN1ASBClb0Q?autoplay=1&loop=1";
             socket.emit("TimeOut", { "room": room_name });
             return;
         }
@@ -353,9 +354,9 @@ window.onload = function() {
             initEventListeners();
             initializeSocketEvents();
             showHostContent(false);
+            dummyplay();
         })
     });
-    dummyplay();
 };
 socket.on("user_change", (data) => {
     console.log(data["totalPlayer"]);

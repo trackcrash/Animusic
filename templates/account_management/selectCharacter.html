@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>캐릭터 선택</title>
+</head>
+<body>
+    <h1>캐릭터 선택</h1>
+    <ul>
+        {% for character in character_list %}
+            <img id="{{ character.split('.')[0] }}" src="{{ url_for('static', filename='img/character/' + character) }}" alt="캐릭터 이미지" class="clickable-image">
+        {% endfor %}
+    </ul>
+</body>
+</html>
+<script src="{{ url_for('static', filename='js/insertCharacter.js') }}" ></script>

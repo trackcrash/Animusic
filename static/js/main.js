@@ -431,3 +431,4 @@ function number_max(number_object) {
     let number = parseInt(number_object.value);
     const max_number = parseInt(number_object.getAttribute("max"));
     if (number > max_number) {number_object.value = number_object.getAttribute("max")}};
+
