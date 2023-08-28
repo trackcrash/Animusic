@@ -137,10 +137,17 @@ def update_profile():
             print("\033[92;1m사용자의 회원정보 변경이 실패하였습니다.\033[0m")
             return jsonify({'message': '기존 비밀번호가 일치하지 않거나 동일한 닉네임이 존재합니다.'}), 400
 
+# 캐릭터 변경기능
 @app.route('/select_character')
 def select_character():
     character_list = [file for file in os.listdir('static/img/character')]
+    print("캐릭터 이미지파일 리스트: ", character_list)
     return render_template('account_management/selectCharacter.html', character_list=character_list)
+
+@app.route('/insert_character', methods=['POST'])
+def insert_character():
+    character_number = request.get_json().get('character_number')
+    return login_model.insert_character_number(character_number)
 # -------------------------------------
 ####################################################################################
 

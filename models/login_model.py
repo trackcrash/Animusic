@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from sqlalchemy import Boolean, Column, Integer, String
 from db.database import Base, session, create_tables
 from controllers import play_controller
+from flask import jsonify
 bcrypt = Bcrypt()
 
 create_tables()
@@ -127,3 +128,10 @@ def account_insert(nickname, password, newpassword):
 
     session.commit()
     return True
+
+#캐릭터 변경
+def insert_character_number(character_number):
+    userinfo = session.query(User).filter_by(id=current_user.id).first()
+    userinfo.character = character_number
+    session.commit()
+    return jsonify({'message': '정상적으로 변경되었습니다.'})
