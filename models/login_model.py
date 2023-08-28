@@ -141,5 +141,5 @@ def account_insert(nickname, password, newpassword):
 def insert_character_number(character_number):
     userinfo = session.query(User).filter_by(id=current_user.id).first()
     userinfo.character = character_number
-    session.commit()
+    commit_or_rollback()
     return jsonify({'message': '정상적으로 변경되었습니다.'})
