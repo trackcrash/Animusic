@@ -112,14 +112,18 @@ def account_insert_in_googleuser(nickname):
 #일반 회원용 회원정보 수정
 def account_insert(nickname, password, newpassword):
     userinfo = session.query(User).filter_by(id=current_user.id).first()
-
     if not bcrypt.check_password_hash(userinfo.password, password):
         return False
 
-    if nickname and not session.query(User).filter(User.name == nickname).first():
+    if session.query(User).filter(User.name == nickname).first():
+        return False
+
+    if nickname:
         userinfo.name = nickname
 
     if newpassword:
-        userinfo.password = newpassword
+        hashed_password = bcrypt.generate_password_hash(newpassword)
+        userinfo.password = hashed_password
 
     session.commit()
+    return True

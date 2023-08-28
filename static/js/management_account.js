@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (response.message) {
                     console.log("성공: " + response.message);
                     alert(response.message);
-                    location.reload();
+                    window.location.href = '/';
                 } else {
                     console.log("오류: 응답 메시지 없음");
                 }

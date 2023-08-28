@@ -106,6 +106,7 @@ def deleting_account():
         return render_template('account_management/deleteAccountFail.html')
 @app.get('/account_confirm')
 def account_confirm():
+    print("체크 중: ", current_user.is_authenticated)
     if current_user.is_authenticated == False:
         return render_template('account_management/accountConfirm.html')
     else:
@@ -135,6 +136,11 @@ def update_profile():
         else:
             print("\033[92;1m사용자의 회원정보 변경이 실패하였습니다.\033[0m")
             return jsonify({'message': '기존 비밀번호가 일치하지 않거나 동일한 닉네임이 존재합니다.'}), 400
+
+@app.route('/select_character')
+def select_character():
+    character_list = [file for file in os.listdir('static/img/character')]
+    return render_template('account_management/selectCharacter.html', character_list=character_list)
 # -------------------------------------
 ####################################################################################
 
