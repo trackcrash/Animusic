@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
 from models.user_model import insert_character_number
-char_bp = Blueprint('char', url_prefix='')
+char_bp = Blueprint('char', __name__, url_prefix='')
 @char_bp.route('/select_character')
 def select_character():
     return render_template('account_management/selectCharacter.html')

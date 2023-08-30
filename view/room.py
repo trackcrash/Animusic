@@ -1,6 +1,6 @@
 from flask import render_template, Blueprint
 from flask_login import current_user
-room_bp = Blueprint('room', url_prefix='')
+room_bp = Blueprint('room', __name__, url_prefix='')
 
 @room_bp.route('/room_list')
 def room_list():

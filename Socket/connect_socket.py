@@ -2,7 +2,7 @@ from Socket.socket import socketio,emit
 from flask import request
 from flask_login import current_user
 from models.play_model import room_data_manager
-from Socket.socket import socket_class
+from Socket.socket import socket_class, vote_counts
 
 @socketio.on('connect')
 def handle_connect():
