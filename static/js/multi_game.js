@@ -154,11 +154,16 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
         endTime = player.getDuration();
     }
     GameTimer = endTime - startTime;
+    let Num = 3;
     gameTimerInterval = setInterval(() => {
         document.querySelector("#GameTimer span").innerText = GameTimer;
         if (GameTimer <= 0) {
-            const dummy = document.getElementById('dummy');
-            dummy.querySelector("iframe").src = "https://www.youtube.com/embed/LN1ASBClb0Q?autoplay=1&loop=1";
+            if(Num == 0)
+            {
+                dummyplay();
+                Num = 3;
+            }
+            Num--;
             socket.emit("TimeOut", { "room": room_name });
             return;
         }
@@ -484,11 +489,13 @@ function playerListGet(players) {
 
     let index = 0;
 
+    //캐릭터
     Object.entries(players).forEach(function([key, value]) {
         let username = value["username"];
         let score = value['score'];
-        let characterImageUrl = value['character'];
-
+        let charImg = findKeysByValue(CharacterEnum, value['character']);
+        let characterImageUrl = getCharacter(charImg);
+        console.log(characterImageUrl);
         let userDiv = document.createElement("div");
         userDiv.classList.add(
             "bg-white", "border-2", "border-gray-300", "p-4",
@@ -511,4 +518,5 @@ function playerListGet(players) {
 
         index++;
     });
+
 }
