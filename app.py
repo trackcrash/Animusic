@@ -4,17 +4,21 @@ from flask import Flask,render_template, send_file
 from flask_login import LoginManager, current_user
 from controllers import map_controller
 from models.user_model import get_user_by_id
-
-import requests, os
-app = Flask(__name__)
-app.config['SECRET_KEY'] = config('SECRET_KEY')
 from view.play import play_bp
 from view.map import map_bp
 from view.user import user_bp
+from view.room import room_bp
+from view.character import char_bp
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = config('SECRET_KEY')
 
 app.register_blueprint(play_bp)
 app.register_blueprint(map_bp)
 app.register_blueprint(user_bp)
+app.register_blueprint(room_bp)
+app.register_blueprint(char_bp)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
