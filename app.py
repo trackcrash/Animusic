@@ -138,9 +138,7 @@ def update_profile():
 # 캐릭터 변경기능
 @app.route('/select_character')
 def select_character():
-    character_list = [file for file in os.listdir('static/img/character')]
-    print("캐릭터 이미지파일 리스트: ", character_list)
-    return render_template('account_management/selectCharacter.html', character_list=character_list)
+    return render_template('account_management/selectCharacter.html')
 
 @app.route('/insert_character', methods=['POST'])
 def insert_character():
