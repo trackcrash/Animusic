@@ -5,7 +5,7 @@ from controllers.login_controller import user_controller
 from models.user_model import delete_account, account_insert, account_insert_in_googleuser
 
 
-login_bp = Blueprint('login', __name__)
+login_bp = Blueprint('login', url_prefix='')
 
 @login_bp.get('/delete_account_confirm')
 def delete_account_confirm():

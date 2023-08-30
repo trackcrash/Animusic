@@ -34,6 +34,12 @@ def play_controller():
         data = [mission_data, show_table_bymissionid(id)]
     return play_view(data)
 
+
+def update_to_db():
+    data = request.json
+    data_model.update_to_db(data)
+    return jsonify({"message": "Data received and processed!"})
+
 def play_view(data=None):
     return render_template('play.html', data=data)
 
@@ -72,12 +78,6 @@ def SuchTable(table_Name):
 def submit_to_db():
     data = request.json
     data_model.save_to_db(data)
-    return jsonify({"message": "Data received and processed!"})
-
-
-def update_to_db():
-    data = request.json
-    data_model.update_to_db(data)
     return jsonify({"message": "Data received and processed!"})
 
 

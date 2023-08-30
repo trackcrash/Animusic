@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column
 
-from db.database import Base, engine, session
+from db.database import Base, session
 from flask_login import current_user
 
 from collections import deque
