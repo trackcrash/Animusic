@@ -5,7 +5,7 @@ from controllers.user_controller import user_controller
 from models.user_model import delete_account, account_insert, account_insert_in_googleuser
 
 
-user_bp = Blueprint('user', url_prefix='')
+user_bp = Blueprint('user', __name__, url_prefix='')
 
 @user_bp.get('/delete_account_confirm')
 def delete_account_confirm():

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, jsonify, send_file
 from controllers.map_controller import show_mission, show_table,single_make_answer,submit_to_db,show_mission_byProducer,update_to_db,delete_Mission
 from flask_login import current_user
 from controllers.map_controller import map_controller, videoid_check, show_mission_active
-map_bp = Blueprint('map', url_prefix='')
+map_bp = Blueprint('map', __name__, url_prefix='')
 
 @map_bp.get('/get-music-data')
 def get_music_data():
