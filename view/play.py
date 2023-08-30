@@ -1,5 +1,4 @@
-from controllers.map_controller import get_room_dict, get_user
-from models.play_model import make_answer
+from models.play_model import make_answer ,get_room_dict, get_user
 from flask import Blueprint, render_template, request
 from flask_login import current_user
 from flask import Blueprint

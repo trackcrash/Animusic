@@ -1,6 +1,8 @@
 import random
 from controllers.map_controller import show_table_bymissionid
 from models.user_model import get_user_by_id
+from flask import jsonify
+from flask_login import current_user
 
 class RoomDataManger:
     def __init__(self):
@@ -190,3 +192,14 @@ def dict_join(dict_name,dict_index,dict_value):
 
 def dict_create(dict_name,dict_index,dict_value):
         dict_name[dict_index] = dict_value
+
+def get_room_dict():
+    room_dict = room_data_manager._data_store
+    
+    return jsonify(room_dict)
+
+def get_user():
+    data = ""
+    if current_user.is_authenticated:
+        data = current_user.name
+    return jsonify(data)
