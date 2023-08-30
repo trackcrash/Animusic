@@ -33,7 +33,7 @@ def map_controller():
                 </html>
             '''
         data = [mission_data, show_table_bymissionid(id)]
-    return play_view(data)
+    return data
 
 def play_view(data=None):
     return render_template('play.html', data=data)
