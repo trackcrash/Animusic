@@ -200,6 +200,9 @@ def room_list():
         print(f"{user_id} 유저 아이디 확인됨.")
     return render_template('room_list.html')
 
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_file('sitemap.xml')
 
 @app.get("/get-room-dict")
 def get_room_dictAll():
@@ -223,6 +226,10 @@ def chat_post():
 def get_mission_table():
     mission_table_data = play_controller.show_mission_active()
     return jsonify(mission_table_data)
+
+@app.route('/robots.txt')
+def robots():
+    return send_file('robots.txt')
 
 if __name__ == '__main__':
     play_controller.ensure_tables_exist()
