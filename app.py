@@ -10,10 +10,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 from view.play import play_bp
 from view.map import map_bp
-from view.user import login_bp
+from view.user import user_bp
+
 app.register_blueprint(play_bp)
 app.register_blueprint(map_bp)
-app.register_blueprint(login_bp)
+app.register_blueprint(user_bp)
 login_manager = LoginManager()
 login_manager.init_app(app)
 

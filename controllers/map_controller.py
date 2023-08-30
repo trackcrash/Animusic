@@ -1,4 +1,5 @@
-import random
+import random, requests
+from decouple import config
 from flask import jsonify, request, render_template
 from flask_login import current_user
 from sqlalchemy import func, inspect
@@ -12,7 +13,7 @@ def ensure_tables_exist():
         if not SuchTable(table.__tablename__):
             table.__table__.create(bind=engine, checkfirst=True)
 
-def play_controller():
+def map_controller():
     data = None
     id = request.args.get('id')
     if id is not None:
@@ -32,7 +33,7 @@ def play_controller():
                 </html>
             '''
         data = [mission_data, show_table_bymissionid(id)]
-    return play_view(data)
+    return data
 
 
 def update_to_db():
@@ -101,6 +102,8 @@ def get_music_data(data):
     mission_id = data
     return mission_id
 
+
+
 def show_mission():
     Mission.__table__.create(bind=engine, checkfirst=True)
     if SuchTable("MissionTable"):
@@ -108,6 +111,8 @@ def show_mission():
         # 노래 갯수 추가
         entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
         return entries
+    
+
 
 def show_mission_active():
     Mission.__table__.create(bind=engine, checkfirst=True)
@@ -117,12 +122,15 @@ def show_mission_active():
         entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
         return entries
     
+
+    
 def show_mission_byProducer():
     Mission.__table__.create(bind=engine, checkfirst=True)
     if SuchTable("MissionTable"):
         queries = session.query(Mission).filter(Mission.MapProducer_id == current_user.id)
         entries = [dict(id=q.id, MapName=q.MapName, MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id,MusicNum=session.query(Music).filter(Music.mission_id == q.id).count()) for q in queries]
         return entries
+
 
 def show_mission_byid(id):
     Mission.__table__.create(bind=engine, checkfirst=True)
@@ -131,19 +139,8 @@ def show_mission_byid(id):
         entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail, MapProducer_id=q.MapProducer_id) for q in queries]
         return entries
 
-def delete_User(id):
-    data = session.query(Mission).filter(Mission.MapProducer_id == id).all()
-    for mission_item  in data:
-        if show_table_bymissionid(mission_item.id):
-            session.query(Music).filter_by(mission_id=mission_item.id).delete()
-            session.commit()
-    if data:
-        session.query(Mission).filter(Mission.MapProducer_id == id).delete()
-        session.commit()
-
-    # if show_mission_byid(id):
-        
-
+     
+#missionid로 맵 삭제 use on map.py deleteMission()
 def delete_Mission(id):
     if show_table_bymissionid(id):
         session.query(Music).filter_by(mission_id=id).delete()
@@ -167,3 +164,20 @@ def delete_Mission(id):
         </html>
     '''
 
+#videoid가 사용가능한지 체크 use on map.py check_videoid()
+def videoid_check(videoid_list, convert_list):
+    result = videoid_list.copy()
+    for id_count, videoid in enumerate(videoid_list):
+        convert_list.add("&id=" + videoid)
+        if (id_count + 1) % 42 == 0:
+            request_text = "".join(map(str, convert_list))
+            api_result = requests.get(f'https://www.googleapis.com/youtube/v3/videos?key={config("YOUTUBE_API_KEY")}&part=status{request_text}')
+            renewable_list = set(item['id'] for item in api_result.json()['items'] if item['status']['embeddable'])
+            result -= renewable_list
+            convert_list.clear()
+    if len(convert_list) > 0:
+        request_text = "".join(map(str, convert_list))
+        api_result = requests.get(f'https://www.googleapis.com/youtube/v3/videos?key={config("YOUTUBE_API_KEY")}&part=status{request_text}')
+        renewable_list = set(item['id'] for item in api_result.json()['items'] if item['status']['embeddable'])
+        result -= renewable_list
+    return result
