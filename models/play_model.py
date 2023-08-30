@@ -1,8 +1,6 @@
 import random
 from controllers.play_controller import show_table_bymissionid
-from models.login_model import get_user_by_id
-
-
+from models.user_model import get_user_by_id
 
 class RoomDataManger:
     def __init__(self):

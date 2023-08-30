@@ -25,6 +25,11 @@
 
         <!-- Middle Section (Video, Buttons, Song Info, Chat) -->
         <div class="w-2/4 px-4">
+            <div id="mapModal" class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 hidden">
+                <div class="bg-white rounded w-3/4 h-3/4 relative overflow-y-scroll">
+
+                </div>
+            </div>
             <div class="mb-4 bg-white p-4 rounded-lg shadow text-center" style="min-height: 61px;">
                 <h2 id="songTitle" class="text-xl font-semibold "></h2>
             </div>
@@ -32,7 +37,7 @@
             <div class="relative mb-4 w-full" style="padding-bottom: 56.25%;">
                 <div id="videoContainer">
                     <div id="videoFrame" class="absolute top-0 left-0 w-full h-full"></div>
-                    <div id="videoOverlay" class="absolute top-0 left-0 w-full h-full z-10 flex items-center justify-center text-white text-xl bg-black bg-opacity-100">
+                    <div id="videoOverlay" class="absolute top-0 left-0 w-full h-full z-10 flex items-center justify-center text-white text-xl bg-black bg-opacity-100" style="display: block;">
                         <div id="songHint" class="bg-gray-600 p-4 rounded" style="display: none;"></div>
                     </div>
                 </div>

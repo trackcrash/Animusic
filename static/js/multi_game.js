@@ -128,7 +128,7 @@ function onPlayerReady(event, startTime, endTime, totalSong, nowSong, callback) 
     if (callback != null) {
         callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
     }
-    
+
 }
 
 function onNextReady(startTime, endTime, totalSong, nowSong, callback) {
@@ -343,14 +343,7 @@ function initializeSocketEvents() {
         skipvote = data.count;
         updateVoteCountUI(skipvote);
     });
-    //     socket.on("new_host_message", (data) => {
-    //         // data.message를 이용하여 새로운 방장 알림을 처리
-    //         elements.nextButton.style.display = "block";
-    //         elements.MapSelect.style.display = "block";
-    //         elements.nextButton.disabled = true;
-    //         elements.MapSelect.disabled = true;
-    //         console.log(data.message);
-    //     });
+
 }
 
 window.onload = function() {
@@ -425,67 +418,55 @@ document.querySelector("#VolumeBar").addEventListener("input", function() {
 })
 
 function MapSelectPopUp() {
-    // AJAX 호출로 데이터 가져오기
-    $.ajax({
-        url: '/api/get_mission_table',
-        type: 'GET',
-        success: function(data) {
-            openPopupAndDisplayData(data);
-        },
-        error: function(error) {
+    $.get('/api/get_mission_table')
+        .done(displayDataInModal)
+        .fail(error => {
             console.error('Error fetching mission table data:', error);
-        }
-    });
+        });
 }
 
-function openPopupAndDisplayData(data) {
-    const popupContent = populatePopupWithMissionData(data);
-    const popupWindow = window.open('', 'mapSelectPopup', 'width=800,height=800,scrollbars=yes');
-    popupWindow.document.write(popupContent);
-    popupWindow.document.close();
+function displayDataInModal(data) {
+    videoOverlay.style.display = 'none';
+    const modalContent = populateModalWithMissionData(data);
+    const modal = document.getElementById('mapModal');
+    modal.querySelector('div').innerHTML = modalContent; // Insert content into the modal's inner div
+    modal.classList.remove('hidden'); // Display the modal
 }
 
-function populatePopupWithMissionData(data) {
-    let contentHtml = `
-        <html>
-            <head>
-                <title>Select Map</title>
-                <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
-            </head>
-            <body class="bg-gray-100 font-sans">
-                <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
-                    <h1 class="text-center text-3xl font-bold mb-8 text-gray-700">Select Map</h1>
-                    <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">`;
+function populateModalWithMissionData(data) {
+    const mapItems = data.map(item => `
+        <a href="#" class="block bg-white p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300" data-id="${item.id}" onclick="selectAndClose(${item.id})">
+            <p class="text-xl mb-4 truncate">${item.MapName}</p>
+            <div class="mb-4">
+                <img src="${item.Thumbnail}" alt="${item.MapName}" class="mx-auto w-full h-56 object-cover rounded-lg" />
+            </div>
+            <p class="text-gray-500 mb-2">제작자: ${item.MapProducer}</p>
+            <p class="text-indigo-600">곡수: ${item.MusicNum}곡</p>
+        </a>`).join('');
 
-    for (let i = 0; i < data.length; i++) {
-        contentHtml += `
-            <a href="#" class="block bg-white p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300" data-id="${data[i].id}" onclick="selectAndClose(${data[i].id})">
-                <p class="text-xl mb-4 truncate">${data[i].MapName}</p>
-                <div class="mb-4">
-                    <img src="${data[i].Thumbnail}" alt="${data[i].MapName}" class="mx-auto w-full h-56 object-cover rounded-lg" />
-                </div>
-                <p class="text-gray-500 mb-2">제작자: ${data[i].MapProducer}</p>
-                <p class="text-indigo-600">곡수: ${data[i].MusicNum}곡</p>
-            </a>`;
-    }
+    return `
+        <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
+            <h1 class="text-center text-3xl font-bold mb-8 text-gray-700">Select Map</h1>
+            <button onclick="closeModal()" class="absolute top-2 right-2 text-white bg-red-500 rounded px-2 py-1 hover:bg-red-600 transition duration-300">닫기</button>
+            <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                ${mapItems}
+            </div>
+        </div>`;
+}
 
-    contentHtml += `
-                    </div>
-                </div>
-                <script type="text/javascript">
-                    function selectAndClose(id) {
-                        window.opener.setSelectedId(id);
-                        window.close();
-                    }
-                </script>
-            </body>
-        </html>`;
+function selectAndClose(id) {
+    setSelectedId(id);
+    // Close the modal
+    document.getElementById('mapModal').classList.add('hidden');
+}
 
-    return contentHtml;
+function closeModal() {
+    document.getElementById('mapModal').classList.add('hidden');
 }
 
 function setSelectedId(id) {
     selectedId = id;
+    videoOverlay.style.display = 'block';
 }
 
 socket.on('room_players_update', function(data) {;
