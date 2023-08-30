@@ -1,8 +1,6 @@
 from models.play_model import make_answer ,get_room_dict, get_user
 from flask import Blueprint, render_template, request
 from flask_login import current_user
-from flask import Blueprint
-from models.play_model import make_answer
 play_bp = Blueprint('play', __name__, url_prefix='')
 
 @play_bp.route('/single-play', methods=['GET', 'POST'])

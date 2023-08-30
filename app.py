@@ -40,4 +40,4 @@ def sitemap():
 
 if __name__ == '__main__':
     map_controller.ensure_tables_exist()
-    app.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
