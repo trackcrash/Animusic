@@ -36,7 +36,6 @@ def mymap():
 def update():
     return update_to_db()
 
-
 @map_bp.get("/delete-mission")
 def deleteMission():
     return delete_Mission(request.args.get('id'))
@@ -48,9 +47,8 @@ def download_template():
 @map_bp.route('/check_videoid', methods=['POST'])
 #재생가능한 비디오링크인지 체크해주는 기능(요청 1번에 최대 42개의 비디오링크까지 가능)
 def check_videoid():
-    videoid_list, convert_list = set(request.get_json()), set()
-    result = videoid_check(videoid_list, convert_list)
-    return jsonify(list(result))
+    videoid_list = set(request.get_json())
+    return videoid_check(videoid_list)
 
 @map_bp.get('/api/get_mission_table')
 def get_mission_table():

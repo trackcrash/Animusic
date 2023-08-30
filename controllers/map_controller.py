@@ -165,8 +165,9 @@ def delete_Mission(id):
     '''
 
 #videoid가 사용가능한지 체크 use on map.py check_videoid()
-def videoid_check(videoid_list, convert_list):
+def videoid_check(videoid_list):
     result = videoid_list.copy()
+    convert_list = set()
     for id_count, videoid in enumerate(videoid_list):
         convert_list.add("&id=" + videoid)
         if (id_count + 1) % 42 == 0:
@@ -180,4 +181,25 @@ def videoid_check(videoid_list, convert_list):
         api_result = requests.get(f'https://www.googleapis.com/youtube/v3/videos?key={config("YOUTUBE_API_KEY")}&part=status{request_text}')
         renewable_list = set(item['id'] for item in api_result.json()['items'] if item['status']['embeddable'])
         result -= renewable_list
-    return result
+    return jsonify(list(result))
+
+#Youtube API 가 POST 방식으로도 요청받는지 확인 해야 됨 (아직 테스트 안해봤음)
+'''
+def videoid_check(videoid_list):
+    result = videoid_list.copy()
+    convert_list = set()
+
+    api_url = 'https://www.googleapis.com/youtube/v3/videos'
+    api_key = config("YOUTUBE_API_KEY")
+
+    data = {
+        'key': api_key,
+        'part': 'status',
+        'id': list(videoid_list)
+    }
+
+    api_result = requests.post(api_url, data=data)
+    renewable_list = set(item['id'] for item in api_result.json()['items'] if item['status']['embeddable'])
+    result -= renewable_list
+    return jsonify(list(result))
+'''

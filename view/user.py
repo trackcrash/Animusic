@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import logout_user, login_required, current_user
 from controllers.user_controller import user_controller
-from models.user_model import delete_account, account_insert, account_insert_in_googleuser
+from models.user_model import delete_account, account_insert, account_insert_in_googleuser, insert_character_number
 
 
 user_bp = Blueprint('user', url_prefix='')
@@ -82,3 +82,12 @@ def register():
     if request.method == 'POST':
         return register()
     return render_template('register.html')
+
+@user_bp.route('/select_character')
+def select_character():
+    return render_template('account_management/selectCharacter.html')
+
+@user_bp.route('/insert_character', methods=['POST'])
+def insert_character():
+    character_number = request.get_json().get('character_number')
+    return insert_character_number(character_number)

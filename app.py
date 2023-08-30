@@ -7,7 +7,7 @@ from view.map import map_bp
 from view.user import user_bp
 from controllers.play_controller import get_room_dict, get_user
 from controllers import map_controller
-from models.user_model import get_user_by_id, insert_character_number
+from models.user_model import get_user_by_id
 from models.play_model import make_answer
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
@@ -17,7 +17,6 @@ app.register_blueprint(map_bp)
 app.register_blueprint(user_bp)
 login_manager = LoginManager()
 login_manager.init_app(app)
-
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -31,19 +30,6 @@ def single_play():
 def index():
     return render_template('index.html', current_user=current_user)
 
-
-#----------회원 탈퇴 & 회원 정보수정-----------
-
-# 캐릭터 변경기능
-@app.route('/select_character')
-def select_character():
-    return render_template('account_management/selectCharacter.html')
-
-@app.route('/insert_character', methods=['POST'])
-def insert_character():
-    character_number = request.get_json().get('character_number')
-    return insert_character_number(character_number)
-# -------------------------------------
 ####################################################################################
 
 #미션 관리부분
@@ -61,21 +47,14 @@ def update():
 def deleteMission():
     return map_controller.delete_Mission(request.args.get('id'))
 
-@app.route('/download_excelfile', methods=['GET'])
-def download_template():
-    return send_file('static/file_form/MakingMap_form.xlsx', as_attachment=True)
-
-
 #########################################################################################
 
 @app.route('/room_list')
 def room_list():
-    if current_user.is_authenticated == False:
+    if not current_user.is_authenticated:
         user_id = ""
-        print(f"로그인 되어있지 않으므로 멀티플레이는 불가합니다.")
     else:
         user_id = current_user.name
-        print(f"{user_id} 유저 아이디 확인됨.")
     return render_template('room_list.html')
 
 @app.route('/sitemap.xml')
