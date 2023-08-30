@@ -11,18 +11,12 @@ async function data_convert_download() {
         const thumbnail = item.querySelector('img').src;
         const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
         const answer = item.querySelector('h1').innerText;
-        let hint = "";
+
+        let hint = "", startTime = 0, endTime = 0;
+
         if (item.querySelector('h2').innerText !== '') {hint = item.querySelector('h2').innerText};
-
-        let startTime = 0;
-        if (isNaN(parseFloat(item.querySelector('h5').innerText)) || parseFloat(item.querySelector('h5').innerText) === 0) {
-            startTime = 0;
-        } else {startTime = item.querySelector('h5').innerText};
-
-        let endTime = 0;
-        if (isNaN(parseFloat(item.querySelector('h6').innerText)) || parseFloat(item.querySelector('h6').innerText) === 0) {
-            endTime = 0;
-        } else {endTime = item.querySelector('h6').innerText};
+        if (parseFloat(item.querySelector('h5').innerText)) {startTime = item.querySelector('h5').innerText};
+        if (parseFloat(item.querySelector('h6').innerText)) {endTime = item.querySelector('h6').innerText};
 
         // 해당 곡 정보를 액셀파일 데이터에 담는 곳
 
@@ -33,8 +27,19 @@ async function data_convert_download() {
         song_info.push(hint || "");
         song_info.push(songURL || "");
 
-        let before_time = String(Math.floor(startTime / 3600)) + ":" + String(Math.floor((startTime % 3600) / 60)) + ":" + String(startTime % 60) + "." + String((startTime - Math.floor(startTime)) * 1000);
-        let after_time = String(Math.floor(endTime / 3600)) + ":" + String(Math.floor((endTime % 3600) / 60)) + ":" + String(endTime % 60) + "." + String((endTime - Math.floor(endTime)) * 1000);
+        let before_time = (
+            String(Math.floor(startTime / 3600)) + ":" +
+            String(Math.floor((startTime % 3600) / 60)) + ":" +
+            String(startTime % 60) + "." +
+            String((startTime - Math.floor(startTime)) * 1000)
+        );
+
+        let after_time = (
+            String(Math.floor(endTime / 3600)) + ":" +
+            String(Math.floor((endTime % 3600) / 60)) + ":" +
+            String(endTime % 60) + "." +
+            String((endTime - Math.floor(endTime)) * 1000)
+        );
 
         let before_time_list = before_time.split("");
         let after_time_list = after_time.split("");
@@ -105,7 +110,11 @@ async function data_convert_download() {
     };
 
     // Blob 생성 및 다운로드 처리
-    const blobToDownload = new Blob([XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const blobToDownload = new Blob(
+        [XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })],
+        { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+    );
+
     const url = URL.createObjectURL(blobToDownload);
 
     const a = document.createElement('a');

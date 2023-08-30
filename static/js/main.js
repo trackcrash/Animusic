@@ -183,9 +183,23 @@ document.getElementById("register-btn").addEventListener("click", function(e) {
     const thumbnailLink = "https://img.youtube.com/vi/" + videoId + "/sddefault.jpg";
     const answer = document.getElementById('answer-input').value;
     const hint = document.getElementById('hint-input').value;
-    const startTime = String((parseInt(document.getElementById('startTime-input-h').value || 0) * 3600) + (parseInt(document.getElementById('startTime-input-m').value || 0) * 60) + parseInt(document.getElementById('startTime-input-s').value || 0) + parseFloat("0." + document.getElementById('startTime-input-ms').value) || 0);
-    const endTime = String((parseInt(document.getElementById('endTime-input-h').value || 0) * 3600) + (parseInt(document.getElementById('endTime-input-m').value || 0) * 60) + parseInt(document.getElementById('endTime-input-s').value || 0) + parseFloat("0." + document.getElementById('endTime-input-ms').value) || 0);
     const id = document.getElementById('id-input').value;
+
+    const startH = parseInt(document.getElementById('startTime-input-h').value || 0);
+    const startM = parseInt(document.getElementById('startTime-input-m').value || 0);
+    const startS = parseInt(document.getElementById('startTime-input-s').value || 0);
+    const startMS = parseFloat("0." + document.getElementById('startTime-input-ms').value) || 0;
+
+    const start_seconds = (startH * 3600) + (startM * 60) + startS + startMS;
+    const startTime = String(start_seconds);
+
+    const endH = parseInt(document.getElementById('endTime-input-h').value || 0);
+    const endM = parseInt(document.getElementById('endTime-input-m').value || 0);
+    const endS = parseInt(document.getElementById('endTime-input-s').value || 0);
+    const endMS = parseFloat("0." + document.getElementById('endTime-input-ms').value) || 0;
+
+    const end_seconds = (endH * 3600) + (endM * 60) + endS + endMS;
+    const endTime = String(end_seconds);
 
     const inputList =  document.querySelectorAll('#submission-form input:not([id="MapName-input"])');
     const h4List = document.querySelectorAll('#grid-container .box h4');
@@ -249,27 +263,41 @@ document.getElementById('song-link-input').addEventListener('input', function() 
     loadVideo();
 });
 
+// .box의 내용물을 정의하는 함수
+function box_element(item) {
+    const title = item.querySelector('h3').innerText;
+    const song = item.querySelector('p').innerText;
+    const thumbnail = item.querySelector('img').src;
+    const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
+    const answer = item.querySelector('h1').innerText;
+    const id = item.querySelector('h4').innerHTML || null;
+
+    let hint = null, startTime = null, endTime = null;
+
+    if (item.querySelector('h2').innerText !== '') {hint = item.querySelector('h2').innerText};
+    if (parseFloat(item.querySelector('h5').innerText)) {startTime = item.querySelector('h5').innerText};
+    if (parseFloat(item.querySelector('h6').innerText)) {endTime = item.querySelector('h6').innerText};
+
+    return {
+        title: title,
+        song: song,
+        thumbnail: thumbnail,
+        songURL: songURL,
+        answer: answer,
+        id: id,
+        hint: hint,
+        startTime: startTime,
+        endTime: endTime
+    }
+}
+
 //save이벤트
 function saveBtn() {
     const items = document.querySelectorAll('.grid-item.box');
     let data = [];
     items.forEach(item => {
-        const title = item.querySelector('h3').innerText;
-        const song = item.querySelector('p').innerText;
-        const thumbnail = item.querySelector('img').src;
-        const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
-        const answer = item.querySelector('h1').innerText;
-        let hint = null;
-        if (item.querySelector('h2').innerText !== '') {hint = item.querySelector('h2').innerText};
-        let startTime = null;
-        if (isNaN(parseFloat(item.querySelector('h5').innerText)) || parseFloat(item.querySelector('h5').innerText) === 0) {
-            startTime = null;
-        } else {startTime = item.querySelector('h5').innerText};
 
-        let endTime = null;
-        if (isNaN(parseFloat(item.querySelector('h6').innerText)) || parseFloat(item.querySelector('h6').innerText) === 0) {
-            endTime = null;
-        } else {endTime = item.querySelector('h6').innerText};
+        let {id, title, song, thumbnail, songURL, answer, hint, startTime, endTime} = box_element(item);
 
         data.push({
             title: title,
@@ -311,23 +339,9 @@ function UpdateBtn() {
     const items = document.querySelectorAll('.grid-item.box');
     let data = [];
     items.forEach(item => {
-        const title = item.querySelector('h3').innerText;
-        const song = item.querySelector('p').innerText;
-        const thumbnail = item.querySelector('img').src;
-        const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
-        const answer = item.querySelector('h1').innerText;
-        let hint = null;
-        if (item.querySelector('h2').innerText !== '') {hint = item.querySelector('h2').innerText};
-        let startTime = null;
-        if (isNaN(parseFloat(item.querySelector('h5').innerText)) || parseFloat(item.querySelector('h5').innerText) === 0) {
-            startTime = null;
-        } else {startTime = item.querySelector('h5').innerText};
 
-        let endTime = null;
-        if (isNaN(parseFloat(item.querySelector('h6').innerText)) || parseFloat(item.querySelector('h6').innerText) === 0) {
-            endTime = null;
-        } else {endTime = item.querySelector('h6').innerText};
-        const id = item.querySelector('h4').innerHTML;
+        let {id, title, song, thumbnail, songURL, answer, hint, startTime, endTime} = box_element(item);
+
         if(id == "" || id == null)
         {
             data.push({
@@ -393,6 +407,8 @@ let container_height = document.getElementById('grid-container').clientHeight;
 function resize_variable_declaration() {
 
     //grid-container 안의 아이템의 가로 세로 길이를 px단위로 정의함
+    if (!document.querySelector('.box')) {return};
+
     let box_width = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('width'));
     let box_height = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('height'));
 
@@ -415,6 +431,8 @@ let container_item = document.getElementById('grid-container').querySelectorAll(
 // grid-container 안의 아이템 갯수가 바뀔 때 마다 container_item을 재 정의 함
 const observer = new MutationObserver(() => {
     container_item = document.getElementById('grid-container').querySelectorAll('.box').length + 1;
+
+    resize_variable_declaration();
     // 여기에 .box가 3~4줄 이상인 경우( grid-container 스타일에 three-or-more-row 라는 클래스 추가
     if (Math.floor(container_item / Math.floor(container_width / box_width)) >= 3) {
         document.getElementById('grid-container').classList.add('three-or-more-row');
@@ -425,10 +443,3 @@ const observer = new MutationObserver(() => {
 
 // 어떤 대상의 상태 변화를 감지하는 observer 의 설정값 (대상 : grid-container, childList - true : 대상 내용물의 갯수만 감지)
 observer.observe(document.getElementById('grid-container'), {childList: true });
-
-// 시작시간 & 종료시간 최대값 검증 함수
-function number_max(number_object) {
-    let number = parseInt(number_object.value);
-    const max_number = parseInt(number_object.getAttribute("max"));
-    if (number > max_number) {number_object.value = number_object.getAttribute("max")}};
-
