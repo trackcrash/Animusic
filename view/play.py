@@ -4,15 +4,16 @@ from flask_login import current_user
 from flask_socketio import SocketIO, emit, join_room
 from controllers import play_controller
 from flask import Blueprint
-from chat.chat_model import make_answer, music_data_manager, room_data_manager
+from models.play_model import make_answer, music_data_manager, room_data_manager
 import time
-chat_bp = Blueprint('chat', __name__)
+play_bp = Blueprint('play', __name__)
 totalPlayers = 0
 room_name = ""
 waitingroom_userlist = {}
 socketio = SocketIO()
 vote_counts = {}
 voted_users = {}
+socketio.init_app(play_bp,cors_allowed_origins="*")
 @socketio.on('connect')
 def handle_connect():
     # 소켓이 연결되면 실행되는 함수
@@ -205,12 +206,6 @@ def join_sock(data):
     join_room(room_name)
     user_id = room_data_manager.host_setting(room_name)
     game_status = room_data_manager._data_store[room_name]['room_info']['room_status']
-    # if game_status :
-        # totalPlayers = len(room_data_manager._data_store[room_name]['user'])
-        # if room_name not in vote_counts:
-        #     emit('user_change', {'count': vote_counts[room_name], 'totalPlayers': totalPlayers}, room=room_name)
-        # else :
-        #     emit("user_change", {'count': 0, 'totalPlayers': totalPlayers}, room=room_name)
     if user_id != "":
         emit("host_updated", {"user":user_id, "game_status":game_status}, room=room_name)
     update_room_player_count(room_name, "님이 참가 하셨습니다.", room_data_manager._data_store[room_name]['user'][session_id]['username'])
