@@ -13,7 +13,7 @@ def ensure_tables_exist():
         if not SuchTable(table.__tablename__):
             table.__table__.create(bind=engine, checkfirst=True)
 
-def play_controller():
+def map_controller():
     data = None
     id = request.args.get('id')
     if id is not None:

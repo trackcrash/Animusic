@@ -16,7 +16,8 @@ def single_select():
 
 @map_bp.route('/make_map', methods=['GET', 'POST'])
 def make_map():
-    return map_controller()
+    data = map_controller()
+    return render_template('createmap.html', data=data)
 
 @map_bp.route('/Show')
 def show():
