@@ -182,24 +182,3 @@ def videoid_check(videoid_list):
         renewable_list = set(item['id'] for item in api_result.json()['items'] if item['status']['embeddable'])
         result -= renewable_list
     return jsonify(list(result))
-
-#Youtube API 가 POST 방식으로도 요청받는지 확인 해야 됨 (아직 테스트 안해봤음)
-'''
-def videoid_check(videoid_list):
-    result = videoid_list.copy()
-    convert_list = set()
-
-    api_url = 'https://www.googleapis.com/youtube/v3/videos'
-    api_key = config("YOUTUBE_API_KEY")
-
-    data = {
-        'key': api_key,
-        'part': 'status',
-        'id': list(videoid_list)
-    }
-
-    api_result = requests.post(api_url, data=data)
-    renewable_list = set(item['id'] for item in api_result.json()['items'] if item['status']['embeddable'])
-    result -= renewable_list
-    return jsonify(list(result))
-'''

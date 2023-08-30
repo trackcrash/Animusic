@@ -33,6 +33,8 @@ def mymap():
     data_list = show_mission_byProducer()
     return render_template('Map.html', data_list=data_list)
 
+
+
 @map_bp.post('/update-to-db')
 def update():
     return update_to_db()

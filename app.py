@@ -10,6 +10,9 @@ from view.user import user_bp
 from view.room import room_bp
 from view.character import char_bp
 
+import os
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 
