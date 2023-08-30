@@ -431,6 +431,7 @@ function displayDataInModal(data) {
     const modal = document.getElementById('mapModal');
     modal.querySelector('div').innerHTML = modalContent; // Insert content into the modal's inner div
     modal.classList.remove('hidden'); // Display the modal
+    document.getElementById('mapModal').style.zIndex = 1;
 }
 
 function populateModalWithMissionData(data) {
@@ -462,6 +463,7 @@ function selectAndClose(id) {
 
 function closeModal() {
     document.getElementById('mapModal').classList.add('hidden');
+    document.getElementById('mapModal').style.zIndex = 0;
 }
 
 function setSelectedId(id) {
