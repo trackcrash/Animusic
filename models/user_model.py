@@ -3,7 +3,7 @@ from flask_login import current_user
 from flask_bcrypt import Bcrypt
 from sqlalchemy import Boolean, Column, Integer, String
 from db.database import Base, session, create_tables
-from controllers import play_controller
+from controllers import map_controller
 from flask import jsonify
 bcrypt = Bcrypt()
 
@@ -98,7 +98,7 @@ def get_user_by_id(user_id):
 # 회원 탈퇴 처리
 def delete_account():
     if current_user.is_authenticated:
-        play_controller.delete_User(current_user.id)
+        map_controller.delete_User(current_user.id)
         user = session.query(User).filter_by(id=current_user.id).first()
         if user:
             session.delete(user)

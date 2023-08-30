@@ -1,6 +1,8 @@
 import random
-from controllers.play_controller import show_table_bymissionid
+from controllers.map_controller import show_table_bymissionid
 from models.user_model import get_user_by_id
+from flask import jsonify
+from flask_login import current_user
 
 class RoomDataManger:
     def __init__(self):
@@ -158,6 +160,29 @@ def make_answer(mission_id, room_name):
     return room_name
 
 
+def single_make_answer(mission_id):
+    data = show_table_bymissionid(mission_id)
+    result = []
+
+    for item in data:
+        youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
+        answer_list = [answer.strip() for answer in item['answer'].split(',')]
+        music_data = {
+            'hint': item['hint'],
+            'is_answered': 'false',
+            'answer_list': answer_list,
+            'youtube_embed_url': youtube_embed_url,
+            'title': item['title'],
+            'song': item['song'],
+            'startTime' : item['startTime'],
+            'endTime' : item['endTime']
+        }
+        result.append(music_data)
+
+    random.shuffle(result)
+    return result
+
+
 
 def dict_join(dict_name,dict_index,dict_value):
     if dict_index in dict_name:
@@ -167,3 +192,14 @@ def dict_join(dict_name,dict_index,dict_value):
 
 def dict_create(dict_name,dict_index,dict_value):
         dict_name[dict_index] = dict_value
+
+def get_room_dict():
+    room_dict = room_data_manager._data_store
+    
+    return jsonify(room_dict)
+
+def get_user():
+    data = ""
+    if current_user.is_authenticated:
+        data = current_user.name
+    return jsonify(data)
