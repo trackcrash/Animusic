@@ -6,7 +6,7 @@ from controllers import play_controller
 from flask import Blueprint
 from models.play_model import make_answer, music_data_manager, room_data_manager
 import time
-play_bp = Blueprint('play', __name__)
+play_bp = Blueprint('play', url_prefix='')
 totalPlayers = 0
 room_name = ""
 waitingroom_userlist = {}
