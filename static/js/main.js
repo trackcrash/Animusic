@@ -1,8 +1,9 @@
- let videoId = "";
- let modifyIndex = null;
+let videoId = "";
+let modifyIndex = null;
+modifyFunction();
 const zero_space = document.getElementById('zero_space');
 const answerInput = document.getElementById('answer-input');
-modifyFunction();
+
 function zero_space_text() {
     const inputText = answerInput.value;
     const answerList = inputText.split(', ');
@@ -24,7 +25,7 @@ function zero_space_text() {
     
     answerInput.value = resultText;
 }
-zero_space.addEventListener('click', function()
+zero_space.addEventListener('click', () =>
 {
     zero_space_text();
 });
@@ -50,26 +51,25 @@ function loadVideo() {
     videoContainer.appendChild(iframe);
 }
 
-document.getElementById('submission-form').addEventListener('submit', function(e) {
+document.getElementById('submission-form').addEventListener('submit', (e) => {
     e.preventDefault();
 });
 
-
 function modifyFunction() {
     const boxes = document.querySelectorAll('#grid-container .box');
-
-    for (let i = 0; i < boxes.length; i++) {
-        boxes[i].addEventListener('click', function() {
-            const title = this.querySelector('h3')?.innerText;
-            const song = this.querySelector('p')?.innerText;
-            const songURL = this.querySelector('input')?.value;
-            const answer = this.querySelector('h1')?.innerText;
-            const hint = this.querySelector('h2')?.innerText;
+    const addBox = document.querySelector('.add_box.grid-item');
+    boxes.forEach((box, i) => {
+        box.addEventListener('click', () => {
+            const title = box.querySelector('h3')?.innerText;
+            const song = box.querySelector('p')?.innerText;
+            const songURL = box.querySelector('input')?.value;
+            const answer = box.querySelector('h1')?.innerText;
+            const hint = box.querySelector('h2')?.innerText;
             console.log("체크중: ", hint);
-            const id = this.querySelector('h4')?.innerText;
-            const startTime = this.querySelector('h5')?.innerText;
-            const endTime = this.querySelector('h6')?.innerText;
-            
+            const id = box.querySelector('h4')?.innerText;
+            const startTime = box.querySelector('h5')?.innerText;
+            const endTime = box.querySelector('h6')?.innerText;
+    
             // 정보를 설정하면서 선택적 체이닝 사용
             document.getElementById('title-input').value = title || ''; // 속성이 없을 때는 빈 문자열
             document.getElementById('song-name-input').value = song || '';
@@ -87,31 +87,28 @@ function modifyFunction() {
             document.getElementById('id-input').value = id || '';
             loadVideo();
             document.getElementById('register-btn').innerText = "수정하기";
-            
+    
             modifyIndex = i;
         });
-    }
+    });
+    addBox.addEventListener('click', () => {
+        const fields = [
+            'title-input', 'song-name-input', 'song-link-input', 'answer-input', 'hint-input',
+            'startTime-input-h', 'startTime-input-m', 'startTime-input-s', 'startTime-input-ms',
+            'endTime-input-h', 'endTime-input-m', 'endTime-input-s', 'endTime-input-ms',
+            'id-input'
+        ];
+        fields.forEach(field => {
+            const inputElement = document.getElementById(field);
+            if (inputElement) {
+                inputElement.value = '';
+            }
+        });
+
+        document.getElementById('register-btn').innerText = "등록하기";
+        modifyIndex = null;
+    });
 }
-
-document.querySelector(".add_box.grid-item").addEventListener('click', function() {
-    document.getElementById('title-input').value = "";
-    document.getElementById('song-name-input').value = "";
-    document.getElementById('song-link-input').value = "";
-    document.getElementById('answer-input').value = "";
-    document.getElementById('hint-input').value = "";
-    document.getElementById('startTime-input-h').value = "";
-    document.getElementById('startTime-input-m').value = "";
-    document.getElementById('startTime=input-s').value = "";
-    document.getElementById('startTime=input-ms').value = "";
-    document.getElementById('endTime-input-h').value = "";
-    document.getElementById('endTime-input-m').value = "";
-    document.getElementById('endTime=input-s').value = "";
-    document.getElementById('endTime=input-ms').value = "";
-    document.getElementById('id-input').value = "";
-    document.getElementById('register-btn').innerText = "등록하기"; 
-
-    modifyIndex = null;
-});
 
 function createInfoItem(title, song, songURL, thumbnail, answer, hint, startTime, endTime, id) {
     const box = document.createElement('div');
@@ -119,7 +116,7 @@ function createInfoItem(title, song, songURL, thumbnail, answer, hint, startTime
     const closeBtn = document.createElement('button');
     closeBtn.innerText = 'X';
     closeBtn.classList.add('close-btn', 'bg-red-500', 'text-white', 'rounded-full', 'p-1', 'absolute', 'top-2', 'right-2');
-    closeBtn.onclick = function(event) {
+    closeBtn.onclick = (event) => {
         event.stopPropagation();
         box.remove();
     };
@@ -176,7 +173,7 @@ function createInfoItem(title, song, songURL, thumbnail, answer, hint, startTime
     return box;
 };
 
-document.getElementById("register-btn").addEventListener("click", function(e) {
+document.getElementById("register-btn").addEventListener("click", (e) => {
     const title = document.getElementById('title-input').value;
     const song = document.getElementById('song-name-input').value;
     const songURL = document.getElementById('song-link-input').value;
@@ -211,14 +208,7 @@ document.getElementById("register-btn").addEventListener("click", function(e) {
         {
             if(h4List[i].innerText == id)
             {
-                boxList[i].querySelector('h3').innerText = title;
-                boxList[i].querySelector('p').innerText = song;
-                boxList[i].querySelector('img').src = thumbnailLink;
-                boxList[i].querySelector('input').value = songURL;
-                boxList[i].querySelector('h1').innerText = answer;
-                boxList[i].querySelector('h2').innerText = hint;
-                boxList[i].querySelector('h5').innerText = startTime;
-                boxList[i].querySelector('h6').innerText = endTime;
+                changeBox(boxList[i], title, song, songURL, thumbnailLink, answer, hint, startTime, endTime)
             }
         }
     }
@@ -230,14 +220,8 @@ document.getElementById("register-btn").addEventListener("click", function(e) {
             {
                 if(i == modifyIndex)
                 {
-                    boxList[i].querySelector('h3').innerText = title;
-                    boxList[i].querySelector('p').innerText = song;
-                    boxList[i].querySelector('img').src = thumbnailLink;
-                    boxList[i].querySelector('input').value = songURL;
-                    boxList[i].querySelector('h1').innerText = answer;
-                    boxList[i].querySelector('h2').innerText = hint;
-                    boxList[i].querySelector('h5').innerText = startTime;
-                    boxList[i].querySelector('h6').innerText = endTime;
+                    changeBox(boxList[i], title, song, songURL, thumbnailLink, answer, hint, startTime, endTime)
+
                 }
             }
         }else
@@ -253,13 +237,24 @@ document.getElementById("register-btn").addEventListener("click", function(e) {
     }
 });
 
-document.body.addEventListener('click', function(event) {
+function changeBox(box,title, song, songURL, thumbnail, answer, hint, startTime, endTime) {
+    box.querySelector('h3').innerText = title;
+    box.querySelector('p').innerText = song;
+    box.querySelector('img').src = thumbnail;
+    box.querySelector('input').value = songURL;
+    box.querySelector('h1').innerText = answer;
+    box.querySelector('h2').innerText = hint;
+    box.querySelector('h5').innerText = startTime;
+    box.querySelector('h6').innerText = endTime;
+}
+
+document.body.addEventListener('click', (event) => {
     if (event.target && event.target.classList.contains('close-btn')) {
         event.target.parentElement.remove();
     }
 });
 
-document.getElementById('song-link-input').addEventListener('input', function() {
+document.getElementById('song-link-input').addEventListener('input', () => {
     loadVideo();
 });
 
@@ -322,11 +317,11 @@ function saveBtn() {
         dataType: "json",
         contentType: "application/json",
         data: data,
-        error: function(request, status, error) {
+        error: (request, status, error) => {
             console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
 
         },
-        success: function(data) {
+        success: (data) => {
             console.log("통신데이터 값 : ", data);
             alert("등록 완료되었습니다.");
             window.location.href = '/Map'
@@ -384,10 +379,10 @@ function UpdateBtn() {
         dataType: "json",
         contentType: "application/json",
         data: data,
-        error: function(request, status, error) {
+        error: (request, status, error) => {
             console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
         },
-        success: function(data) {
+        success: (data) => {
             console.log("통신데이터 값 : ", data);
             alert("등록 완료되었습니다.");
             window.location.href = '/Map'
