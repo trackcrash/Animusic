@@ -134,18 +134,3 @@ def play_Socket(socketio):
 
         else:
             emit('updateVoteCount', {'count': socket_class.vote_counts[room]}, room=room)
-    @socketio.on("TimeOut")
-    def handle_time_out(data):
-        room = data.get("room")
-        next_data = music_data_manager.retrieve_next_data(room)
-        if next_data:
-            socket_class.totalPlayers = len(room_data_manager._data_store[room]['user'])
-            youtube_embed_url = next_data['youtube_embed_url']
-            startTime = float(next_data['startTime'])
-            endTime = float(next_data['endTime'])
-            totalSong =len(music_data_manager._data_store[room]['data'])
-            nowSong = int(music_data_manager._data_store.get(room, {})['current_index'])+1
-            emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers, "startTime": startTime, "endTime":endTime,'totalSong':totalSong, 'nowSong':nowSong}, room=room)
-        else:
-            before_data,new_data = get_info_for_room(room)
-            emit('EndOfData', {'before_data': before_data,'new_data':new_data}, room=room)

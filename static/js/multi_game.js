@@ -155,16 +155,16 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
         endTime = player.getDuration();
     }
     GameTimer = endTime - startTime;
-    let Num = 3;
+    let Num = 0;
     gameTimerInterval = setInterval(() => {
         document.querySelector("#GameTimer span").innerText = GameTimer;
         if (GameTimer <= 0) {
-            if (Num == 0) {
+            if (Num == 3) {
                 dummyplay();
-                Num = 3;
+                Num = 0;
             }
-            Num--;
-            socket.emit("TimeOut", { "room": room_name });
+            Num++;
+            voteSkip();
             return;
         }
         GameTimer--;
