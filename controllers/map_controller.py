@@ -7,6 +7,22 @@ from models import data_model
 from db.database import session,engine
 from models.data_model import Mission, Music
 
+def commit_or_rollback():
+    try:
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        print(f"An error occurred: {e}")
+        raise
+    finally:
+        session.close()
+
+def SuchTable(table_Name):
+    inspector = inspect(engine)
+    if table_Name in inspector.get_table_names():
+        return True
+    return False
+
 #db에 테이블 존재하는지 확인하고 없으면 생성
 def ensure_tables_exist():
     for table in [Music, Mission]:
@@ -69,12 +85,6 @@ def single_make_answer(mission_id):
     random.shuffle(result)
     return result
 
-def SuchTable(table_Name):
-    inspector = inspect(engine)
-    if table_Name in inspector.get_table_names():
-        return True
-    return False
-
 
 def submit_to_db():
     data = request.json
@@ -83,19 +93,15 @@ def submit_to_db():
 
 
 def show_table():
-    Music.__table__.create(bind=engine, checkfirst=True)
-    if SuchTable("MusicTable"):
-        queries = session.query(Music)
-        entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint if q.hint is not None else "", startTime=q.startTime if q.startTime is not None else "", endTime=q.endTime if q.endTime is not None else "") for q in queries]
-        return entries
+    queries = session.query(Music)
+    entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint if q.hint is not None else "", startTime=q.startTime if q.startTime is not None else "", endTime=q.endTime if q.endTime is not None else "") for q in queries]
+    return entries
 
 
 def show_table_bymissionid(missionid):
-    Music.__table__.create(bind=engine, checkfirst=True)
-    if SuchTable("MusicTable"):
-        queries = session.query(Music).filter(Music.mission_id==missionid)
-        entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint if q.hint is not None else "", startTime=q.startTime if q.startTime is not None else "0", endTime = q.endTime if q.endTime is not None and (q.startTime is None or q.endTime > q.startTime) else "0") for q in queries]
-        return entries
+    queries = session.query(Music).filter(Music.mission_id==missionid)
+    entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint if q.hint is not None else "", startTime=q.startTime if q.startTime is not None else "0", endTime = q.endTime if q.endTime is not None and (q.startTime is None or q.endTime > q.startTime) else "0") for q in queries]
+    return entries
     
 
 def get_music_data(data):
@@ -105,50 +111,42 @@ def get_music_data(data):
 
 
 def show_mission():
-    Mission.__table__.create(bind=engine, checkfirst=True)
-    if SuchTable("MissionTable"):
-        queries = session.query(Mission)
-        # 노래 갯수 추가
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
-        return entries
+    queries = session.query(Mission)
+    # 노래 갯수 추가
+    entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
+    return entries
     
 
 
 def show_mission_active():
-    Mission.__table__.create(bind=engine, checkfirst=True)
-    if SuchTable("MissionTable"):
-        queries = session.query(Mission).filter(Mission.active == True)
-        # 노래 갯수 추가
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
-        return entries
+    queries = session.query(Mission).filter(Mission.active == True)
+    # 노래 갯수 추가
+    entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
+    return entries
     
 
     
 def show_mission_byProducer():
-    Mission.__table__.create(bind=engine, checkfirst=True)
-    if SuchTable("MissionTable"):
-        queries = session.query(Mission).filter(Mission.MapProducer_id == current_user.id)
-        entries = [dict(id=q.id, MapName=q.MapName, MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id,MusicNum=session.query(Music).filter(Music.mission_id == q.id).count()) for q in queries]
-        return entries
+    queries = session.query(Mission).filter(Mission.MapProducer_id == current_user.id)
+    entries = [dict(id=q.id, MapName=q.MapName, MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id,MusicNum=session.query(Music).filter(Music.mission_id == q.id).count()) for q in queries]
+    return entries
 
 
 def show_mission_byid(id):
-    Mission.__table__.create(bind=engine, checkfirst=True)
-    if SuchTable("MissionTable"):
-        queries = session.query(Mission).filter(Mission.id == id)
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail, MapProducer_id=q.MapProducer_id) for q in queries]
-        return entries
+    queries = session.query(Mission).filter(Mission.id == id)
+    entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail, MapProducer_id=q.MapProducer_id) for q in queries]
+    return entries
 
      
 #missionid로 맵 삭제 use on map.py deleteMission()
 def delete_Mission(id):
     if show_table_bymissionid(id):
         session.query(Music).filter_by(mission_id=id).delete()
-        session.commit()
+        commit_or_rollback()
     if show_mission_byid(id):
         data_to_delete = session.query(Mission).filter_by(id=id).first()
         session.delete(data_to_delete)
-        session.commit()
+        commit_or_rollback()
 
     return '''
         <html>

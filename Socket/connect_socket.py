@@ -23,7 +23,7 @@ def connect_MySocket(socketio):
         removed_rooms = []  # 나간 방의 이름을 저장할 리스트
         user_name = ""  # 유저 이름을 저장할 변수
 
-        for room_name, room_data in room_data_manager._data_store.items():
+        for room_name, room_data in list(room_data_manager._data_store.items()):
             if 'user' in room_data and request.sid in room_data['user']:
                 user_name = room_data['user'][request.sid]['username']
                 room = room_data_manager.user_left(room_name, request.sid)
@@ -35,8 +35,6 @@ def connect_MySocket(socketio):
                     update_room_player_count(room_name, "님이 퇴장 하셨습니다.", user_name)  # 플레이어 수 업데이트
                 if not room_data['user']:  # 방에 더 이상 유저가 없으면 방 제거
                     removed_rooms.append(room_name)
-                    room_data_manager.remove_room(room_name)  # 방 제거 메서드 호출
-                    emit('room_removed', room_name, broadcast=True)  # 방 제거 이벤트 전송
                 else:
                     if room_data_manager._data_store[room_name]['room_info']['room_status']:
                         socket_class.totalPlayers = len(room_data_manager._data_store[room_name]['user'])
@@ -48,11 +46,12 @@ def connect_MySocket(socketio):
                             emit('user_change', {'count': socket_class.vote_counts[room_name], 'totalPlayers': socket_class.totalPlayers}, room=room_name)
                         else:
                             emit("user_change", {'count': 0, 'totalPlayers': socket_class.totalPlayers}, room=room_name)
-                    
+        for room_name in removed_rooms:
+            room_data_manager.remove_room(room_name)  # 방 제거 메서드 호출
+            emit('room_removed', room_name, broadcast=True)
         try:
             if current_user.name in socket_class.waitingroom_userlist:
                 del socket_class.waitingroom_userlist[current_user.name]
                 emit('update_waiting_userlist', socket_class.waitingroom_userlist, broadcast=True)
         except:
             pass
-
