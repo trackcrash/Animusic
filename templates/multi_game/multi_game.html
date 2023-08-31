@@ -17,84 +17,90 @@
 <body class="bg-gray-100 font-sans">
     {% include "header.html" %}
 
-    <div class="flex mt-6 mx-4">
+    <div class="flex mt-1 mx-4">
         <!-- Left Players Section -->
         <div class="w-1/4 pr-8" id="Players_Box_Left">
 
         </div>
 
         <!-- Middle Section (Video, Buttons, Song Info, Chat) -->
-        <div class="w-2/4 px-4">
+        <div class="w-2/4 px-2 mx-4">
             <div id="mapModal" class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 hidden">
-                <div class="bg-white rounded w-3/4 h-3/4 relative overflow-y-scroll">
-
-                </div>
-            </div>
-            <div class="mb-4 bg-white p-4 rounded-lg shadow text-center" style="min-height: 61px;">
-                <h2 id="songTitle" class="text-xl font-semibold "></h2>
+                <div class="bg-white rounded w-3/4 h-3/4 relative overflow-y-scroll"></div>
             </div>
 
-            <div class="relative mb-4 w-full" style="padding-bottom: 56.25%;">
+            <div class="relative mb-1 w-full" style="padding-bottom: 40%;">
                 <div id="videoContainer">
                     <div id="videoFrame" class="absolute top-0 left-0 w-full h-full"></div>
                     <div id="videoOverlay" class="absolute top-0 left-0 w-full h-full z-10 flex items-center justify-center text-white text-xl bg-black bg-opacity-100" style="display: block;">
-                        <div id="songHint" class="bg-gray-600 p-4 rounded" style="display: none;"></div>
+                        <div id="songHint" class="bg-gray-600 p-2 rounded" style="display: none;"></div>
                     </div>
                 </div>
             </div>
-            <p id="GameTimer">남은 재생 시간 : <span>0</span>초</p>
-            <div class="flex">
-                <p id="nowNumber">0</p>
-                <p>/</p>
-                <p id="AllNumber">0</p>
+            <div class="mb-1 bg-white p-4 rounded-lg shadow text-center flex items-center justify-center h-12 overflow-hidden">
+                <h2 id="songTitle" class="text-xl font-semibold"></h2>
+            </div>
+            <div class="flex items-center justify-between py-2 bg-blue-100 p-2 rounded-lg">
+                <p id="GameTimer" class="text-sm bg-blue-500 text-white px-3 py-1 rounded-full">남은 재생 시간: <span>0</span>초</p>
+                <div class="flex items-center space-x-2 bg-green-500 text-white px-3 py-1 rounded-full">
+                    <p class="text-sm">남은 곡 수:</p>
+                    <p id="nowNumber" class="text-sm font-bold ml-2">0</p>
+                    <p class="text-sm font-light mx-2">/</p>
+                    <p id="AllNumber" class="text-sm font-bold mr-2">0</p>
+                </div>
             </div>
 
-            <div class="flex justify-between">
-                <div>
-                    <input type="checkbox" name="" id="NextVideo"> 자동 스킵 투표(누군가가 정답을 맞춘경우에만 스킵됩니다.)
+            <div class="flex justify-between mt-4">
+                <div class="flex items-center space-x-3">
+                    <input type="checkbox" name="" id="NextVideo">
+                    <label for="NextVideo" class="text-sm text-gray-600">자동 스킵 투표(누군가가 정답을 맞춘경우에만 스킵됩니다.)</label>
                 </div>
-                <div>
-                    음량조절<input type="range" id="VolumeBar">
+                <div class="flex items-center space-x-3">
+                    <label for="VolumeBar" class="text-sm text-gray-600">음량조절</label>
+                    <input type="range" id="VolumeBar">
                 </div>
             </div>
+
             <!-- Buttons and Song Info Section -->
-            <div class="flex justify-between items-center mb-6">
-                <div class="grid grid-cols-2 gap-4 w-2/3">
-                    <button id="nextButton" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-300 ease-in-out" style="display: none;">다음 영상</button>
-                    <button id="hintButton" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-300 ease-in-out" style="display: none;">힌트 보기</button>
-                    <button id="MapSelect" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition duration-300 ease-in-out" style="display: none;">맵선택</button>
-                    <button id="StartButton" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition duration-300 ease-in-out" style="display: none;">시작하기</button>
+            <div class="flex justify-between items-center mt-4">
+                <div class="grid grid-cols-2 gap-2 w-2/3">
+                    <button id="nextButton" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg transition duration-300 ease-in-out" style="display: none;">다음 영상</button>
+                    <button id="hintButton" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg transition duration-300 ease-in-out" style="display: none;">힌트 보기</button>
+                    <button id="MapSelect" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded-lg transition duration-300 ease-in-out">맵선택</button>
+                    <button id="StartButton" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded-lg transition duration-300 ease-in-out">시작하기</button>
                 </div>
 
-                <div id="songInfo" class="text-center" style="min-height: 100px;">
-                    <h2 id="songArtist" class="text-gray-600"></h2>
-                    <p id="correctUser" class="text-blue-500"></p>
-                    <span id="skipVoteCount"></span>
+                <div id="songInfo" class="text-center bg-gray-100 p-4 rounded-lg shadow-lg h-24">
+                    <h2 id="songArtist" class="text-gray-700 font-bold overflow-ellipsis overflow-hidden"> </h2>
+                    <p id="correctUser" class="text-blue-600 overflow-ellipsis overflow-hidden"> </p>
+                    <span id="skipVoteCount" class="text-gray-600 overflow-ellipsis overflow-hidden"> </span>
                 </div>
             </div>
 
             <!-- Chat Section -->
-            <div class="bg-white p-4 rounded-lg shadow-lg mb-6">
-                <div class="h-64 overflow-y-scroll mb-4 border-b border-gray-200" id="messages"></div>
-                <div class="flex">
+            <div class="bg-white p-2 rounded-lg shadow-lg mt-1">
+                <div class="h-40 overflow-y-scroll border-b border-gray-200" id="messages"></div>
+                <div class="flex mt-4">
                     <input type="text" id="inputMessage" class="flex-grow border rounded-l-lg px-2 py-1" placeholder="메시지 입력...">
                     <button id="sendButton" class="flex-shrink bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-r-lg transition duration-300 ease-in-out">보내기</button>
                 </div>
-                <p class="mt-2 text-gray-600 text-sm">End 키를 눌러 스킵 할 수 있습니다.</p>
-                <button id="text_clear" class="mt-2 bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-lg transition duration-300 ease-in-out">text clear</button>
+                <p class="text-gray-600 text-xs mt-2">End 키를 눌러 스킵 할 수 있습니다.</p>
+                <button id="text_clear" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg transition duration-300 ease-in-out mt-2">text clear</button>
             </div>
         </div>
+    </div>
 
-        <!-- Right Players Section -->
-        <div class="w-1/4 pl-8" id="Players_Box_Right">
+    <!-- Right Players Section -->
+    <div class="w-1/4 pl-8" id="Players_Box_Right">
 
-        </div>
-        <div id="dummy">
+    </div>
+    <div id="dummy">
 
-        </div>
+    </div>
     </div>
 </body>
 
 
 <script src="{{ url_for('static', filename='js/multi_game.js') }}"></script>
+
 </html>
