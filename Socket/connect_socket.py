@@ -12,12 +12,14 @@ def connect_MySocket(socketio):
         # 소켓이 연결되면 실행되는 함수
         num_connected = len(socketio.server.eio.sockets)
         print(f"현재 연결된 소켓 수: {num_connected}")
+     
+    @socketio.on('Waiting')
+    def connect_waiting():
         try:
             socket_class.waitingroom_userlist[current_user.name] = None
-            emit('update_waiting_userlist', socket_class.waitingroom_userlist, broadcast = True)
+            emit('update_waiting_userlist', socket_class.waitingroom_userlist, broadcast=True)
         except:
             pass
-
     @socketio.on('disconnect')
     def disconnect():
         removed_rooms = []  # 나간 방의 이름을 저장할 리스트

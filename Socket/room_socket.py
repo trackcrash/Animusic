@@ -52,7 +52,10 @@ def room_Socket(socketio):
         if room_data_manager.is_user_in_room(user_name,room_name):
             emit('user_check_not_ok', room=session_id)
         else :
-            emit('Join_room',room_name, room=session_id)
+            if room_data_manager.room_user_check(room_name) < room_data_manager._data_store[room_name]["room_info"]["room_full_user"]:
+                emit('Join_room',room_name, room=session_id)
+            else : 
+                emit("room_full_user", room_name, room=session_id)
 
     @socketio.on('playingStatus_true')
     def playingroom_hidden(room_name):

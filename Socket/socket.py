@@ -7,7 +7,6 @@ class socketClass:
         self.waitingroom_userlist = {}
         self.totalPlayers = 0
         self.room_name = ""
-        self.waitingroom_userlist = {}
         self.vote_counts = {}
         self.voted_users = {}
     
