@@ -13,20 +13,11 @@
     </style>
 </head>
 
-<body class="bg-gray-100 py-8">
+<body class="bg-gray-100">
     {% include "header.html" %}
     <div class="container mx-auto mb-16">
         <h1 class="text-center text-3xl font-bold mb-8">대기실</h1>
         <ul id="room-list" class="grid grid-cols-5 gap-6 scrollable mb-4">
-            {% for mission in missions %}
-            <a href="/play-test?id={{ mission.id }}" class="block bg-white p-4 shadow-md hover:bg-gray-100 rounded text-center transition duration-300">
-                <p class="text-sm text-gray-600">ID: {{ mission.id }}</p>
-                <p class="text-xl">{{ mission.MapName }}</p>
-                <p class="text-gray-500">{{ mission.MapProducer }}</p>
-                <img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" class="my-4" />
-                <p class="text-indigo-600">{{ mission.MusicNum }}곡</p>
-            </a>
-            {% endfor %}
         </ul>
         <div id="room-buttons" class="grid grid-cols-2 gap-4 scrollable mb-4"></div>
     </div>
