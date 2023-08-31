@@ -14,18 +14,19 @@ class RoomDataManger:
         if room_name in self._data_store and "user" in self._data_store[room_name]:
             users = self._data_store[room_name]["user"]
         
-            
         if len(users) > 0:
             if user_id in users and users[user_id]["host"] == 1:
             # 가장 오랜 시간 동안 머문 사용자를 새로운 방장으로 설정
                 longest_present_user = max(users, key=lambda user: users[user]["joined_time"])
                 users[longest_present_user]["host"] = 1
                 return longest_present_user
+            
     def room_check(self, room_name):
         if room_name in self._data_store:
             return True
         else:
             return False
+        
     def create_room(self,room_name,session_id):
             if room_name in self._data_store:
                 return False
@@ -50,6 +51,7 @@ class RoomDataManger:
             dict_create(self._data_store,room_name,room_data)
             print(f"{room_name}님이 방을 생성하셨습니다.")
             return True
+    
     def join(self, room_name, session_id, current_user,time):
         user_name = current_user.name
         character = get_user_by_id(current_user.id).character
@@ -57,6 +59,7 @@ class RoomDataManger:
         print(f"{room_name}방에 연결되었습니다.")
         user_data = {'username': user_name , 'host':0 ,'score':0 ,'joined_time' : time.time(), 'character':character_link}  # 유저 데이터를 리스트로 생성
         dict_join(self._data_store[room_name]["user"], session_id, user_data)
+
     def host_setting(self,room_name, callback=None):  
         if room_name in self._data_store and "user" in self._data_store[room_name]:
             users = self._data_store[room_name]["user"]
@@ -77,21 +80,26 @@ class RoomDataManger:
             return ""
         if callback:
             callback()  # 콜백 함수 호출
+
     def is_user_in_room(self, user_name, room_name):
         dictionaryData = self._data_store[room_name]['user']
         for key, value in dictionaryData.items():
             if 'username' in value and value['username'] == user_name:
                 return True
         return False
+    
     def game_status(self, room_name, booldata):
         self._data_store[room_name]['room_info']['room_status'] = booldata
+
     def game_init(self, room_name):
         dictionaryData = self._data_store[room_name]['user']
         for key, value in dictionaryData.items():
             value['score'] = 0
+
     def room_user_check(self, room_name):
         playerNum = len(self._data_store[room_name]['user'])
         return playerNum
+                
 room_data_manager = RoomDataManger()
 class MusicDataManager:
     def __init__(self):

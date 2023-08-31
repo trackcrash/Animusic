@@ -5,6 +5,46 @@ from flask_login import current_user
 from models.play_model import make_answer, music_data_manager, room_data_manager
 from Socket.socket import socket_class
 from models.room_model import update_room_player_count
+from models.user_model import get_userinfo_by_name, update_level_info
+
+def get_info_for_room(room_name):
+    data = room_data_manager._data_store[room_name]['user']
+    user_info = {}
+    update_info = {}
+    for session_id, name in data.items():
+        username = name.get('username')
+        user = get_userinfo_by_name(username)
+        if user:
+            user_info[username]={
+                'score': name['score'],
+                'exp' : user.exp,
+                'nextexp' : user.nextexp,
+                'level' : user.level
+            }
+            user_update_info = exp_calculator(username,user.exp, user.nextexp, name['score'], user.level)
+            update_info[username] = user_update_info
+            print(user_info)
+            print(update_info)
+            return user_info, update_info
+
+def exp_calculator(name, exp, nextexp, score, level):
+    if score == 0:
+        return {
+            'exp': exp,
+            'nextexp': nextexp,
+            'level': level
+        }
+    exp += score * 10
+    if exp >= nextexp:
+        while exp < nextexp:
+            level += 1
+            nextexp = 30+(level**1.77)
+    update_level_info(name, level, exp, nextexp)
+    return {
+        'exp': exp,
+        'nextexp': nextexp,
+        'level': level
+    }
 
 def play_Socket(socketio):
     @socketio.on('single_message')
@@ -87,7 +127,8 @@ def play_Socket(socketio):
                 nowSong = int(music_data_manager._data_store.get(room, {})['current_index'])+1
                 emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers, "startTime": startTime, "endTime":endTime, 'totalSong':totalSong,'nowSong':nowSong}, room=room)
             else:
-                emit('EndOfData', {}, room=room)
+                before_data,new_data = get_info_for_room(room)
+                emit('EndOfData', {'before_data': before_data,'new_data':new_data}, room=room)
 
 
 
@@ -106,4 +147,5 @@ def play_Socket(socketio):
             nowSong = int(music_data_manager._data_store.get(room, {})['current_index'])+1
             emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers, "startTime": startTime, "endTime":endTime,'totalSong':totalSong, 'nowSong':nowSong}, room=room)
         else:
-            emit('EndOfData', {}, room=room)
+            before_data,new_data = get_info_for_room(room)
+            emit('EndOfData', {'before_data': before_data,'new_data':new_data}, room=room)

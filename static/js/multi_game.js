@@ -12,6 +12,7 @@ let doMessage = true;
 let playerStateChangeHandler; // 이벤트 핸들러를 저장할 변수
 let gameTimerInterval; //setInteval 이벤트
 let isSkipFlag = true;
+let currentData = null;
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -158,8 +159,7 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
     gameTimerInterval = setInterval(() => {
         document.querySelector("#GameTimer span").innerText = GameTimer;
         if (GameTimer <= 0) {
-            if(Num == 0)
-            {
+            if (Num == 0) {
                 dummyplay();
                 Num = 3;
             }
@@ -235,6 +235,11 @@ function initEventListeners() {
     })
 }
 
+function updateExpBar(exp, nextexp) {
+    let percentage = (exp / nextexp) * 100;
+    $('#expBar').css('width', percentage + '%');
+    $('#expText').text(exp + '/' + nextexp);
+}
 
 function initializeSocketEvents() {
     //게임 시작
@@ -278,7 +283,8 @@ function initializeSocketEvents() {
         showHostContent(true);
     });
     //게임 끝났을 때 init
-    socket.on('EndOfData', function() {
+    socket.on('EndOfData', function(data) {
+        // 기존의 게임 상태 및 UI 초기화 코드
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
@@ -295,12 +301,72 @@ function initializeSocketEvents() {
         setTimeout(function() {
             player.stopVideo();
             clearInterval(gameTimerInterval);
-
         }, 1000)
 
         socket.emit('playingStatus_false', room_name);
-
         showHostContent(false);
+        currentData = data;
+        const scores = data.before_data;
+        const userNames = Object.keys(scores);
+        const sortedScores = userNames.map(username => ({ username, ...scores[username] })).sort((a, b) => b.score - a.score);
+
+        $('#scoreModalBody').empty();
+
+        for (let i = 0; i < sortedScores.length; i++) {
+            const rank = i + 1;
+            const username = sortedScores[i].username;
+            const score = sortedScores[i].score;
+            const row = `
+            <tr>
+                <td class="py-2">${rank}</td>
+                <td>${username}</td>
+                <td>${score}</td>
+            </tr>
+        `;
+            $('#scoreModalBody').append(row);
+        }
+
+        $('#scoreModal').removeClass('hidden');
+    });
+
+    $('#scoreModalCloseBtn').click(function() {
+        $('#scoreModal').addClass('hidden');
+        if (!currentData || !currentData.new_data || !currentData.new_data[player_name]) {
+            console.warn("Data is missing!");
+            return;
+        }
+
+        const newUserData = currentData.new_data[player_name];
+        const newExp = newUserData.exp;
+        const newLevel = newUserData.level;
+        const currentExp = newUserData.nextexp;
+
+        const currentUser = currentData.before_data[player_name];
+        if (!currentUser) {
+            console.warn("Current user data is missing!");
+            return;
+        }
+        const expPercentage = (newExp / currentExp) * 100;
+        $('#expBar').css('width', `${expPercentage}%`);
+        $('#expText').text(`${newExp}/${currentExp}`);
+
+        if (newLevel > currentUser.level) {
+            $('#levelUpModal h2').text(`축하합니다! ${newLevel} 레벨이 되었습니다!`);
+            $('#levelUpModal').removeClass('hidden').addClass('fade-in-out');
+        }
+        // 사용자 정보 업데이트
+        $('#userExp').text(newExp);
+        $('#userLevel').text(newLevel);
+
+        currentUser.exp = newExp;
+        currentUser.level = newLevel;
+
+        currentData = null;
+    });
+
+    $('#levelUpModalCloseBtn').click(function() {
+        $('#levelUpModal').addClass('hidden');
+        $('#levelUpModal').removeClass('fade-in-out');
     });
 
     socket.on('MissionSelect_get', data => {
@@ -356,10 +422,9 @@ window.onload = function() {
         })
     });
 };
-window.addEventListener('scroll', function(){
+window.addEventListener('scroll', function() {
     let scrollYvalue = window.scrollY;
-    if(scrollYvalue > 140)
-    {
+    if (scrollYvalue > 140) {
         this.document.getElementById('Players_Box_Left').style.transform = `translateY(${scrollYvalue-140}px)`;
         this.document.getElementById('Players_Box_Right').style.transform = `translateY(${scrollYvalue-140}px)`
 

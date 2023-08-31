@@ -51,6 +51,8 @@ class User(Base):
 
     def get_id(self):
         return str(self.id)
+    
+    
 
 def commit_or_rollback():
     try:
@@ -60,6 +62,13 @@ def commit_or_rollback():
         print(f"An error occurred: {e}")
         raise
 
+def update_level_info(name, level, exp, nextexp):
+    userinfo = session.query(User).filter_by(name=name).first()
+    userinfo.level = level
+    userinfo.exp = exp
+    userinfo.nextexp = nextexp
+    commit_or_rollback()
+
 # 일반 가입
 def save_user(email, name, password=None, is_google_authenticated=False, level=0, exp=0, nextexp=10, character=0):
     user = User(email=email, name=name, password=password, is_google_authenticated=is_google_authenticated,
@@ -68,6 +77,8 @@ def save_user(email, name, password=None, is_google_authenticated=False, level=0
     commit_or_rollback()
     return user
 
+def get_userinfo_by_name(name):
+        return session.query(User).filter(User.name == name).first()
 
 # 구글 가입
 def save_google_user(user_info):
