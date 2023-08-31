@@ -63,25 +63,15 @@ async function data_convert_download() {
             after_time_list.pop();
         }
 
-        if (before_time_list.length < 1) {
-            before_time = "";
-        } else {
-            before_time = before_time_list.join("");
-        };
+        if (before_time_list.length < 1) {before_time = ""}
+        else {before_time = before_time_list.join("")};
 
-        if (after_time_list.length < 1) {
-            after_time = "";
-        } else {
-            after_time = after_time_list.join("");
-        }
+        if (after_time_list.length < 1) {after_time = ""}
+        else {after_time = after_time_list.join("")};
 
-        if (before_time && after_time) {
-            play_time = before_time + "~" + after_time;
-        } else if (before_time) {
-            play_time = before_time + "~";
-        } else if (after_time) {
-            play_time = "~" + after_time;
-        };
+        if (before_time && after_time) {play_time = before_time + "~" + after_time}
+        else if (before_time) {play_time = before_time + "~"}
+        else if (after_time) {play_time = "~" + after_time};
 
         song_info.push(play_time);
 
