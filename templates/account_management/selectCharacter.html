@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>캐릭터 선택</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">    
+    <script src="{{ url_for('static', filename='js/characterEnum.js') }}"></script>
+</head>
+
+<body class="bg-gray-100 h-screen flex flex-col justify-center" style="height: 100%;">
+    {% include "header.html" %}
+    <h1 class="text-center text-3xl font-bold mb-10">캐릭터 선택</h1>
+    <div class="flex justify-center">
+        <ul id="characterSelect" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+
+        </ul>
+    </div>
+</body>
+
+</html>
+<script src="{{ url_for('static', filename='js/insertCharacter.js') }}"></script>

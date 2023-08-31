@@ -8,31 +8,26 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body class="font-sans bg-gray-100 text-black h-screen">
+<body class="bg-gray-100 font-sans">
     {% include "header.html" %}
-    <!-- 왼쪽 영역 -->
-    <div class="flex">
-        <!-- 오른쪽 영역 -->
-        <div class="">
-            <!-- 상단 정보 영역 -->
-            <div class="info-section bg-gray-200 rounded p-2 shadow-md mb-4">
-                <div id="grid-container" class="grid grid-cols-3 gap-4 w-full h-full">
-                    {% if data_list is defined and data_list %} {% for data in data_list %}
-                    <a href="play?id={{data['id']}}">
-                        <div class="data-box">
-                            <div>{{ data['id'] }}</div>
-                            <div>{{ data['MapName'] }}</div>
-                            <div>{{ data['MapProducer'] }}</div>
-                            <div>{{ data['Thumbnail'] }}</div>
-                        </div>
-                    </a>
-                    {% endfor %} {% endif %}
-
+    <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
+        <h1 class="text-center text-3xl font-bold mb-8 text-gray-700">내 맵</h1>
+        <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% if data_list is defined and data_list %} {% for data in data_list %}
+            <a href="play?id={{data['id']}}" class="block bg-white p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300">
+                <p class="text-xl mb-4 truncate">{{ data['MapName'] }}</p>
+                <div class="mb-4">
+                    <img src="{{ data['Thumbnail'] }}" alt="{{ data['MapName'] }}" class="mx-auto w-full h-56 object-cover rounded-lg" />
                 </div>
-                <!-- <button id="addmap-button" onclick="window.location.href='/play'" class="mr-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">없어도될듯</button> -->
-            </div>
+                <p class="text-gray-500 mb-2">제작자: {{ data['MapProducer'] }}</p>
+                <p class="text-indigo-600">곡수: {{ data['MusicNum'] }}곡</p>
+            </a>
+            {% endfor %} {% endif %}
+        </div>
+        <div class="mt-10 text-center">
+            <button id="MyMap-button" onclick="window.location.href='/make_map'" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">등록하기</button>
         </div>
     </div>
-    <button id="MyMap-button" onclick="window.location.href='/play'" class="mr-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">등록하기</button>
 </body>
+
 </html>

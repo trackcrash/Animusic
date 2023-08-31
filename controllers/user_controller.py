@@ -7,7 +7,7 @@ from flask import flash, redirect, render_template, request, url_for
 from flask_login import login_user
 from oauthlib.oauth2 import WebApplicationClient
 
-from models import login_model
+from models import user_model
 
 
 GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID')
@@ -26,13 +26,13 @@ def register():
         password = request.form.get('password')
 
         # 사용자 이메일 중복 검사
-        existing_user = login_model.get_user_by_email(email)
+        existing_user = user_model.get_user_by_email(email)
         if existing_user:
             flash('Email already exists.')
             return redirect(url_for('register'))
 
         # 사용자 정보 저장
-        user = login_model.save_user(email, name, password)
+        user = user_model.save_user(email, name, password)
         if user:
             flash('Successfully registered.')
             return redirect(url_for('login'))
@@ -47,7 +47,7 @@ def user_controller():
         password = request.form.get('password')
 
         # 일반 로그인 검증
-        user = login_model.validate_user(email, password)
+        user = user_model.validate_user(email, password)
         if user:
             login_user(user)
             return True
@@ -89,7 +89,7 @@ def google_callback():
     userinfo_response = requests.get(uri, headers=headers, data=body)
 
     user_info = userinfo_response.json()
-    user = login_model.save_google_user(user_info)
+    user = user_model.save_google_user(user_info)
 
     # Use Flask-Login to login user
     login_user(user)
