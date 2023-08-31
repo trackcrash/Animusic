@@ -61,7 +61,6 @@ def room_Socket(socketio):
     def playingroom_hidden(room_name):
         room_data_manager.game_status(room_name,True)
         room_status = room_data_manager._data_store[room_name]["room_info"]["room_status"]
-        print("wpqkf",room_status)
         room_data_manager.game_init(room_name)
         emit('request_room_changed', {"room_name":room_name,"room_status":room_status},  broadcast = True)
 
