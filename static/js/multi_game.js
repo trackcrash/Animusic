@@ -308,6 +308,7 @@ function initializeSocketEvents() {
         currentData = data;
         const scores = data.before_data;
         const userNames = Object.keys(scores);
+        console.log(userNames);
         const sortedScores = userNames.map(username => ({ username, ...scores[username] })).sort((a, b) => b.score - a.score);
 
         $('#scoreModalBody').empty();
@@ -339,7 +340,7 @@ function initializeSocketEvents() {
         const newUserData = currentData.new_data[player_name];
         const newExp = newUserData.exp;
         const newLevel = newUserData.level;
-        const currentExp = newUserData.nextexp;
+        const currentExp = (newUserData.nextexp);
 
         const currentUser = currentData.before_data[player_name];
         if (!currentUser) {
@@ -352,7 +353,10 @@ function initializeSocketEvents() {
 
         if (newLevel > currentUser.level) {
             $('#levelUpModal h2').text(`축하합니다! ${newLevel} 레벨이 되었습니다!`);
-            $('#levelUpModal').removeClass('hidden').addClass('fade-in-out');
+            $('#levelUpModal').removeClass('hidden');
+        } else{
+            $('#levelUpModal h2').text(`다음 레벨까지`);
+            $('#levelUpModal').removeClass('hidden');
         }
         // 사용자 정보 업데이트
         $('#userExp').text(newExp);
@@ -366,7 +370,6 @@ function initializeSocketEvents() {
 
     $('#levelUpModalCloseBtn').click(function() {
         $('#levelUpModal').addClass('hidden');
-        $('#levelUpModal').removeClass('fade-in-out');
     });
 
     socket.on('MissionSelect_get', data => {

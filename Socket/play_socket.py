@@ -15,17 +15,19 @@ def get_info_for_room(room_name):
         username = name.get('username')
         user = get_userinfo_by_name(username)
         if user:
+            nextexp = int(user.nextexp)
             user_info[username]={
                 'score': name['score'],
                 'exp' : user.exp,
-                'nextexp' : user.nextexp,
+                'nextexp' : nextexp,
                 'level' : user.level
             }
             user_update_info = exp_calculator(username,user.exp, user.nextexp, name['score'], user.level)
             update_info[username] = user_update_info
             print(user_info)
             print(update_info)
-            return user_info, update_info
+    
+    return user_info, update_info
 
 def exp_calculator(name, exp, nextexp, score, level):
     if score == 0:
@@ -34,15 +36,17 @@ def exp_calculator(name, exp, nextexp, score, level):
             'nextexp': nextexp,
             'level': level
         }
-    exp += score * 10
-    if exp >= nextexp:
-        while exp < nextexp:
+    exp += score
+    while True:
+        if exp >= nextexp:
             level += 1
             nextexp = 30+(level**1.77)
-    update_level_info(name, level, exp, nextexp)
+        else:
+            break
+    update_level_info(name, level, exp, int(nextexp))
     return {
         'exp': exp,
-        'nextexp': nextexp,
+        'nextexp': int(nextexp),
         'level': level
     }
 
@@ -129,8 +133,5 @@ def play_Socket(socketio):
             else:
                 before_data,new_data = get_info_for_room(room)
                 emit('EndOfData', {'before_data': before_data,'new_data':new_data}, room=room)
-
-
-
         else:
             emit('updateVoteCount', {'count': socket_class.vote_counts[room]}, room=room)
