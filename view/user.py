@@ -1,7 +1,7 @@
 #user_main --author: NewKyaru 30/08/2023
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import logout_user, login_required, current_user
-from controllers.user_controller import user_controller
+from controllers.user_controller import user_controller, google_login, google_callback
 from models.user_model import delete_account, account_insert, account_insert_in_googleuser, insert_character_number
 
 
@@ -61,12 +61,12 @@ def login():
         return redirect(url_for('login'))
     
 @user_bp.get('/login/google')
-def google_login():
+def move_google_login():
     return google_login()
 
 
 @user_bp.get('/login/google/callback')
-def google_callback():
+def move_google_callback():
     return google_callback()
 
 

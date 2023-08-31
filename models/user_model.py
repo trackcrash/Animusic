@@ -59,8 +59,6 @@ def commit_or_rollback():
         session.rollback()
         print(f"An error occurred: {e}")
         raise
-    finally:
-        session.close()
 
 # 일반 가입
 def save_user(email, name, password=None, is_google_authenticated=False, level=0, exp=0, nextexp=10, character=0):
