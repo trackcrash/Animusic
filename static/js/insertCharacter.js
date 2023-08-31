@@ -22,7 +22,7 @@ function sendImageIdToServer(id) {
 /* <li>
 <img id="{{ character.split('.')[0] }}" src="{{ url_for('static', filename='img/character/' + character) }}" alt="캐릭터 이미지" class="clickable-image block bg-white p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300">
 </li> */
-window.onload = function() {
+window.onload = () => {
     const CharacterSelect = document.getElementById("characterSelect");
     // CharacterEnum 객체의 키 배열을 가져옵니다.
     const characterKeys = Object.keys(CharacterEnum);
@@ -47,7 +47,7 @@ window.onload = function() {
 
         list.appendChild(img);
         CharacterSelect.appendChild(list);
-        img.addEventListener("click", function()
+        img.addEventListener("click", () =>
         {
             sendImageIdToServer(i);
         })

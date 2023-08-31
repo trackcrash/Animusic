@@ -58,7 +58,7 @@ function showHint(hint) {
 }
 
 function voteSkip() {
-    socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) }, function() {
+    socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) }, () => {
         isSkipFlag = true;
     });
 }
@@ -101,7 +101,7 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
                 'rel': 0,
             },
             events: {
-                'onReady': function(event) {
+                'onReady': (event) => {
                     // 비디오 정보를 가져와서 endTime을 설정합니다.
                     onPlayerReady(event, startTime, endTime, totalSong, nowSong, callback); // endTime와 callback 전달
                 },
@@ -110,7 +110,7 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
     } else {
         // 기존 플레이어를 사용하여 비디오를 변경합니다.
         player.cueVideoById({ videoId: videoId, startSeconds: startTime });
-        setTimeout(function() {
+        setTimeout(()=> {
             onNextReady(startTime, endTime, totalSong, nowSong, callback);
         }, 1000)
 
@@ -230,7 +230,7 @@ function initEventListeners() {
         socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
-    elements.textClear.addEventListener('click', function() {
+    elements.textClear.addEventListener('click', ()=> {
         elements.messages.innerHTML = "";
     })
 }
@@ -251,7 +251,7 @@ function initializeSocketEvents() {
         nextButton.disabled = false;
         updateVoteCountUI(0);
         showHostContent(true);
-        socket.emit('playingStatus_true', room_name, function() {
+        socket.emit('playingStatus_true', room_name, ()=> {
             let scoreItem = document.querySelectorAll(".ScoreSpan")
             for (const element of scoreItem) {
                 element.innerHTML = 0;
@@ -259,7 +259,7 @@ function initializeSocketEvents() {
         })
     });
     //다음 곡 진행
-    socket.on('NextData', function(data) {
+    socket.on('NextData', (data) => {
         currentvideolink = data.youtubeLink;
         totalPlayers = data['totalPlayers'];
         isPlayingVideo = false;
@@ -278,7 +278,7 @@ function initializeSocketEvents() {
         showHostContent(true);
     });
     //게임 끝났을 때 init
-    socket.on('EndOfData', function() {
+    socket.on('EndOfData', () => {
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
@@ -292,7 +292,7 @@ function initializeSocketEvents() {
         nextButton.style.display = "none";
         hintButton.style.display = "none";
         isPlayingVideo = false;
-        setTimeout(function() {
+        setTimeout(() => {
             player.stopVideo();
             clearInterval(gameTimerInterval);
 
@@ -316,7 +316,7 @@ function initializeSocketEvents() {
         showSongInfo(data.data.title, data.data.song, data.name);
         if (document.querySelector("#NextVideo").checked) {
             setTimeout(
-                function() {
+                () => {
                     if (!isSkipFlag) {
                         elements.nextButton.disabled = true;
                         voteSkip();
@@ -339,14 +339,14 @@ function initializeSocketEvents() {
     });
 
 
-    socket.on('updateVoteCount', function(data) {
+    socket.on('updateVoteCount', (data) => {
         skipvote = data.count;
         updateVoteCountUI(skipvote);
     });
 
 }
 
-window.onload = function() {
+window.onload = () => {
     socket.emit('create_room', { room_name: room_name }, () => {
         socket.emit('join', { room_name: room_name }, () => {
             initEventListeners();
@@ -356,7 +356,7 @@ window.onload = function() {
         })
     });
 };
-window.addEventListener('scroll', function(){
+window.addEventListener('scroll', () => {
     let scrollYvalue = window.scrollY;
     if(scrollYvalue > 140)
     {
@@ -420,7 +420,7 @@ function showHostContent(game_status) {
 
     }
 }
-document.querySelector("#VolumeBar").addEventListener("input", function() {
+document.querySelector("#VolumeBar").addEventListener("input", () => {
     if (player) {
         player.setVolume(document.querySelector("#VolumeBar").value);
     }
@@ -480,7 +480,7 @@ function setSelectedId(id) {
     videoOverlay.style.display = 'block';
 }
 
-socket.on('room_players_update', function(data) {;
+socket.on('room_players_update', (data) => {;
     if (data.room_name == room_name) {
         const item = document.createElement('div');
         item.innerHTML = `<span class="font-semibold">${data.player}</span> ${data.msg}`;
@@ -501,7 +501,7 @@ function playerListGet(players) {
     let index = 0;
 
     //캐릭터
-    Object.entries(players).forEach(function([key, value]) {
+    Object.entries(players).forEach(([key, value]) => {
         let username = value["username"];
         let score = value['score'];
         let charImg = findKeysByValue(CharacterEnum, value['character']);

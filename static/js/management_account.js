@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('form');
 
     // {{ current_user.is_google_authenticated }} 로 불러오면 token 에러발생에 의한 조치
@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let check_googleID;
     const xhr = new XMLHttpRequest();
     xhr.open('GET', '/get_current_user_is_google_authenticated', true);
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
             check_googleID = response.check_googleuser;
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
             dataType: "json",
             contentType: "application/json",
             data: data,
-            success: function(response) {
+            success: (response) => {
                 if (response.message) {
                     console.log("성공: " + response.message);
                     alert(response.message);
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log("오류: 응답 메시지 없음");
                 }
             },
-            error: function(request, status, error) {
+            error: (request, status, error) => {
                 console.log("오류: " + request.status + " - " + request.responseText);
                 alert(request.responseJSON.message);
             }

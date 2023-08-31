@@ -30,7 +30,7 @@ function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
             width: '100%',
             videoId: videoId,
             events: {
-                'onReady': function(event) {
+                'onReady': (event) => {
                     // 비디오 정보를 가져와서 endTime을 설정합니다.
                     onPlayerReady(event, startTime, endTime, callback); // endTime와 callback 전달
                 },
@@ -40,7 +40,7 @@ function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
         // 기존 플레이어를 사용하여 비디오를 변경합니다.
 
         player.cueVideoById({ videoId: videoId, startSeconds: startTime });
-        setTimeout(function() {
+        setTimeout(() => {
             onNextReady(startTime, endTime, callback)
         }, 1000)
     }
@@ -113,11 +113,11 @@ function seekTo(seconds) {
 }
 
 
-sendButton.addEventListener('click', function() {
+sendButton.addEventListener('click', () => {
     sendMessage();
 });
 
-inputMessage.addEventListener('keyup', function(event) {
+inputMessage.addEventListener('keyup', (event) => {
     if (event.key === 'Enter') {
         sendMessage();
     }
@@ -133,7 +133,7 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-nextButton.addEventListener('click', function() {
+nextButton.addEventListener('click', () => {
     isPlayingVideo = false;
     if (!skipWait) {
         nextVideo();
@@ -147,7 +147,7 @@ function sendMessage() {
         if (content) {
             socket.emit('single_message', {
                 content: content
-            }, function() {
+            }, () => {
                 checkAnswer(content);
             });
             inputMessage.value = '';
@@ -166,7 +166,7 @@ function sendMessage() {
     // }
 }
 
-socket.on('single_message', function(data) {
+socket.on('single_message', (data) => {
     const item = document.createElement('div');
     if (data.name == '') {
         data.name = 'guest'
@@ -200,7 +200,7 @@ function checkAnswer(answer) {
         showSongInfo(currentIndex);
         if (document.querySelector("#NextVideo").checked) {
             setTimeout(
-                function() {
+                () => {
                     if (!skipWait) {
                         nextVideo();
                     }
@@ -229,15 +229,15 @@ function nextVideo() {
     }
 }
 
-$(document).ready(function() {
+$(document).ready(() => {
     const missionId = new URLSearchParams(window.location.search).get('id');
-    $.getJSON("/get-music-data?id=" + missionId, function(data) {
+    $.getJSON("/get-music-data?id=" + missionId, (data) => {
         musicData = data;
         isPlayingVideo = false;
         playvideo(currentIndex, musicData[currentIndex]['startTime'], musicData[currentIndex]['endTime'], EndTimeTest);
         document.querySelector("#AllNumber").innerText = musicData.length;
     });
 });
-document.querySelector("#VolumeBar").addEventListener("input", function() {
+document.querySelector("#VolumeBar").addEventListener("input", () => {
     player.setVolume(document.querySelector("#VolumeBar").value);
 })

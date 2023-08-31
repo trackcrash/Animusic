@@ -6,7 +6,7 @@ function fetchData(url, callback) {
 
 function createRoomElement(room_name, room_status, user_count) {
     const roomContainer = document.createElement('div');
-    roomContainer.id = 'roomContainer_' + room_name;
+    roomContainer.id = `roomContainer_${room_name}`;
     roomContainer.classList.add('room-container', 'grid', 'grid-rows-1', 'gap-4', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition', 'duration-300', 'hover:bg-gray-100');
 
     const button = document.createElement('a');
@@ -30,14 +30,17 @@ function createRoomElement(room_name, room_status, user_count) {
     InnerDivContainer.appendChild(roomCountElement);
     InnerDivContainer.appendChild(roomStatusElement); // 여기에 roomStatusElement 추가
     roomContainer.appendChild(InnerDivContainer);
-    roomContainer.addEventListener('click', function() {
-        socket.emit('user_check',{"room_name":room_name});
-        // joinChatRoom(button.dataset.room_name);
-    });
-
+    ContaineraddClickListener(roomContainer, room_name);
     return roomContainer;
 }
 
+function ContaineraddClickListener(roomContainer, room_name)
+{
+    roomContainer.addEventListener('click', () => {
+        socket.emit('user_check',{"room_name":room_name});
+        // joinChatRoom(button.dataset.room_name);
+    });
+}
 function updateRoomCount(room_name, playerCount) {
     const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${room_name}`);
     if (roomCountElement) {
@@ -47,7 +50,7 @@ function updateRoomCount(room_name, playerCount) {
 
 function create_room_button() {
     // 사용자 정보를 가져옵니다.
-    fetchData("/get_user_info", function(user_id) {
+    fetchData("/get_user_info", (user_id) => {
         if (user_id) { // 사용자가 로그인된 경우
             const room_name = prompt("방 이름을 입력하세요:");
             if (room_name && room_name.trim() !== '') {
@@ -67,14 +70,14 @@ function joinChatRoom(room_name) {
 }
 
 function firstCreateRoom() {
-    fetchData("/get_user_info", function(user_id) {
+    fetchData("/get_user_info", (user_id) => {
         if (!user_id) {
             alert("로그인 후에 이용가능합니다.");
             location.href = "/login";
             return;
         }
 
-        fetchData("/get-room-dict", function(room_dict) {
+        fetchData("/get-room-dict", (room_dict) => {
             const roomButtonsContainer = document.getElementById('room-buttons');
             for (let room_name in room_dict) {
                 const roomInfo = room_dict[room_name]["room_info"];
@@ -106,34 +109,33 @@ function removeRoomFromList(room_name) {
     }
 }
 
-window.onload = function() {
-    socket.emit('Waiting',function()
-    {
+window.onload = () => {
+    socket.emit('Waiting',()=>{
         firstCreateRoom();
     }); // 클라이언트에서 서버로 데이터를 전송
 
 }
 
-socket.on('room_players_update', function(data) {;
+socket.on('room_players_update', (data)=> {;
     updateRoomCount(data.room_name, data.player_count);
 });
 
-socket.on('room_update', function(data) {
-    fetchData("/get_user_info", function(user_id) {
+socket.on('room_update', (data) => {
+    fetchData("/get_user_info", (user_id) => {
         if (!user_id) return;
         addRoomToList(data);
     });
 });
 
-socket.on('Do_not_create_duplicates', function() {
+socket.on('Do_not_create_duplicates', () => {
     alert("방을 중복생성 할 수 없습니다.");
 });
 
-socket.on('user_check_not_ok', function() {
+socket.on('user_check_not_ok', () => {
     alert("입장 제한");
 });
 
-socket.on('room_removed', (data)=>
+socket.on('room_removed', (data) =>
 {
     console.log("삭제되었습니다.");
     removeRoomFromList(data);
@@ -143,13 +145,13 @@ socket.on('Join_room', (data)=>
     joinChatRoom(data);
 })
 
-socket.on('update_waiting_userlist', function(data) {
+socket.on('update_waiting_userlist', (data) => {
     let userlist = document.getElementById("userlist");
     userlist.innerText = "현재 대기실 인원 수: " + Object.keys(data).length + "명\n" + Object.keys(data).join('\n');
 });
 
 // 해당 방을 안보이게 처리함
-socket.on('request_room_changed', function(data) {
+socket.on('request_room_changed', (data) => {
     let playing = data["room_status"];
     if(playing)
     {
@@ -159,7 +161,7 @@ socket.on('request_room_changed', function(data) {
         document.getElementById('roomContainer_' + data["room_name"]).querySelector('.room-status').innerText = "대기중";
     }
 });
-socket.on("room_full_user", function(data)
+socket.on("room_full_user", (data) =>
 {
     alert(data+"방의 인원이 가득 차있습니다.");
 })
