@@ -11,7 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
     <script src="{{ url_for('static', filename='js/characterEnum.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/Socket_function.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/socket_function.js') }}"></script>
+
 </head>
 
 <body class="bg-gray-100 font-sans">
@@ -19,9 +20,7 @@
 
     <div class="flex mt-1 mx-4">
         <!-- Left Players Section -->
-        <div class="w-1/4 pr-8" id="Players_Box_Left">
-
-        </div>
+        <div id="Players_Box_Left" class="w-1/4"></div>
 
         <!-- Middle Section (Video, Buttons, Song Info, Chat) -->
         <div class="w-2/4 px-2 mx-4">

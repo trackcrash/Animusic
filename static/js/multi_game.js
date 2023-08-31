@@ -356,6 +356,15 @@ window.onload = function() {
         })
     });
 };
+window.addEventListener('scroll', function(){
+    let scrollYvalue = window.scrollY;
+    if(scrollYvalue > 140)
+    {
+        this.document.getElementById('Players_Box_Left').style.transform = `translateY(${scrollYvalue-140}px)`;
+        this.document.getElementById('Players_Box_Right').style.transform = `translateY(${scrollYvalue-140}px)`
+
+    }
+});
 socket.on("user_change", (data) => {
     console.log(data["totalPlayer"]);
     let count = data["count"];

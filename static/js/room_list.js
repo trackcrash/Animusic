@@ -107,7 +107,11 @@ function removeRoomFromList(room_name) {
 }
 
 window.onload = function() {
-    firstCreateRoom();
+    socket.emit('Waiting',function()
+    {
+        firstCreateRoom();
+    }); // 클라이언트에서 서버로 데이터를 전송
+
 }
 
 socket.on('room_players_update', function(data) {;
@@ -155,3 +159,7 @@ socket.on('request_room_changed', function(data) {
         document.getElementById('roomContainer_' + data["room_name"]).querySelector('.room-status').innerText = "대기중";
     }
 });
+socket.on("room_full_user", function(data)
+{
+    alert(data+"방의 인원이 가득 차있습니다.");
+})

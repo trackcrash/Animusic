@@ -39,7 +39,8 @@ class RoomDataManger:
                 "room_info":{
                     "session_id":session_id,
                     #room_password, room_status, playing\
-                    "room_status" : False
+                    "room_status" : False,
+                    "room_full_user" : 8
                 },
                 "user":
                 {
@@ -88,7 +89,9 @@ class RoomDataManger:
         dictionaryData = self._data_store[room_name]['user']
         for key, value in dictionaryData.items():
             value['score'] = 0
-
+    def room_user_check(self, room_name):
+        playerNum = len(self._data_store[room_name]['user'])
+        return playerNum
 room_data_manager = RoomDataManger()
 class MusicDataManager:
     def __init__(self):
