@@ -16,10 +16,9 @@ function delete_mission()
         location.href=delete_link;
     }
 }
-document.getElementById('delete-btn').addEventListener("click", ()=>
-{
-    delete_mission();
-})
+
+const delete_btn = document.getElementById('delete-btn');
+if (delete_btn) {delete_btn.addEventListener("click", ()=> {delete_mission()})}
 
 function zero_space_text() {
     const inputText = answerInput.value;
@@ -303,15 +302,15 @@ function box_element(item) {
     }
 }
 
-//save이벤트
-function saveBtn() {
+//upload이벤트 (SaveBtn, UpdateBtn 통합)
+function UploadBtn(event) {
     const items = document.querySelectorAll('.grid-item.box');
-    let data = [];
+    let upload_url, data = [];
     items.forEach(item => {
 
         let {id, title, song, thumbnail, songURL, answer, hint, startTime, endTime} = box_element(item);
 
-        data.push({
+        let song_entry = {
             title: title,
             song: song,
             thumbnail: thumbnail,
@@ -320,79 +319,38 @@ function saveBtn() {
             hint: hint,
             startTime: startTime,
             endTime: endTime
-        });
+        };
+
+        if(id == "" || id == null) {
+            data.push(song_entry);
+        } else {
+            song_entry.Music_id = id;
+            data.push(song_entry);
+        };
     });
-    data.push({
+
+    let map_entry = {
         MapName: document.querySelector("#MapName-input").value,
         MapProducer: document.querySelector("#User_Name").innerHTML,
         Thumbnail: data[0].thumbnail || 'basic'
-    })
+    };
+
+    if (event.target.id === "save-btn") {
+        data.push(map_entry);
+
+        upload_url = "/submit-to-db";
+
+    } else if (event.target.id === "update-btn") {
+        map_entry.mission_Id = document.querySelector("#Mission_id").innerHTML;
+        data.push(map_entry);
+
+        upload_url = "update-to-db";
+
+    };
     data = JSON.stringify(data);
     $.ajax({
         type: "POST",
-        url: "/submit-to-db",
-        dataType: "json",
-        contentType: "application/json",
-        data: data,
-        error: (request, status, error) => {
-            console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
-
-        },
-        success: (data) => {
-            console.log("통신데이터 값 : ", data);
-            alert("등록 완료되었습니다.");
-            window.location.href = '/Map'
-        }
-    });
-};
-
-//update이벤트
-function UpdateBtn() {
-    const items = document.querySelectorAll('.grid-item.box');
-    let data = [];
-    items.forEach(item => {
-
-        let {id, title, song, thumbnail, songURL, answer, hint, startTime, endTime} = box_element(item);
-
-        if(id == "" || id == null)
-        {
-            data.push({
-                title: title,
-                song: song,
-                thumbnail: thumbnail,
-                songURL: songURL,
-                answer: answer,
-                hint: hint,
-                startTime: startTime,
-                endTime: endTime
-            });
-        }
-        else
-        {
-            data.push({
-                Music_id : id,
-                title: title,
-                song: song,
-                thumbnail: thumbnail,
-                songURL: songURL,
-                answer: answer,
-                hint: hint,
-                startTime: startTime,
-                endTime: endTime
-            });
-        }
-
-    });
-    data.push({
-        MapName: document.querySelector("#MapName-input").value,
-        MapProducer: document.querySelector("#User_Name").innerHTML,
-        mission_Id : document.querySelector("#Mission_id").innerHTML,
-        Thumbnail : data[0].thumbnail || 'basic'
-    })
-    data = JSON.stringify(data);
-    $.ajax({
-        type: "POST",
-        url: "/update-to-db",
+        url: upload_url,
         dataType: "json",
         contentType: "application/json",
         data: data,
@@ -407,13 +365,14 @@ function UpdateBtn() {
     });
 };
 
-$("#update-btn").on("click", UpdateBtn);
-$("#save-btn").on("click", saveBtn);
+$("#update-btn").on("click", UploadBtn);
+$("#save-btn").on("click", UploadBtn);
 /* grid-container 안에 아이템이 3줄 이상일 경우 아이템의 높이를 줄이는 기능 */
 
 // grid-container 가로 세로 길이를 px단위로 정의함
 let container_width = document.getElementById('grid-container').clientWidth;
 let container_height = document.getElementById('grid-container').clientHeight;
+let box_width = 0, box_height = 0;
 
 // container_width, container_height 를 재 정의함
 function resize_variable_declaration() {
@@ -421,8 +380,8 @@ function resize_variable_declaration() {
     //grid-container 안의 아이템의 가로 세로 길이를 px단위로 정의함
     if (!document.querySelector('.box')) {return};
 
-    let box_width = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('width'));
-    let box_height = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('height'));
+    box_width = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('width'));
+    box_height = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('height'));
 
     container_width = document.getElementById('grid-container').clientWidth;
     container_height = document.getElementById('grid-container').clientHeight;
