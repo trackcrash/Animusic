@@ -142,7 +142,7 @@ def update_to_db(data):
 def update_to_db(data):
     try:
         data = deque(data)
-        map_name = data[1]['MapName']
+        map_name = data[-1]['MapName']
         mission_data = data.pop()
         mission_id = mission_data['mission_Id']
         now_mission_info = session.query(Mission).filter_by(id=mission_id).first()
