@@ -29,16 +29,16 @@ def register():
         existing_user = user_model.get_user_by_email(email)
         if existing_user:
             flash('Email already exists.')
-            return redirect(url_for('register'))
+            return redirect(url_for('user.register'))
 
         # 사용자 정보 저장
         user = user_model.save_user(email, name, password)
         if user:
             flash('Successfully registered.')
-            return redirect(url_for('login'))
+            return redirect(url_for('user.login'))
         else:
             flash('Registration failed.')
-            return redirect(url_for('register'))
+            return redirect(url_for('user.register'))
 
 
 def user_controller():

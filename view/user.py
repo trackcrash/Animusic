@@ -2,6 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import logout_user, login_required, current_user
 from controllers.user_controller import user_controller, google_login, google_callback
+from controllers.user_controller import register as user_register
 from models.user_model import delete_account, account_insert, account_insert_in_googleuser, insert_character_number
 
 
@@ -58,7 +59,7 @@ def login():
             return redirect(url_for('index'))
 
         flash('Invalid email or password')
-        return redirect(url_for('login'))
+        return redirect(url_for('user.login'))
     
 @user_bp.get('/login/google')
 def move_google_login():
@@ -80,7 +81,7 @@ def logout():
 @user_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        return register()
+        return user_register()
     return render_template('register.html')
 
 @user_bp.route('/select_character')

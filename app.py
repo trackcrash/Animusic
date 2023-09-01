@@ -1,5 +1,5 @@
 #flask main --author: NewKyaru 11/08/2023
-from decouple import config
+from decouple import config 
 from flask import Flask,render_template, send_file
 from flask_login import LoginManager, current_user
 #controller&model&view(blueprint)
