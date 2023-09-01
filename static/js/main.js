@@ -3,6 +3,23 @@ let modifyIndex = null;
 modifyFunction();
 const zero_space = document.getElementById('zero_space');
 const answerInput = document.getElementById('answer-input');
+function delete_mission()
+{
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Get the 'id' parameter value
+    const id = urlParams.get('id');
+
+    if(confirm("정말 삭제하시겠습니까?"))
+    {
+        let delete_link = `/delete-mission?id=${id}`;
+        location.href=delete_link;
+    }
+}
+document.getElementById('delete-btn').addEventListener("click", ()=>
+{
+    delete_mission();
+})
 
 function zero_space_text() {
     const inputText = answerInput.value;
