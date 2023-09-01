@@ -104,6 +104,9 @@ class RoomDataManger:
             callback()  # 콜백 함수 호출
 
     def is_user_in_room(self, user_name, room_name):
+        if room_name not in self._data_store:  # 방 이름이 존재하지 않는 경우
+            return False  # 사용자는 방에 없는 것으로 간주
+
         dictionaryData = self._data_store[room_name]['user']
         for key, value in dictionaryData.items():
             if 'username' in value and value['username'] == user_name:

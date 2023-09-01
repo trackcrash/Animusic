@@ -1,8 +1,9 @@
 from flask import render_template, Blueprint
-from flask_login import current_user
+from flask_login import current_user, login_required
 room_bp = Blueprint('room', __name__, url_prefix='')
 
 @room_bp.route('/room_list')
+@login_required
 def room_list():
     if current_user.is_authenticated == False:
         user_id = ""
