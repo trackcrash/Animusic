@@ -3,7 +3,7 @@ from controllers.map_controller import show_table_bymissionid
 from models.user_model import get_user_by_id
 from flask import jsonify
 from flask_login import current_user
-
+from models.user_model import get_userinfo_by_name
 class RoomDataManger:
     def __init__(self):
         self._data_store = dict()
@@ -54,10 +54,32 @@ class RoomDataManger:
     
     def join(self, room_name, session_id, current_user,time):
         user_name = current_user.name
-        character = get_user_by_id(current_user.id).character
+        user=get_user_by_id(current_user.id)
+        character = user.character
+        level = user.level
         character_link = str(character)
         print(f"{room_name}방에 연결되었습니다.")
-        user_data = {'username': user_name , 'host':0 ,'score':0 ,'joined_time' : time.time(), 'character':character_link}  # 유저 데이터를 리스트로 생성
+        user_data = {'username': user_name , 'host':0 ,'score':0 ,'joined_time' : time.time(), 'character':character_link,'level':level}  # 유저 데이터를 리스트로 생성
+        dict_join(self._data_store[room_name]["user"], session_id, user_data)
+    
+    def get_all_session_ids_in_rooms(self):
+        session_ids = []
+
+        # 모든 방에 대해서 반복
+        for room_name, room_data in self._data_store.items():
+            if "user" in room_data:
+                # 방에 있는 모든 세션 아이디를 리스트에 추가
+                session_ids.extend(room_data["user"].keys())
+
+        return session_ids
+    def user_update(self, room_name, session_id):
+        user_name=self._data_store[room_name]["user"][session_id]['username']
+        user = get_userinfo_by_name(user_name)
+        character = user.character
+        level = user.level
+        character_link = str(character)
+        previous_user = self._data_store[room_name]["user"][session_id]
+        user_data = {'username': user_name , 'host':previous_user['host'] ,'score':previous_user['score'] ,'joined_time' :previous_user['joined_time'], 'character':character_link,'level':level}
         dict_join(self._data_store[room_name]["user"], session_id, user_data)
 
     def host_setting(self,room_name, callback=None):  

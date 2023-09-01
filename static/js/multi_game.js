@@ -310,7 +310,7 @@ function initializeSocketEvents() {
         const userNames = Object.keys(scores);
         console.log(userNames);
         const sortedScores = userNames.map(username => ({ username, ...scores[username] })).sort((a, b) => b.score - a.score);
-
+        
         $('#scoreModalBody').empty();
 
         for (let i = 0; i < sortedScores.length; i++) {
@@ -328,6 +328,9 @@ function initializeSocketEvents() {
         }
 
         $('#scoreModal').removeClass('hidden');
+        let players = data['players'];
+        console.log(players);
+        playerListGet(players)
     });
 
     $('#scoreModalCloseBtn').click(function() {
@@ -336,36 +339,40 @@ function initializeSocketEvents() {
             console.warn("Data is missing!");
             return;
         }
-
         const newUserData = currentData.new_data[player_name];
         const newExp = newUserData.exp;
         const newLevel = newUserData.level;
         const currentExp = (newUserData.nextexp);
 
         const currentUser = currentData.before_data[player_name];
+
         if (!currentUser) {
             console.warn("Current user data is missing!");
             return;
         }
-        const expPercentage = (newExp / currentExp) * 100;
-        $('#expBar').css('width', `${expPercentage}%`);
-        $('#expText').text(`${newExp}/${currentExp}`);
+        if(currentUser.level != -1)
+        {
+            const expPercentage = (newExp / currentExp) * 100;
+            $('#expBar').css('width', `${expPercentage}%`);
+            $('#expText').text(`${newExp}/${currentExp}`);
 
-        if (newLevel > currentUser.level) {
-            $('#levelUpModal h2').text(`축하합니다! ${newLevel} 레벨이 되었습니다!`);
-            $('#levelUpModal').removeClass('hidden');
-        } else{
-            $('#levelUpModal h2').text(`다음 레벨까지`);
-            $('#levelUpModal').removeClass('hidden');
+            if (newLevel > currentUser.level) {
+                $('#levelUpModal h2').text(`축하합니다! ${newLevel} 레벨이 되었습니다!`);
+                $('#levelUpModal').removeClass('hidden');
+            } else{
+                $('#levelUpModal h2').text(`다음 레벨까지`);
+                $('#levelUpModal').removeClass('hidden');
+            }
+            // 사용자 정보 업데이트
+            $('#userExp').text(newExp);
+            $('#userLevel').text(newLevel);
+
+            currentUser.exp = newExp;
+            currentUser.level = newLevel;
+
+            currentData = null;
         }
-        // 사용자 정보 업데이트
-        $('#userExp').text(newExp);
-        $('#userLevel').text(newLevel);
-
-        currentUser.exp = newExp;
-        currentUser.level = newLevel;
-
-        currentData = null;
+        
     });
 
     $('#levelUpModalCloseBtn').click(function() {
@@ -567,11 +574,16 @@ function playerListGet(players) {
     rightContainer.innerHTML = "";
 
     let index = 0;
-
+    
     //캐릭터
     Object.entries(players).forEach(([key, value]) => {
         let username = value["username"];
         let score = value['score'];
+        let level = value['level'];
+        if(level == -1)
+        {
+            level = "GM";
+        }
         let charImg = findKeysByValue(CharacterEnum, value['character']);
         let characterImageUrl = getCharacter(charImg);
         console.log(characterImageUrl);
@@ -583,6 +595,7 @@ function playerListGet(players) {
         );
         userDiv.innerHTML = `
             <div class="space-y-3 text-center">
+                <p class="font-semibold">${level}</p>
                 <p class="font-semibold text-lg text-gray-800">${username}</p>
                 <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
                 <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>

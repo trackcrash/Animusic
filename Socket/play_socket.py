@@ -22,14 +22,20 @@ def get_info_for_room(room_name):
                 'nextexp' : nextexp,
                 'level' : user.level
             }
-            user_update_info = exp_calculator(username,user.exp, user.nextexp, name['score'], user.level)
+            user_update_info = exp_calculator(username,user.exp, user.nextexp, name['score'], user.level, room_name,session_id)
             update_info[username] = user_update_info
             print(user_info)
             print(update_info)
     
     return user_info, update_info
 
-def exp_calculator(name, exp, nextexp, score, level):
+def exp_calculator(name, exp, nextexp, score, level, room_name,session_id):
+    if level == -1:
+        return {
+            'exp': exp,
+            'nextexp': nextexp,
+            'level': level
+        }
     if score == 0:
         return {
             'exp': exp,
@@ -44,6 +50,7 @@ def exp_calculator(name, exp, nextexp, score, level):
         else:
             break
     update_level_info(name, level, exp, int(nextexp))
+    room_data_manager.user_update(room_name,session_id)
     return {
         'exp': exp,
         'nextexp': int(nextexp),
@@ -132,6 +139,7 @@ def play_Socket(socketio):
                 emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers, "startTime": startTime, "endTime":endTime, 'totalSong':totalSong,'nowSong':nowSong}, room=room)
             else:
                 before_data,new_data = get_info_for_room(room)
-                emit('EndOfData', {'before_data': before_data,'new_data':new_data}, room=room)
+                emit('EndOfData', {'before_data': before_data,'new_data':new_data,'players': room_data_manager._data_store[room]['user']}, room=room)
         else:
             emit('updateVoteCount', {'count': socket_class.vote_counts[room]}, room=room)
+
