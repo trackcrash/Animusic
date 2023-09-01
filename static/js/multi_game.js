@@ -81,8 +81,8 @@ function dummyplay() {
 }
 
 function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, callback = null) {
-    let videoFrame = document.getElementById("videoFrame");
     const videoId = getYoutubeVideoId(videolink);
+    let videoFrame;
     AbleCheckAnswerTime = 1;
     if (!videoId) {
         console.error("Invalid YouTube URL provided");
@@ -90,19 +90,16 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
     }
     if (player) {
         player.destroy();
+        document.querySelector("div #videoFrame").remove();
         isVideoPlaying = false;
-        console.log("destroy");
+        videoFrame = document.createElement("div");
+        videoFrame.id = "videoFrame";
+        videoFrame.classList.add("absolute", "top-0", "left-0" ,"w-full", "h-full")
+        document.getElementById("videoContainer").insertBefore(videoFrame , document.getElementById("videoOverlay"));
     }
+    videoFrame = document.getElementById("videoFrame");
 
     // videoFrame 초기화
-    videoFrame = document.createElement("div");
-    videoFrame.id = "videoFrame";
-    videoFrame.classList.add("absolute", "top-0", "left-0" ,"w-full", "h-full")
-    document.getElementById("videoContainer").insertBefore(videoFrame , document.getElementById("videoOverlay"));
-
-    console.log(videoFrame);
-    console.log(videoId);
-
     player = new YT.Player(videoFrame, {
         height: '100%',
         width: '100%',
@@ -147,17 +144,6 @@ function getPlayerState() {
     }
 }
 
-
-// function onPlayerReady(event, startTime, endTime, totalSong, nowSong, callback) {
-//     clearInterval(gameTimerInterval);
-//     event.target.playVideo();
-// }
-
-// function onNextReady(startTime, videoId) {
-//     clearInterval(gameTimerInterval);
-//     player.cueVideoById({ videoId: videoId, startSeconds: startTime });
-//     player.playVideo();
-// }
 function OnNextPlay(startTime, endTime,totalSong, nowSong,callback)
 {
     setVolume(document.querySelector("#VolumeBar").value);
@@ -170,9 +156,6 @@ function OnNextPlay(startTime, endTime,totalSong, nowSong,callback)
     }
     
     callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
-    dummyplay();
-    // videoFrame 요소의 title 속성이 표시되지 않게 함 (주소는 지울 수가 없음...)
-    // videoFrame.removeAttribute("title");
 }
 
 function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
@@ -197,6 +180,9 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
     document.querySelector("#AllNumber").innerText = totalSong;
     document.querySelector("#nowNumber").innerText = nowSong;
     isSkipFlag = false;
+     // videoFrame 요소의 title 속성이 표시되지 않게 함 (주소는 지울 수가 없음...)
+     document.getElementById("videoFrame").removeAttribute("title");
+     dummyplay();
 }
 
 function getYoutubeVideoId(url) {
