@@ -14,6 +14,7 @@ let isSkipFlag = true;
 let currentData = null;
 let isVideoPlaying = false;
 let AbleCheckAnswerTime;
+let Num = 0;
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -60,6 +61,7 @@ function showHint(hint) {
 }
 
 function voteSkip() {
+    elements.nextButton.disabled = true;
     socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) }, () => {
         isSkipFlag = true;
     });
@@ -77,7 +79,6 @@ function dummyplay() {
     dummy.innerHTML = "";
     dummy.style.display = 'none';
     dummy.appendChild(iframe);
-    console.log("더미재생중");
 }
 
 function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, callback = null) {
@@ -110,13 +111,11 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
         },
         events: {
             'onReady': (event) => {
-                console.log("호출확인");
                 onPlayerEvent(startTime, endTime);
             },
             'onStateChange': (event) => {
                 const playerState = event.data;
                 if (playerState === 1 && !isVideoPlaying) {
-                    getPlayerState(); // 필요한 경우 getPlayerState()를 호출                        
                     OnNextPlay(startTime, endTime, totalSong, nowSong, callback)
                     isVideoPlaying = true;
                 }
@@ -124,8 +123,8 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
         }
     });
 
-    console.log(player);
     videoOverlay.style.display = 'block';
+    
 }
 
 
@@ -133,14 +132,6 @@ function onPlayerEvent(startTime) {
     player.playVideo();
     if (startTime > 0) {
         seekTo(startTime);
-    }
-}
-function getPlayerState() {
-    if (player) {
-        const playerState = player.getPlayerState();
-        console.log('플레이어 상태:', playerState);
-    } else {
-        console.log('플레이어가 아직 생성되지 않았습니다.');
     }
 }
 
@@ -165,24 +156,26 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
     }
     GameTimer = endTime - startTime;
     gameTimerInterval = setInterval(() => {
-        document.querySelector("#GameTimer span").innerText = GameTimer;
+        document.querySelector("#GameTimer span").innerText = parseInt(GameTimer);
         if(AbleCheckAnswerTime != 0)
         {
             AbleCheckAnswerTime--;
         }
         if (GameTimer <= 0) {
-            voteSkip();
+            if(!isSkipFlag)
+            {
+                voteSkip();
+            }
             return;
         }
         GameTimer--;
-      
     }, 1000);
     document.querySelector("#AllNumber").innerText = totalSong;
     document.querySelector("#nowNumber").innerText = nowSong;
     isSkipFlag = false;
-     // videoFrame 요소의 title 속성이 표시되지 않게 함 (주소는 지울 수가 없음...)
-     document.getElementById("videoFrame").removeAttribute("title");
-     dummyplay();
+    // videoFrame 요소의 title 속성이 표시되지 않게 함 (주소는 지울 수가 없음...)
+    document.getElementById("videoFrame").removeAttribute("title");
+    elements.nextButton.disabled = false;
 }
 
 function getYoutubeVideoId(url) {
@@ -193,11 +186,7 @@ function getYoutubeVideoId(url) {
 //볼륨용
 function setVolume(volumeLevel) {
     if (player && player.setVolume) {
-        console.log(player.isMuted);
-        if (player.isMuted()) {
-            player.unMute();
-            console.log("음소거가 해제되었습니다.");
-        }
+        player.unMute();
         player.setVolume(volumeLevel);
     }
 }
@@ -224,7 +213,6 @@ function initEventListeners() {
     });
     elements.nextButton.addEventListener('click', () => {
         if (!isSkipFlag) {
-            elements.nextButton.disabled = true;
             voteSkip();
         }
     });
@@ -232,7 +220,6 @@ function initEventListeners() {
     document.addEventListener('keydown', (event) => {
         if (event.key === 'End' && elements.nextButton.disabled === false) {
             if (!isSkipFlag) {
-                elements.nextButton.disabled = true;
                 voteSkip();
             }
         }
@@ -308,17 +295,18 @@ function initializeSocketEvents() {
         nextButton.disabled = true;
         nextButton.style.display = "none";
         document.getElementById('skipVoteCount').innerText = "";
-        console.log("재생종료");
         nextButton.style.display = "none";
         hintButton.style.display = "none";
-        player.stopVideo();
+        if(player && player.stopVideo)
+        {
+            player.stopVideo();
+        }
         clearInterval(gameTimerInterval);
         socket.emit('playingStatus_false', room_name);
         showHostContent(false);
         currentData = data;
         const scores = data.before_data;
         const userNames = Object.keys(scores);
-        console.log(userNames);
         const sortedScores = userNames.map(username => ({ username, ...scores[username] })).sort((a, b) => b.score - a.score);
 
         $('#scoreModalBody').empty();
@@ -339,7 +327,6 @@ function initializeSocketEvents() {
 
         $('#scoreModal').removeClass('hidden');
         let players = data['players'];
-        console.log(players);
         playerListGet(players)
     });
 
@@ -412,7 +399,6 @@ function initializeSocketEvents() {
             showSongInfo(data.data.title, data.data.song, data.name);
             if (document.querySelector("#NextVideo").checked) {
                 if (!isSkipFlag) {
-                    elements.nextButton.disabled = true;
                     voteSkip();
                 }                        
             }
@@ -445,7 +431,6 @@ window.onload = () => {
             initEventListeners();
             initializeSocketEvents();
             showHostContent(false);
-            dummyplay();
         })
     });
 };
@@ -458,7 +443,6 @@ window.addEventListener('scroll', function() {
     }
 });
 socket.on("user_change", (data) => {
-    console.log(data["totalPlayer"]);
     let count = data["count"];
     totalPlayers = data["totalPlayers"];
     updateVoteCountUI(count);
@@ -602,7 +586,6 @@ function playerListGet(players) {
         }
         let charImg = findKeysByValue(CharacterEnum, value['character']);
         let characterImageUrl = getCharacter(charImg);
-        console.log(characterImageUrl);
         let userDiv = document.createElement("div");
         userDiv.classList.add(
             "bg-white", "border-2", "border-gray-300", "p-4",
