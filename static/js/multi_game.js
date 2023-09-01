@@ -61,10 +61,13 @@ function showHint(hint) {
 }
 
 function voteSkip() {
-    elements.nextButton.disabled = true;
-    socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) }, () => {
-        isSkipFlag = true;
-    });
+    if(AbleCheckAnswerTime == 0)
+    {
+        elements.nextButton.disabled = true;
+        socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers),"TimeOut": (AbleCheckAnswerTime==0? true:false ) }, () => {
+            isSkipFlag = true;
+        });
+    }
 }
 
 
@@ -297,10 +300,7 @@ function initializeSocketEvents() {
         document.getElementById('skipVoteCount').innerText = "";
         nextButton.style.display = "none";
         hintButton.style.display = "none";
-        if(player && player.stopVideo)
-        {
-            player.stopVideo();
-        }
+        player.stopVideo();
         clearInterval(gameTimerInterval);
         socket.emit('playingStatus_false', room_name);
         showHostContent(false);
