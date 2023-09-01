@@ -1,3 +1,4 @@
+from threading import Lock
 from flask_socketio import emit
 from flask import request
 from controllers import map_controller
@@ -6,7 +7,7 @@ from models.play_model import make_answer, music_data_manager, room_data_manager
 from Socket.socket import socket_class
 from models.room_model import update_room_player_count
 from models.user_model import get_userinfo_by_name, update_level_info
-
+vote_lock = Lock()
 def get_info_for_room(room_name):
     data = room_data_manager._data_store[room_name]['user']
     user_info = {}
@@ -46,7 +47,7 @@ def exp_calculator(name, exp, nextexp, score, level, room_name,session_id):
     while True:
         if exp >= nextexp:
             level += 1
-            nextexp = 30+(level**1.77)
+            nextexp += 30+(level**1.77)
         else:
             break
     update_level_info(name, level, exp, int(nextexp))
@@ -113,34 +114,34 @@ def play_Socket(socketio):
     #스킵투표
     @socketio.on('voteSkip')
     def handle_vote_skip(data):
-        room = data.get("room")
-        user = current_user.name
-        if room not in socket_class.vote_counts:
-            socket_class.vote_counts[room] = 0
-        if user not in socket_class.voted_users:
-            socket_class.voted_users[room] = [] 
-        # 이름 기준으로 이미 투표한 사용자는 다시 투표할 수 없도록 처리
-        if user in socket_class.voted_users[room]:
-            return
-        socket_class.vote_counts[room] += 1
-        socket_class.voted_users[room].append(user)
-        required_votes = data['requiredSkipVotes']
-        if socket_class.vote_counts[room] >= required_votes:
-            player_count = socket_class.vote_counts[room]
-            socket_class.vote_counts[room] = 0
-            socket_class.voted_users[room] = [] #초기화
-            next_data = music_data_manager.retrieve_next_data(room)
-            if next_data:
-                socket_class.totalPlayers = len(room_data_manager._data_store[room]['user'])
-                youtube_embed_url = next_data['youtube_embed_url']
-                startTime = float(next_data['startTime'])
-                endTime = float(next_data['endTime'])
-                totalSong = len(music_data_manager._data_store[room]['data'])
-                nowSong = int(music_data_manager._data_store.get(room, {})['current_index'])+1
-                emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers, "startTime": startTime, "endTime":endTime, 'totalSong':totalSong,'nowSong':nowSong}, room=room)
+        with vote_lock:
+            room = data.get("room")
+            user = current_user.name
+            if room not in socket_class.vote_counts:
+                socket_class.vote_counts[room] = 0
+            if user not in socket_class.voted_users:
+                socket_class.voted_users[room] = [] 
+            # 이름 기준으로 이미 투표한 사용자는 다시 투표할 수 없도록 처리
+            if user in socket_class.voted_users[room]:
+                return
+            socket_class.vote_counts[room] += 1
+            socket_class.voted_users[room].append(user)
+            required_votes = data['requiredSkipVotes']
+            if socket_class.vote_counts[room] >= required_votes:
+                player_count = socket_class.vote_counts[room]
+                socket_class.vote_counts[room] = 0
+                socket_class.voted_users[room] = [] #초기화
+                next_data = music_data_manager.retrieve_next_data(room)
+                if next_data:
+                    socket_class.totalPlayers = len(room_data_manager._data_store[room]['user'])
+                    youtube_embed_url = next_data['youtube_embed_url']
+                    startTime = float(next_data['startTime'])
+                    endTime = float(next_data['endTime'])
+                    totalSong = len(music_data_manager._data_store[room]['data'])
+                    nowSong = int(music_data_manager._data_store.get(room, {})['current_index'])+1
+                    emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers, "startTime": startTime, "endTime":endTime, 'totalSong':totalSong,'nowSong':nowSong}, room=room)
+                else:
+                    before_data,new_data = get_info_for_room(room)
+                    emit('EndOfData', {'before_data': before_data,'new_data':new_data,'players': room_data_manager._data_store[room]['user']}, room=room)
             else:
-                before_data,new_data = get_info_for_room(room)
-                emit('EndOfData', {'before_data': before_data,'new_data':new_data,'players': room_data_manager._data_store[room]['user']}, room=room)
-        else:
-            emit('updateVoteCount', {'count': socket_class.vote_counts[room]}, room=room)
-
+                emit('updateVoteCount', {'count': socket_class.vote_counts[room]}, room=room)
