@@ -90,59 +90,10 @@ def save_to_db(data):
 
 
 # 코드 구조개선 --kyaru 16/08/23 12:00
-'''
-def update_to_db(data):
-    try:
-        mission_id = int(data[-1]['mission_Id'])
-        existing_music_ids = [item.id for item in session.query(Music).filter_by(mission_id=mission_id).all()]
-        ids_to_keep = {int(item['Music_id']) for item in data if 'Music_id' in item}
-
-        for music_id in existing_music_ids:
-            if music_id not in ids_to_keep:
-                session.query(Music).filter_by(id=music_id).delete()
-
-        for item in data:
-            if 'mission_Id' in item:
-                mission_query = session.query(Mission).filter_by(id=mission_id).first()
-                if mission_query:
-                    mission_query.MapName = item.get('MapName', mission_query.MapName)
-                    mission_query.MapProducer = item.get('MapProducer', mission_query.MapProducer)
-                    mission_query.Thumbnail = item.get('Thumbnail', mission_query.Thumbnail)
-
-            if 'Music_id' in item:
-                music_id = int(item['Music_id'])
-                music_query = session.query(Music).filter_by(id=music_id).first()
-                if music_query:
-                    music_query.title = item.get('title', music_query.title)
-                    music_query.song = item.get('song', music_query.song)
-                    music_query.youtube_url = item.get('songURL',
-                                                       music_query.youtube_url)  # Note the change in attribute name
-                    music_query.thumbnail_url = item.get('thumbnail',
-                                                         music_query.thumbnail_url)  # Note the change in attribute name
-                    music_query.answer = item.get('answer', music_query.answer)
-                    music_query.hint = item.get('hint', music_query.hint)
-                else:
-                    new_music = Music(
-                        item['title'], item['song'], item['songURL'],
-                        item['thumbnail'], item['answer'], item.get('hint'),
-                        mission_id=mission_id
-                    )
-                    session.add(new_music)
-
-
-        session.commit()
-    except SQLAlchemyError as e:
-        session.rollback()
-        error_msg = f'Error saving data: {str(e)}'
-        print(error_msg)
-        return error_msg
-    finally:
-        session.close()
-'''
 def update_to_db(data):
     try:
         data = deque(data)
-        map_name = data[1]['MapName']
+        map_name = data[-1]['MapName']
         mission_data = data.pop()
         mission_id = mission_data['mission_Id']
         now_mission_info = session.query(Mission).filter_by(id=mission_id).first()
