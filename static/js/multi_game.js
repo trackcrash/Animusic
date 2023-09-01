@@ -129,7 +129,8 @@ function onPlayerReady(event, startTime, endTime, totalSong, nowSong, callback) 
     if (callback != null) {
         callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
     }
-
+    // videoFrame 요소의 title 속성이 표시되지 않게 함 (주소는 지울 수가 없음...)
+    videoFrame.removeAttribute("title");
 }
 
 function onNextReady(startTime, endTime, totalSong, nowSong, callback) {
@@ -145,6 +146,8 @@ function onNextReady(startTime, endTime, totalSong, nowSong, callback) {
     if (callback != null) {
         callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
     }
+    // videoFrame 요소의 title 속성이 표시되지 않게 함 (주소는 지울 수가 없음...)
+    videoFrame.removeAttribute("title");
 }
 
 function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
@@ -610,5 +613,4 @@ function playerListGet(players) {
 
         index++;
     });
-
 }
