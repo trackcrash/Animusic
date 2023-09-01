@@ -154,7 +154,7 @@ def delete_Mission(id):
                 <title>삭제 완료</title>
                 <script>
                     alert("삭제가 완료 되었습니다.");
-                    location.href='/';
+                    location.href='/Map';
                 </script>
             </head>
             <body>

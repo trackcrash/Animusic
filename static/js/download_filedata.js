@@ -1,4 +1,5 @@
-document.getElementById('download_excelfile').addEventListener('click', data_convert_download);
+const downloadBtn = document.getElementById('download_excelfile')
+if (downloadBtn) {downloadBtn.addEventListener('click', data_convert_download)};
 
 async function data_convert_download() {
 
