@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, send_file
-from flask_login import current_user
+from flask_login import current_user, login_required
 from controllers.map_controller import show_mission, show_table, show_mission_byProducer, show_mission_active
 from controllers.map_controller import submit_to_db, update_to_db, delete_Mission, single_make_answer
 from controllers.map_controller import map_controller, videoid_check
@@ -16,6 +16,7 @@ def single_select():
     return render_template('single_select.html', current_user=current_user,missions=missions)
 
 @map_bp.route('/make_map', methods=['GET', 'POST'])
+@login_required
 def make_map():
     data = map_controller()
     return render_template('createmap.html', data=data)
@@ -25,10 +26,12 @@ def show():
     return show_table()
 
 @map_bp.route('/submit-to-db', methods=['POST'])
+@login_required
 def submit():
     return submit_to_db()
 
 @map_bp.route('/Map')
+@login_required
 def mymap():
     data_list = show_mission_byProducer()
     return render_template('Map.html', data_list=data_list)
@@ -36,10 +39,12 @@ def mymap():
 
 
 @map_bp.post('/update-to-db')
+@login_required
 def update():
     return update_to_db()
 
 @map_bp.get("/delete-mission")
+@login_required
 def deleteMission():
     return delete_Mission(request.args.get('id'))
 
