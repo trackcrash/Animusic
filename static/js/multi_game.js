@@ -13,6 +13,7 @@ let gameTimerInterval; //setInteval 이벤트
 let isSkipFlag = true;
 let currentData = null;
 let isVideoPlaying = false;
+let AbleCheckAnswerTime;
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -33,7 +34,7 @@ function sendMessage() {
         doMessage = false;
         const content = elements.inputMessage.value.trim();
         if (content) {
-            socket.emit('message', { content, room: room_name });
+            socket.emit('message', { content, room: room_name , timeOut : (AbleCheckAnswerTime==0 ? true : false)});
             elements.inputMessage.value = '';
         }
         setTimeout(() => {
@@ -82,7 +83,7 @@ function dummyplay() {
 function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, callback = null) {
     let videoFrame = document.getElementById("videoFrame");
     const videoId = getYoutubeVideoId(videolink);
-
+    AbleCheckAnswerTime = 1;
     if (!videoId) {
         console.error("Invalid YouTube URL provided");
         return;
@@ -161,12 +162,15 @@ function OnNextPlay(startTime, endTime,totalSong, nowSong,callback)
 {
     setVolume(document.querySelector("#VolumeBar").value);
     if (endTime == "stop") {
+        clearInterval(gameTimerInterval)
         return;
     }
     if (startTime > 0) {
         seekTo(startTime);
     }
+    
     callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
+    dummyplay();
     // videoFrame 요소의 title 속성이 표시되지 않게 함 (주소는 지울 수가 없음...)
     // videoFrame.removeAttribute("title");
 }
@@ -177,15 +181,13 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
         endTime = player.getDuration();
     }
     GameTimer = endTime - startTime;
-    let Num = 0;
     gameTimerInterval = setInterval(() => {
         document.querySelector("#GameTimer span").innerText = GameTimer;
+        if(AbleCheckAnswerTime != 0)
+        {
+            AbleCheckAnswerTime--;
+        }
         if (GameTimer <= 0) {
-            if (Num == 3) {
-                dummyplay();
-                Num = 0;
-            }
-            Num++;
             voteSkip();
             return;
         }
@@ -323,11 +325,8 @@ function initializeSocketEvents() {
         console.log("재생종료");
         nextButton.style.display = "none";
         hintButton.style.display = "none";
-        setTimeout(() => {
-            player.stopVideo();
-            clearInterval(gameTimerInterval);
-        }, 1000)
-
+        player.stopVideo();
+        clearInterval(gameTimerInterval);
         socket.emit('playingStatus_false', room_name);
         showHostContent(false);
         currentData = data;
@@ -420,18 +419,17 @@ function initializeSocketEvents() {
     socket.on('correctAnswer', data => {
         nowSong = data.nowSong;
         totalSong = data.totalSong;
-        playvideo(currentvideolink, data.startTime, "stop", totalSong, nowSong, null);
-        elements.videoOverlay.style.display = 'none';
-        showSongInfo(data.data.title, data.data.song, data.name);
-        if (document.querySelector("#NextVideo").checked) {
-            setTimeout(
-                () => {
-                    if (!isSkipFlag) {
-                        elements.nextButton.disabled = true;
-                        voteSkip();
-                    }
-                }, 1000
-            )
+        if(GameTimer > 0)
+        {
+            playvideo(currentvideolink, data.startTime, "stop", totalSong, nowSong, null);
+            elements.videoOverlay.style.display = 'none';
+            showSongInfo(data.data.title, data.data.song, data.name);
+            if (document.querySelector("#NextVideo").checked) {
+                if (!isSkipFlag) {
+                    elements.nextButton.disabled = true;
+                    voteSkip();
+                }                        
+            }
         }
     });
 

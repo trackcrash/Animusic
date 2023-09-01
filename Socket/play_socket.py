@@ -73,13 +73,14 @@ def play_Socket(socketio):
         room = data.get('room')
         name = current_user.name
         if music_data_manager.check_answer(room, msg) and music_data_manager.retrieve_data(room).get('is_answered') == 'false':
-            current_data = music_data_manager.retrieve_data(room)
-            current_data['is_answered'] = 'true'
-            startTime = float(current_data['startTime'])
+            if data['timeOut'] :
+                current_data = music_data_manager.retrieve_data(room)
+                current_data['is_answered'] = 'true'
+                startTime = float(current_data['startTime'])
+                emit('correctAnswer', {'name':name,'data':current_data,'startTime':startTime}, room=room)
+                room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
+                update_room_player_count(room, "님이 정답을 맞췄습니다.", name)
             emit('message', {'name': name, 'msg': msg}, room=room)
-            emit('correctAnswer', {'name':name,'data':current_data,'startTime':startTime}, room=room)
-            room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
-            update_room_player_count(room, "님이 정답을 맞췄습니다.", name)
         else:
             emit('message', {'name': name, 'msg': msg}, room=room)
     #다음 데이터 요청
