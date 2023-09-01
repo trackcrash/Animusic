@@ -310,7 +310,7 @@ function initializeSocketEvents() {
         const userNames = Object.keys(scores);
         console.log(userNames);
         const sortedScores = userNames.map(username => ({ username, ...scores[username] })).sort((a, b) => b.score - a.score);
-        
+
         $('#scoreModalBody').empty();
 
         for (let i = 0; i < sortedScores.length; i++) {
@@ -343,23 +343,32 @@ function initializeSocketEvents() {
         const newExp = newUserData.exp;
         const newLevel = newUserData.level;
         const currentExp = (newUserData.nextexp);
-
         const currentUser = currentData.before_data[player_name];
-
+        const beforeExp = currentUser.exp;
+        const beforeLevel = currentUser.level;
+        const beforeNextExp = currentUser.nextexp;
         if (!currentUser) {
             console.warn("Current user data is missing!");
             return;
         }
-        if(currentUser.level != -1)
-        {
-            const expPercentage = (newExp / currentExp) * 100;
-            $('#expBar').css('width', `${expPercentage}%`);
-            $('#expText').text(`${newExp}/${currentExp}`);
+        if (currentUser.level != -1) {
+            const startPercentage = (beforeExp / beforeNextExp) * 100;
+            const endPercentage = (newExp / currentExp) * 100;
+
+            $('#expBar').css('width', `${startPercentage}%`);
+
+            $('#expText').text(`${beforeExp}/${beforeNextExp}`);
+
+            $('#expBar').animate({ width: `${endPercentage}%` }, 3000);
+
+            setTimeout(() => {
+                $('#expText').text(`${newExp}/${currentExp}`);
+            }, 1000);
 
             if (newLevel > currentUser.level) {
                 $('#levelUpModal h2').text(`축하합니다! ${newLevel} 레벨이 되었습니다!`);
                 $('#levelUpModal').removeClass('hidden');
-            } else{
+            } else {
                 $('#levelUpModal h2').text(`다음 레벨까지`);
                 $('#levelUpModal').removeClass('hidden');
             }
@@ -372,7 +381,7 @@ function initializeSocketEvents() {
 
             currentData = null;
         }
-        
+
     });
 
     $('#levelUpModalCloseBtn').click(function() {
@@ -574,14 +583,13 @@ function playerListGet(players) {
     rightContainer.innerHTML = "";
 
     let index = 0;
-    
+
     //캐릭터
     Object.entries(players).forEach(([key, value]) => {
         let username = value["username"];
         let score = value['score'];
         let level = value['level'];
-        if(level == -1)
-        {
+        if (level == -1) {
             level = "GM";
         }
         let charImg = findKeysByValue(CharacterEnum, value['character']);
