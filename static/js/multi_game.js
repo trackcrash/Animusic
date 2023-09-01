@@ -35,7 +35,7 @@ function sendMessage() {
         doMessage = false;
         const content = elements.inputMessage.value.trim();
         if (content) {
-            socket.emit('message', { content, room: room_name , timeOut : (AbleCheckAnswerTime==0 ? true : false)});
+            socket.emit('message', { content, room: room_name, timeOut: (AbleCheckAnswerTime == 0 ? true : false) });
             elements.inputMessage.value = '';
         }
         setTimeout(() => {
@@ -61,13 +61,11 @@ function showHint(hint) {
 }
 
 function voteSkip() {
-    if(AbleCheckAnswerTime == 0)
-    {
-        elements.nextButton.disabled = true;
-        socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers),"TimeOut": (AbleCheckAnswerTime==0? true:false ) }, () => {
-            isSkipFlag = true;
-        });
-    }
+    console.log("voteSkip호출됨");
+    elements.nextButton.disabled = true;
+    socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) }, () => {
+        isSkipFlag = true;
+    });
 }
 
 
@@ -98,8 +96,8 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
         isVideoPlaying = false;
         videoFrame = document.createElement("div");
         videoFrame.id = "videoFrame";
-        videoFrame.classList.add("absolute", "top-0", "left-0" ,"w-full", "h-full")
-        document.getElementById("videoContainer").insertBefore(videoFrame , document.getElementById("videoOverlay"));
+        videoFrame.classList.add("absolute", "top-0", "left-0", "w-full", "h-full")
+        document.getElementById("videoContainer").insertBefore(videoFrame, document.getElementById("videoOverlay"));
     }
     videoFrame = document.getElementById("videoFrame");
 
@@ -127,7 +125,7 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
     });
 
     videoOverlay.style.display = 'block';
-    
+
 }
 
 
@@ -138,8 +136,7 @@ function onPlayerEvent(startTime) {
     }
 }
 
-function OnNextPlay(startTime, endTime,totalSong, nowSong,callback)
-{
+function OnNextPlay(startTime, endTime, totalSong, nowSong, callback) {
     setVolume(document.querySelector("#VolumeBar").value);
     if (endTime == "stop") {
         clearInterval(gameTimerInterval)
@@ -148,7 +145,7 @@ function OnNextPlay(startTime, endTime,totalSong, nowSong,callback)
     if (startTime > 0) {
         seekTo(startTime);
     }
-    
+
     callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
 }
 
@@ -160,13 +157,12 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
     GameTimer = endTime - startTime;
     gameTimerInterval = setInterval(() => {
         document.querySelector("#GameTimer span").innerText = parseInt(GameTimer);
-        if(AbleCheckAnswerTime != 0)
-        {
+        if (AbleCheckAnswerTime != 0) {
             AbleCheckAnswerTime--;
         }
         if (GameTimer <= 0) {
-            if(!isSkipFlag)
-            {
+            clearInterval(gameTimerInterval);
+            if (!isSkipFlag) {
                 voteSkip();
             }
             return;
@@ -392,15 +388,14 @@ function initializeSocketEvents() {
     socket.on('correctAnswer', data => {
         nowSong = data.nowSong;
         totalSong = data.totalSong;
-        if(GameTimer > 0)
-        {
+        if (GameTimer > 0) {
             playvideo(currentvideolink, data.startTime, "stop", totalSong, nowSong, null);
             elements.videoOverlay.style.display = 'none';
             showSongInfo(data.data.title, data.data.song, data.name);
             if (document.querySelector("#NextVideo").checked) {
                 if (!isSkipFlag) {
                     voteSkip();
-                }                        
+                }
             }
         }
     });

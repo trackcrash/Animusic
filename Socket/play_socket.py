@@ -114,7 +114,6 @@ def play_Socket(socketio):
     #스킵투표
     @socketio.on('voteSkip')
     def handle_vote_skip(data):
-        if data["TimeOut"]:
             with vote_lock:
                 room = data.get("room")
                 user = current_user.name
