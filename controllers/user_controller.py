@@ -62,6 +62,7 @@ def google_login():
 
     request_uri = client.prepare_request_uri(
         authorization_endpoint,
+        #redirect_uri="https://www.igeo.site/login/google/callback",
         redirect_uri=request.base_url + "/callback",
         scope=["openid", "email", "profile"],
     )
@@ -71,6 +72,13 @@ def google_login():
 
 def google_callback():
     token_endpoint = requests.get(GOOGLE_DISCOVERY_URL).json()["token_endpoint"]
+    # temp = request.url
+    # token_url, headers, body = client.prepare_token_request(
+    #     token_endpoint,
+    #     authorization_response=temp.replace('http','https'),
+    #     redirect_url="https://www.igeo.site/login/google/callback",
+    #     code=request.args.get("code")
+    # )
     token_url, headers, body = client.prepare_token_request(
         token_endpoint,
         authorization_response=request.url,

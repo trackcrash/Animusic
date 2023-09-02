@@ -65,8 +65,18 @@ function create_room_button() {
     });
 }
 
-function joinChatRoom(room_name) {
-    location.href = `/multi_game?room_name=${room_name}`;
+function joinChatRoom(room_name, token) {
+    // 새로운 XMLHttpRequest 객체 생성
+    // const xhr = new XMLHttpRequest();
+
+    // 요청을 열고 설정
+    // xhr.open('GET', `/multi_game?room_name=${room_name}`, true);
+    window.location = `/multi_game?room_name=${room_name}`;
+    // 헤더에 토큰 추가
+    // xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+
+    // 요청 보내기
+    // xhr.send();
 }
 
 function firstCreateRoom() {
