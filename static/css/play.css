@@ -64,10 +64,6 @@
     height: 60px;
 }
 
-.align-right-button {
-    float: right;
-}
-
 .scrolling-text {
     white-space: nowrap;
     width: 100%

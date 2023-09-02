@@ -1,8 +1,6 @@
 let videoId = "";
 let modifyIndex = null;
 modifyFunction();
-const zero_space = document.getElementById('zero_space');
-const answerInput = document.getElementById('answer-input');
 function delete_mission()
 {
     const urlParams = new URLSearchParams(window.location.search);
@@ -20,32 +18,15 @@ function delete_mission()
 const delete_btn = document.getElementById('delete-btn');
 if (delete_btn) {delete_btn.addEventListener("click", ()=> {delete_mission()})}
 
-function zero_space_text() {
-    const inputText = answerInput.value;
-    const answerList = inputText.split(', ');
+function zero_space_text(answer) {
+    const answerList = answer.split(',').map(str => str.trim());
+    const zeroSpaceList = answerList.map(str => str.replace(/\s+/g, ''));
 
-    let zeroSpaceList = [];
-    for (const element of answerList) {
-        zeroSpaceList.push(element.replace(/\s+/g, ''));
-    }
+    const combinedList = answerList.concat(zeroSpaceList);
+    const combinedSet = new Set(combinedList);
 
-    let uniqueList = [];
-
-    for (const element of zeroSpaceList) {
-        if (!uniqueList.includes(element) && !answerList.includes(element) && element !== "") {
-            uniqueList.push(element);
-        }
-    }
-
-    let resultText = answerList.concat(uniqueList).join(', ');
-    
-    answerInput.value = resultText;
+    return Array.from(combinedSet).join(',');
 }
-zero_space.addEventListener('click', () =>
-{
-    zero_space_text();
-});
-
  // 유튜브 영상링크 videoId분리 함수(일반링크, 공유링크)
 function split_ytLink(ytLink) {
     if (ytLink.split('v=')[1]) {return ytLink.split('v=')[1].substring(0, 11)}
@@ -281,6 +262,9 @@ function box_element(item) {
     const thumbnail = item.querySelector('img').src;
     const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
     const answer = item.querySelector('h1').innerText;
+
+    answer = zero_space_text(answer);
+
     const id = item.querySelector('h4').innerHTML || null;
 
     let hint = null, startTime = null, endTime = null;
