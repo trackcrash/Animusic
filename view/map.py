@@ -36,8 +36,6 @@ def mymap():
     data_list = show_mission_byProducer()
     return render_template('Map.html', data_list=data_list)
 
-
-
 @map_bp.post('/update-to-db')
 @login_required
 def update():
@@ -49,10 +47,12 @@ def deleteMission():
     return delete_Mission(request.args.get('id'))
 
 @map_bp.route('/download_excelfile', methods=['GET'])
+@login_required
 def download_template():
     return send_file('static/file_form/MakingMap_form.xlsx', as_attachment=True)
 
 @map_bp.route('/check_videoid', methods=['POST'])
+@login_required
 #재생가능한 비디오링크인지 체크해주는 기능(요청 1번에 최대 42개의 비디오링크까지 가능)
 def check_videoid():
     videoid_list = set(request.get_json())

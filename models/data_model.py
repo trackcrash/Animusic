@@ -145,6 +145,7 @@ def update_to_db(data):
         mission_data = data.pop()
         mission_id = mission_data['mission_Id']
         now_mission_info = session.query(Mission).filter_by(id=mission_id).first()
+        now_mission_info.MapName = mission_data['MapName']
         now_mission_info.Thumbnail = mission_data['Thumbnail']
         now_music_info = session.query(Music).filter_by(mission_id=mission_id).all() #현재 맵 미션id를 가진 모든 곡 불러오기
         now_music_idset = set(music.id for music in now_music_info) # id값만 추출한 set() 생성

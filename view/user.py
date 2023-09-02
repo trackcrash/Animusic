@@ -9,10 +9,12 @@ from models.user_model import delete_account, account_insert, account_insert_in_
 user_bp = Blueprint('user', __name__, url_prefix='')
 
 @user_bp.get('/delete_account_confirm')
+@login_required
 def delete_account_confirm():
     return render_template('account_management/deleteAccountConfirm.html')
 
 @user_bp.get('/delete_account')
+@login_required
 def deleting_account():
     result_delete_account = delete_account()
     if result_delete_account:
@@ -20,6 +22,7 @@ def deleting_account():
     else:
         return render_template('account_management/deleteAccountFail.html')
 @user_bp.get('/account_confirm')
+@login_required
 def account_confirm():
     if current_user.is_authenticated == False:
         return render_template('account_management/accountConfirm.html')
@@ -30,6 +33,7 @@ def get_current_user_is_google_authenticated():
     return jsonify({'check_googleuser': current_user.is_google_authenticated})
 
 @user_bp.route('/update_profile', methods=['POST'])
+@login_required
 def update_profile():
     data = request.json
     nickname = data[0]['nickname']
@@ -85,10 +89,12 @@ def register():
     return render_template('register.html')
 
 @user_bp.route('/select_character')
+@login_required
 def select_character():
     return render_template('account_management/selectCharacter.html')
 
 @user_bp.route('/insert_character', methods=['POST'])
+@login_required
 def insert_character():
     character_number = request.get_json().get('character_number')
     return insert_character_number(character_number)
