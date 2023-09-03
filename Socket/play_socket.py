@@ -1,4 +1,3 @@
-from threading import Lock
 from flask_socketio import emit
 from flask import request
 from controllers import map_controller
@@ -7,7 +6,7 @@ from models.play_model import make_answer, music_data_manager, room_data_manager
 from Socket.socket import socket_class
 from models.room_model import update_room_player_count
 from models.user_model import get_userinfo_by_name, update_level_info
-vote_lock = Lock()
+
 def get_info_for_room(room_name):
     data = room_data_manager._data_store[room_name]['user']
     user_info = {}
@@ -114,7 +113,6 @@ def play_Socket(socketio):
     #스킵투표
     @socketio.on('voteSkip')
     def handle_vote_skip(data):
-            with vote_lock:
                 room = data.get("room")
                 user = current_user.name
                 if room not in socket_class.vote_counts:

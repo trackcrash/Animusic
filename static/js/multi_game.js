@@ -15,6 +15,7 @@ let currentData = null;
 let isVideoPlaying = false;
 let AbleCheckAnswerTime;
 let Num = 0;
+let isVoteSkipCalled = false;
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -83,6 +84,7 @@ function dummyplay() {
 }
 
 function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, callback = null) {
+    isVoteSkipCalled = false;
     const videoId = getYoutubeVideoId(videolink);
     let videoFrame;
     AbleCheckAnswerTime = 1;
@@ -162,7 +164,8 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
         }
         if (GameTimer <= 0) {
             clearInterval(gameTimerInterval);
-            if (!isSkipFlag) {
+            if (!isSkipFlag && !isVoteSkipCalled) {
+                isVoteSkipCalled = true;
                 voteSkip();
             }
             return;
@@ -392,8 +395,9 @@ function initializeSocketEvents() {
             playvideo(currentvideolink, data.startTime, "stop", totalSong, nowSong, null);
             elements.videoOverlay.style.display = 'none';
             showSongInfo(data.data.title, data.data.song, data.name);
-            if (document.querySelector("#NextVideo").checked) {
-                if (!isSkipFlag) {
+            if (GameTimer > 0 && document.querySelector("#NextVideo").checked) {
+                if (!isSkipFlag && !isVoteSkipCalled) {
+                    isVoteSkipCalled = true;
                     voteSkip();
                 }
             }
