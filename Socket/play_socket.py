@@ -6,6 +6,20 @@ from models.play_model import make_answer, music_data_manager, room_data_manager
 from Socket.socket import socket_class
 from models.room_model import update_room_player_count
 from models.user_model import get_userinfo_by_name, update_level_info
+#반복이라 함수로 분리
+def skip_song(room):
+    next_data = music_data_manager.retrieve_next_data(room)
+    if next_data:
+        socket_class.totalPlayers = len(room_data_manager._data_store[room]['user'])
+        youtube_embed_url = next_data['youtube_embed_url']
+        startTime = float(next_data['startTime'])
+        endTime = float(next_data['endTime'])
+        totalSong = len(music_data_manager._data_store[room]['data'])
+        nowSong = int(music_data_manager._data_store.get(room, {})['current_index'])+1
+        emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers, "startTime": startTime, "endTime":endTime, 'totalSong':totalSong,'nowSong':nowSong}, room=room)
+    else:
+        before_data,new_data = get_info_for_room(room)
+        emit('EndOfData', {'before_data': before_data,'new_data':new_data,'players': room_data_manager._data_store[room]['user']}, room=room)
 
 def get_info_for_room(room_name):
     data = room_data_manager._data_store[room_name]['user']
@@ -73,13 +87,12 @@ def play_Socket(socketio):
         room = data.get('room')
         name = current_user.name
         if music_data_manager.check_answer(room, msg) and music_data_manager.retrieve_data(room).get('is_answered') == 'false':
-            if data['timeOut'] :
-                current_data = music_data_manager.retrieve_data(room)
-                current_data['is_answered'] = 'true'
-                startTime = float(current_data['startTime'])
-                emit('correctAnswer', {'name':name,'data':current_data,'startTime':startTime}, room=room)
-                room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
-                update_room_player_count(room, "님이 정답을 맞췄습니다.", name)
+            current_data = music_data_manager.retrieve_data(room)
+            current_data['is_answered'] = 'true'
+            startTime = float(current_data['startTime'])
+            emit('correctAnswer', {'name':name,'data':current_data,'startTime':startTime}, room=room)
+            room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
+            update_room_player_count(room, "님이 정답을 맞췄습니다.", name)
             emit('message', {'name': name, 'msg': msg}, room=room)
         else:
             emit('message', {'name': name, 'msg': msg}, room=room)
@@ -110,6 +123,28 @@ def play_Socket(socketio):
         make_answer(map_controller.get_music_data(data['selected_id']), room_name)
         emit('MissionSelect_get', room_name, room=room_name)
 
+
+    @socketio.on('autoSkip')
+    def handle_auto_skip(data):
+        room = data.get("room")
+        user = current_user.name
+        required_votes = data['requiredSkipVotes']
+
+        if room not in socket_class.vote_counts:
+            socket_class.vote_counts[room] = 0
+        if user not in socket_class.voted_users:
+            socket_class.voted_users[room] = [] 
+        if user in socket_class.voted_users[room]:
+            return
+
+        socket_class.vote_counts[room] += 1
+        socket_class.voted_users[room].append(user)
+
+        if socket_class.vote_counts[room] >= required_votes:
+            socket_class.vote_counts[room] = 0
+            socket_class.voted_users[room] = []
+            skip_song(room)
+
     #스킵투표
     @socketio.on('voteSkip')
     def handle_vote_skip(data):
@@ -129,17 +164,6 @@ def play_Socket(socketio):
                     player_count = socket_class.vote_counts[room]
                     socket_class.vote_counts[room] = 0
                     socket_class.voted_users[room] = [] #초기화
-                    next_data = music_data_manager.retrieve_next_data(room)
-                    if next_data:
-                        socket_class.totalPlayers = len(room_data_manager._data_store[room]['user'])
-                        youtube_embed_url = next_data['youtube_embed_url']
-                        startTime = float(next_data['startTime'])
-                        endTime = float(next_data['endTime'])
-                        totalSong = len(music_data_manager._data_store[room]['data'])
-                        nowSong = int(music_data_manager._data_store.get(room, {})['current_index'])+1
-                        emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers, "startTime": startTime, "endTime":endTime, 'totalSong':totalSong,'nowSong':nowSong}, room=room)
-                    else:
-                        before_data,new_data = get_info_for_room(room)
-                        emit('EndOfData', {'before_data': before_data,'new_data':new_data,'players': room_data_manager._data_store[room]['user']}, room=room)
+                    skip_song(room)
                 else:
                     emit('updateVoteCount', {'count': socket_class.vote_counts[room]}, room=room)
