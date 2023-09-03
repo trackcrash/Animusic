@@ -160,14 +160,14 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
         if (AbleCheckAnswerTime != 0) {
             AbleCheckAnswerTime--;
         }
-        if (GameTimer <= 0) {
+        if (GameTimer < 1) {
             clearInterval(gameTimerInterval);
             if (!isSkipFlag) {
                 setTimeout(() => {
                     if (!isSkipFlag) {
                         voteSkip();
                     }
-                }, 800);
+                }, 300);
             }
             return;
         }
