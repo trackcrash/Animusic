@@ -68,11 +68,23 @@ function updateMission(room_name, mission)
 
 function create_room_button() {
     // 사용자 정보를 가져옵니다.
+    $('#CreateRoomModal').removeClass('hidden');
+}
+$('#CreateRoomModalCloseBtn').click(function() {
+    console.log("클릭");
+    $('#CreateRoomModal').addClass('hidden');
+});
+$('#CreateRoomBtn').click(function() {
+    console.log("방생성");
+    $('#CreateRoomModal').addClass('hidden');
     fetchData("/get_user_info", (user_id) => {
         if (user_id) { // 사용자가 로그인된 경우
-            const room_name = prompt("방 이름을 입력하세요:");
+            const room_name = $("#room_title").val();
+            const room_password = $("#room_password").val();
+            const room_max_human = $("#room_max_human").val();
+
             if (room_name && room_name.trim() !== '') {
-                socket.emit('room_check', {room_name: room_name});
+                socket.emit('room_check', {room_name: room_name, room_password: room_password, room_max_human:room_max_human});
                 // 방 이름이 제대로 입력된 경우 방 생성 및 해당 방으로 리다이렉트
             } else if (room_name !== null) { // 취소 버튼을 클릭하지 않은 경우
                 alert("올바른 방 이름을 입력해주세요.");
@@ -81,7 +93,7 @@ function create_room_button() {
             alert("로그인 후 이용해주세요");
         }
     });
-}
+});
 
 function joinChatRoom(room_name, token) {
     // 새로운 XMLHttpRequest 객체 생성
@@ -160,7 +172,7 @@ socket.on('room_update', (data) => {
 });
 
 socket.on('Do_not_create_duplicates', () => {
-    alert("방을 중복생성 할 수 없습니다.");
+    alert("같은 이름의 방을 만들수 없습니다.");
 });
 
 socket.on('user_check_not_ok', () => {
@@ -203,3 +215,6 @@ socket.on("MissionSelect_get", (data) =>
     const mission = data['map_data'];
     updateMission(room_name,mission);
 })
+
+
+

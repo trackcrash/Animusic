@@ -6,6 +6,7 @@ from Socket.socket import socket_class
 from models.room_model import update_room_player_count
 import time
 
+tempRoomdict = {}
 def room_Socket(socketio):
 
     @socketio.on('room_check')
@@ -16,6 +17,10 @@ def room_Socket(socketio):
         if booldata :
             emit('Do_not_create_duplicates', room=session_id)
         else : 
+            if(tempRoomdict[room_name]):
+                emit('Do_not_create_duplicates', room=session_id)
+            else :
+                tempRoomdict[room_name] = {"room_password" :data["room_password"], "room_max_human": data["room_max_human"]}
             emit('Join_room', room_name, room=session_id)
 
     @socketio.on('create_room')

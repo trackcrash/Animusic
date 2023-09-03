@@ -1,4 +1,6 @@
 #flask main --author: NewKyaru 11/08/2023
+import os
+
 from decouple import config 
 from flask import Flask,render_template, send_file
 from flask_login import LoginManager, current_user
@@ -15,6 +17,8 @@ from Socket.socket import socketio
 from Socket.connect_socket import connect_MySocket
 from Socket.play_socket import play_Socket
 from Socket.room_socket import room_Socket
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 

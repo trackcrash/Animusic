@@ -89,7 +89,7 @@ def save_to_db(data):
     finally:
        close_session(engine,session)
 
-def update_to_db(session,data):
+def update_to_db(data):
     engine, session = create_session()
     try:
         data = deque(data)
