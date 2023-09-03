@@ -97,8 +97,9 @@ def google_callback():
     userinfo_response = requests.get(uri, headers=headers, data=body)
 
     user_info = userinfo_response.json()
-    user = user_model.save_google_user(user_info)
+    user,session = user_model.save_google_user(user_info)
 
     # Use Flask-Login to login user
     login_user(user)
+    session.close()
     return redirect(url_for('index'))
