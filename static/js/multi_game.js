@@ -193,7 +193,7 @@ function seekTo(seconds) {
 }
 
 function requiredSkipVotes(players) {
-    return players <= 2 ? players : players <= 6 ? Math.ceil(players / 2) : Math.ceil(players * 0.7);
+    return players <= 2 ? players : players - 1;
 }
 
 function updateVoteCountUI(count) {
