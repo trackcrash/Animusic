@@ -4,7 +4,7 @@ function fetchData(url, callback) {
     $.getJSON(url, callback);
 }
 
-function createRoomElement(room_name, room_status, user_count, mission) {
+function createRoomElement(room_name, room_status, user_count, mission,max_user) {
     const roomContainer = document.createElement('div');
     roomContainer.id = `roomContainer_${room_name}`;
     roomContainer.classList.add('room-container', 'grid', 'grid-rows-1', 'gap-4', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition', 'duration-300', 'hover:bg-gray-100');
@@ -16,9 +16,12 @@ function createRoomElement(room_name, room_status, user_count, mission) {
 
     const roomCountElement = document.createElement('span');
     roomCountElement.id = `${roomNameElementIdPrefix}${room_name}`;
-    roomCountElement.classList.add('room-count', 'text-sm', 'text-gray-600');
+    roomCountElement.classList.add('text-sm', 'text-gray-600');
     roomCountElement.textContent = `인원 : ${user_count ? user_count+"명" : "1명"}`;
-
+    const maxUserElement = document.createElement('span');
+    maxUserElement.id = `max-user-${room_name}`;
+    maxUserElement.classList.add('text-sm', 'text-gray-600');
+    maxUserElement.textContent = `최대인원 : ${max_user}`;
     const InnerDivContainer = document.createElement('div');
     InnerDivContainer.classList.add('grid', 'grid-rows-3', 'gap-4', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition', 'duration-300', 'hover:bg-gray-100');
 
@@ -39,6 +42,7 @@ function createRoomElement(room_name, room_status, user_count, mission) {
     InnerDivContainer.appendChild(roomMissionElement);
     InnerDivContainer.appendChild(MissionProducerElement);
     InnerDivContainer.appendChild(roomStatusElement); // 여기에 roomStatusElement 추가
+    InnerDivContainer.appendChild(maxUserElement);
     roomContainer.appendChild(InnerDivContainer);
     ContaineraddClickListener(roomContainer, room_name);
     return roomContainer;
@@ -70,31 +74,6 @@ function create_room_button() {
     // 사용자 정보를 가져옵니다.
     $('#CreateRoomModal').removeClass('hidden');
 }
-$('#CreateRoomModalCloseBtn').click(function() {
-    console.log("클릭");
-    $('#CreateRoomModal').addClass('hidden');
-});
-$('#CreateRoomBtn').click(function() {
-    console.log("방생성");
-    $('#CreateRoomModal').addClass('hidden');
-    fetchData("/get_user_info", (user_id) => {
-        if (user_id) { // 사용자가 로그인된 경우
-            const room_name = $("#room_title").val();
-            const room_password = $("#room_password").val();
-            const room_max_human = $("#room_max_human").val();
-
-            if (room_name && room_name.trim() !== '') {
-                socket.emit('room_check', {room_name: room_name, room_password: room_password, room_max_human:room_max_human});
-                // 방 이름이 제대로 입력된 경우 방 생성 및 해당 방으로 리다이렉트
-            } else if (room_name !== null) { // 취소 버튼을 클릭하지 않은 경우
-                alert("올바른 방 이름을 입력해주세요.");
-            }
-        } else { // 사용자가 로그인되지 않은 경우
-            alert("로그인 후 이용해주세요");
-        }
-    });
-});
-
 function joinChatRoom(room_name, token) {
     // 새로운 XMLHttpRequest 객체 생성
     // const xhr = new XMLHttpRequest();
@@ -125,16 +104,17 @@ function firstCreateRoom() {
                 const user_info = room_dict[room_name]["user"];
                 const Mission = roomInfo["room_mission"];
                 const user_count = Object.keys(user_info).length;
+                const max_user = roomInfo["room_full_user"]
                 // roomStatus를 이용하여 원하는 작업 수행
-                roomButtonsContainer.appendChild(createRoomElement(room_name, roomStatus,user_count,Mission));
+                roomButtonsContainer.appendChild(createRoomElement(room_name, roomStatus,user_count,Mission,max_user));
             }
         });
     });
 }
 
-function addRoomToList(room_name, mission) {
+function addRoomToList(room_name, max_user) {
     const roomButtonsContainer = document.getElementById('room-buttons');
-    roomButtonsContainer.appendChild(createRoomElement(room_name,false,false,false));
+    roomButtonsContainer.appendChild(createRoomElement(room_name,false,false,false,max_user));
 
     
 
@@ -167,7 +147,9 @@ socket.on('room_players_update', (data)=> {;
 socket.on('room_update', (data) => {
     fetchData("/get_user_info", (user_id) => {
         if (!user_id) return;
-        addRoomToList(data);
+        const room_name = data["room_name"];
+        const max_user = data["max_user"]
+        addRoomToList(data["room_name"], max_user);
     });
 });
 
@@ -216,5 +198,44 @@ socket.on("MissionSelect_get", (data) =>
     updateMission(room_name,mission);
 })
 
+socket.on("passwordCheck", (data)=>
+{
+    let password = prompt("비밀번호를 입력해주세요")
+    if(password != null && password != "")
+    {
+        socket.emit("passwordCheckToServer",{"room_name":data , "password":password})
+    }
+    else
+    {
+        alert("비밀번호를 입력해주세요");
+    }
+})
+socket.on("passwordFail", ()=>
+{
+    alert("비밀번호가 틀렸습니다.");
+})
 
+$('#CreateRoomModalCloseBtn').click(function() {
+    console.log("클릭");
+    $('#CreateRoomModal').addClass('hidden');
+});
+$('#CreateRoomBtn').click(function() {
+    console.log("방생성");
+    $('#CreateRoomModal').addClass('hidden');
+    fetchData("/get_user_info", (user_id) => {
+        if (user_id) { // 사용자가 로그인된 경우
+            const room_name = $("#room_title").val();
+            const room_password = $("#room_password").val();
+            const room_max_human = $("#room_max_human").val();
 
+            if (room_name && room_name.trim() !== '') {
+                socket.emit('room_check', {room_name: room_name, room_password: room_password, room_max_human:room_max_human});
+                // 방 이름이 제대로 입력된 경우 방 생성 및 해당 방으로 리다이렉트
+            } else if (room_name !== null) { // 취소 버튼을 클릭하지 않은 경우
+                alert("올바른 방 이름을 입력해주세요.");
+            }
+        } else { // 사용자가 로그인되지 않은 경우
+            alert("로그인 후 이용해주세요");
+        }
+    });
+});

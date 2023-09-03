@@ -40,7 +40,7 @@ class RoomDataManger:
             room_data = {
                 "room_info":{
                     "session_id":session_id,
-                    #room_password, room_status, playing\
+                    "room_password": None,
                     "room_status" : False,
                     "room_full_user" : 8,
                     "room_mission" : None,
