@@ -116,13 +116,12 @@ def save_google_user(user_info):
             commit_or_rollback(session)
         else:
             user = save_user(email=user_info['email'], name=user_info.get('name'), is_google_authenticated=True)
-        return user
+        session.add(user)
+        return user, session
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while saving Google user: {str(e)}")
         return None
-    finally:
-        close_session(engine, session)
 
 def validate_user(email, password):
     engine, session = create_session()
