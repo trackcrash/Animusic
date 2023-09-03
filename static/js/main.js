@@ -41,7 +41,8 @@ function loadVideo() {
     iframe.src = embedLink;
     iframe.width = "1024";
     iframe.height = "720";
-    iframe.allow = "autoplay";
+
+    if (document.getElementById('autoplay-check').checked) {iframe.allow = "autoplay"}
 
     const videoContainer = document.querySelector(".video-container");
     videoContainer.innerHTML = "";
@@ -62,7 +63,6 @@ function modifyFunction() {
             const songURL = box.querySelector('input')?.value;
             const answer = box.querySelector('h1')?.innerText;
             const hint = box.querySelector('h2')?.innerText;
-            console.log("체크중: ", hint);
             const id = box.querySelector('h4')?.innerText;
             const startTime = box.querySelector('h5')?.innerText;
             const endTime = box.querySelector('h6')?.innerText;
@@ -261,7 +261,7 @@ function box_element(item) {
     const song = item.querySelector('p').innerText;
     const thumbnail = item.querySelector('img').src;
     const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
-    const answer = item.querySelector('h1').innerText;
+    let answer = item.querySelector('h1').innerText;
 
     answer = zero_space_text(answer);
 
@@ -328,7 +328,7 @@ function UploadBtn(event) {
         map_entry.mission_Id = document.querySelector("#Mission_id").innerHTML;
         data.push(map_entry);
 
-        upload_url = "update-to-db";
+        upload_url = "/update-to-db";
 
     };
     data = JSON.stringify(data);
@@ -398,3 +398,46 @@ const observer = new MutationObserver(() => {
 
 // 어떤 대상의 상태 변화를 감지하는 observer 의 설정값 (대상 : grid-container, childList - true : 대상 내용물의 갯수만 감지)
 observer.observe(document.getElementById('grid-container'), {childList: true });
+
+// 시작시간, 종료시간 숫자입력 고정 및 최대값 고정
+function number_max(inputdata) {
+    const time_max = inputdata.getAttribute('max');
+    let time_data = inputdata.value;
+
+    time_data = time_data.replace(/[^0-9]/g, '');
+    inputdata.value = time_data;
+    if (parseInt(time_data) > parseInt(time_max)) {time_data = time_max};
+
+    inputdata.value = time_data;
+};
+
+// 입력 란에서 Enter 또는 Tab을 누를경우 다음 입력란으로 커서 이동
+const formInputs = document.getElementById('submission-form').querySelectorAll('input');
+
+formInputs.forEach((input, index) => {
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            if (index === formInputs.length - 1) {formInputs[2].focus()}
+            else {formInputs[index + 1].focus()};
+        };
+        if (e.key === 'Tab' && index === formInputs.length - 1) {formInputs[1].focus()};
+    });
+});
+
+// 제목 입력 란 고정
+const MapName_label = document.getElementById('MapName-label');
+const MapName_insert = document.getElementById('MapName-insert');
+document.getElementById('MapName-insert').addEventListener('click', () => {
+    if (document.getElementById('MapName-input').classList.contains('hidden')) {
+        document.getElementById('MapName-input').classList.remove('hidden');
+        MapName_insert.classList.remove('w-full');
+        MapName_insert.classList.add('w-1/2');
+        MapName_insert.innerText = '저장하기';
+    } else {
+        document.getElementById('MapName-input').classList.add('hidden');
+        MapName_insert.classList.remove('w-1/2');
+        MapName_insert.classList.add('w-full');
+        MapName_insert.innerText = '제목 변경하기';
+        MapName_label.textContent = "맵 이름: " + document.getElementById('MapName-input').value;
+    };
+});

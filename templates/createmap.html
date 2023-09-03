@@ -11,6 +11,7 @@
     <!-- use version 0.20.0 -->
     <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/map_tutorial.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/upload_filedata.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/download_filedata.js') }}" defer></script>
 </head>
@@ -26,22 +27,30 @@
                     <span>영상이 표시됩니다</span>
                 </div>
             </div>
-                <!-- 양식 파일 다운로드/업로드 form -->
-            <div class="mb-4 py-1">
-                <label class="block font-medium text-gray-700">맵 양식 제출</label>
-                <input type="file" name="excelUpload" id="excelUpload" class="mt-1">
-                <p></p>
-                <label for="checkbox_id" class="text-gray-700">공백없는 정답추가 적용하기</label>
-                <input type="checkbox" id="checkbox_id" name="checkbox_name" value="checkbox_value" class="mr-2">
+            <div class="mb-1 py-1 flex">
+                <span>영상 자동재생</span>
+                <input id="autoplay-check" type="checkbox" class="ml-1" checked>
             </div>
-            <div class="mb-4 py-1">
-                <a href="{{ url_for('static', filename='file_form/MakingMap_form.xlsx') }}" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600" download>양식 다운로드</a>
+                <!-- 양식 파일 다운로드/업로드 form -->
+            <div class="mb-1 py-1">
+                <label class="my-1 block font-medium text-gray-700">맵 양식 제출</label>
+                <input type="file" name="excelUpload" id="excelUpload" class="mt-1">
+            </div>
+            <div class="mb-1 py-1">
+                <a href="{{ url_for('static', filename='file_form/MakingMap_form.xlsx') }}" class="px-2 py-1.5 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600" download>양식 다운로드</a>
                 <button id="file_save_btn" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600 {% if request.args.get('id') %}hidden{% endif %}" >맵 추가하기</button>
                 <button id="file_insert_btn" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600 {% if not request.args.get('id') %}hidden{% endif %}">맵 수정하기</button>
                 <div id="loading-spinner" class="spinner"></div>
                 <div class="progress-bar">
                     <div class="progress-fill"></div>
                     <a class="spinner-text">요청 처리중...</a>
+                </div>
+            </div>
+            <button id="tutorial" onclick="open_tutorial()" class="px-2 py-1 mt-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">튜토리얼</button>
+            <!-- 튜토리얼 부분 -->
+            <div id="tutorial-container" class="tutorial-container">
+                <div id="tutorial-content" class="tutorial-content">
+                    <!-- 스크립트에서 동적으로 생성할 예정 -->
                 </div>
             </div>
         </div>
@@ -74,13 +83,20 @@
 
             <!-- 하단 입력 양식 영역 -->
             <div class="input-form-section">
-                <form id="submission-form" class="space-y-4">
+                <form id="submission-form" class="space-y-2">
                     <input type="text" id="id-input" hidden>
-                    <label>맵 이름</label>
-                    <input id="MapName-input" class="w-full p-2 border border-gray-300 rounded" style="margin-top: 5px" type="text" value="{{data[0][0]['MapName']}}">
+
+                    <label id="MapName-label">맵 이름: {{data[0][0]['MapName']}}</label>
+                    <div class="w-full flex">
+                        <input id="MapName-input" class="w-1/2 py-2 mx-1 border border-gray-300 rounded hidden" type="text" value="{{data[0][0]['MapName']}}">
+                        <button id="MapName-insert" type="button" class="w-full py-2 mx-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">제목 변경하기</button>
+                    </div>
+
                     <label>제목:</label>
                     <input id="title-input" class="w-full p-2 border border-gray-300 rounded" style="margin-top: 5px" type="text">
+
                     <div hidden id="Mission_id">{{data[0][0]['id']}}</div>
+
                     <label>곡 이름:</label>
                     <input id="song-name-input" class="w-full p-2 border border-gray-300 rounded" style="margin-top: 5px" type="text">
 
@@ -94,31 +110,30 @@
                     <input id="song-link-input" class="w-full p-2 border border-gray-300 rounded" style="margin-top: 5px" type="url">
 
                     <label>시작 시간 및 종료 시간</label>
-                        <div id="startTime" class="flex space-x-4 time-style">
-                            <input id="startTime-input-h" class="w-full p-2 border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
+                        <div id="Time" class="flex space-x-0.5 time-style">
+                            <input id="startTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
                             <span>:</span>
-                            <input id="startTime-input-m" class="w-full p-2 border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+                            <input id="startTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
                             <span>:</span>
-                            <input id="startTime-input-s" class="w-full p-2 border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
+                            <input id="startTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
                             <span>.</span>
-                            <input id="startTime-input-ms" class="w-full p-2 border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
-                        </div>
-                        <div id="endTime" class="flex space-x-4 time-style">
-                            <input id="endTime-input-h" class="w-full p-2 border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
-                            <span class="text-[40px]">:</span>
-                            <input id="endTime-input-m" class="w-full p-2 border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+                            <input id="startTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
+                            <span>~</span>
+                            <input id="endTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
                             <span>:</span>
-                            <input id="endTime-input-s" class="w-full p-2 border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
+                            <input id="endTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+                            <span>:</span>
+                            <input id="endTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
                             <span>.</span>
-                            <input id="endTime-input-ms" class="w-full p-2 border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)"  placeholder="소숫점">
+                            <input id="endTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)"  placeholder="소숫점">
                         </div>
                     <div class="flex space-x-2">
-                        <button id="register-btn" class="w-1/2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">등록하기</button>
+                        <button id="register-btn" type="button" class="w-1/2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">등록하기</button>
                         <button id="update-btn" type="button" class="w-1/2 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">정보 수정하기</button>
                     </div>
                     <div class="flex space-x-2">
                         <button id="delete-btn" type="button" class="w-1/2 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">맵 삭제하기</button>
-                        <button id="download_excelfile" class="w-1/2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">맵 파일 다운로드 받기</button>
+                        <button id="download_excelfile" type="button" class="w-1/2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">맵 파일 다운로드 받기</button>
                     </div>
                 </form>
             </div>
@@ -137,11 +152,14 @@
 
             <!-- 하단 입력 양식 영역 -->
             <div class="input-form-section">
-                <form id="submission-form" class="space-y-4">
+                <form id="submission-form" class="space-y-2">
                     <input type="text" id="id-input" hidden>
-                    <label>맵 이름</label>
-                    <input id="MapName-input" class="w-full p-2 border border-gray-300 rounded" style="margin-top: 5px" type="text">
 
+                    <label id="MapName-label">맵 이름: </label>
+                    <div class="w-full flex">
+                        <input id="MapName-input" class="w-1/2 py-2 mx-1 border border-gray-300 rounded" type="text">
+                        <button id="MapName-insert" type="button" class="w-1/2 py-2 mx-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">제목 저장하기</button>
+                    </div>
                     <label>제목:</label>
                     <input id="title-input" class="w-full p-2 border border-gray-300 rounded" style="margin-top: 5px" type="text">
 
@@ -158,26 +176,25 @@
                     <input id="song-link-input" class="w-full p-2 border border-gray-300 rounded" style="margin-top: 5px" type="url">
 
                     <label>시작 시간 및 종료 시간</label>
-                        <div id="startTime" class="flex space-x-4 time-style">
-                            <input id="startTime-input-h" class="w-full p-2 border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
+                        <div id="Time" class="flex space-x-0.5 time-style">
+                            <input id="startTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
                             <span>:</span>
-                            <input id="startTime-input-m" class="w-full p-2 border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+                            <input id="startTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
                             <span>:</span>
-                            <input id="startTime-input-s" class="w-full p-2 border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
+                            <input id="startTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
                             <span>.</span>
-                            <input id="startTime-input-ms" class="w-full p-2 border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
-                        </div>
-                        <div id="endTime" class="flex space-x-4 time-style">
-                            <input id="endTime-input-h" class="w-full p-2 border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
+                            <input id="startTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
+                            <span>~</span>
+                            <input id="endTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
                             <span>:</span>
-                            <input id="endTime-input-m" class="w-full p-2 border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+                            <input id="endTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
                             <span>:</span>
-                            <input id="endTime-input-s" class="w-full p-2 border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
+                            <input id="endTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
                             <span>.</span>
-                            <input id="endTime-input-ms" class="w-full p-2 border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
+                            <input id="endTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
                         </div>
                     <div class="flex space-x-2">
-                        <button id="register-btn" class="w-1/2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">등록하기</button>
+                        <button id="register-btn" type="button" class="w-1/2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">등록하기</button>
                         <button id="save-btn" type="button" class="w-1/2 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">저장하기</button>
                     </div>
                 </form>
