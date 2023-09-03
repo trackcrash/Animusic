@@ -28,9 +28,10 @@ def room_Socket(socketio):
         session_id = request.sid
         room_name = data['room_name']
         if room_data_manager.create_room(room_name,session_id):
-            room_data_manager._data_store[room_name]["room_info"]['room_password'] = tempRoomdict[room_name]["room_password"]
-            room_data_manager._data_store[room_name]["room_info"]['room_full_user'] = tempRoomdict[room_name]["room_max_human"]
-            tempRoomdict.pop(room_name)
+            if room_name is tempRoomdict:
+                room_data_manager._data_store[room_name]["room_info"]['room_password'] = tempRoomdict[room_name]["room_password"]
+                room_data_manager._data_store[room_name]["room_info"]['room_full_user'] = tempRoomdict[room_name]["room_max_human"]
+                tempRoomdict.pop(room_name)
             max_user = room_data_manager._data_store[room_name]["room_info"]["room_full_user"]
             emit('room_update', {'room_name': room_name, "max_user": max_user}, broadcast=True)
 

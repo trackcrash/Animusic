@@ -246,6 +246,7 @@ function initializeSocketEvents() {
         elements.nextButton.style.display = "block";
         elements.hintButton.style.display = "block";
         elements.StartButton.style.display = "none";
+        songTitle.innerHTML = "";
         nextButton.disabled = false;
         updateVoteCountUI(0);
         showHostContent(true);
@@ -277,6 +278,8 @@ function initializeSocketEvents() {
     //게임 끝났을 때 init
     socket.on('EndOfData', function(data) {
         // 기존의 게임 상태 및 UI 초기화 코드
+        player.stopVideo();
+        clearInterval(gameTimerInterval);
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
@@ -288,8 +291,6 @@ function initializeSocketEvents() {
         document.getElementById('skipVoteCount').innerText = "";
         nextButton.style.display = "none";
         hintButton.style.display = "none";
-        player.stopVideo();
-        clearInterval(gameTimerInterval);
         socket.emit('playingStatus_false', room_name);
         showHostContent(false);
         currentData = data;
@@ -419,15 +420,6 @@ window.onload = () => {
             initEventListeners();
             initializeSocketEvents();
             showHostContent(false);
-            fetchData(`/get-thisroom-dict?room_name=${room_name}`, (data) => {
-                const mission = data["room_info"]["room_mission"];
-                document.getElementById('room_name').innerHTML = `${room_name}`;
-                console.log(mission);
-                if(mission)
-                {
-                    songTitle.innerText = `${mission[0]["MapName"]} \n 제작자 : ${mission[0]["MapProducer"]}`;
-                }
-            });
         })
     });
 
@@ -457,6 +449,21 @@ socket.on('host_updated', (data) => {
         isHost = true; // 방장이면 isHost를 true로 설정
     }
     showHostContent(game_status);
+    if(!game_status)
+    {
+        fetchData(`/get-thisroom-dict?room_name=${room_name}`, (data) => {
+            const mission = data["room_info"]["room_mission"];
+            document.getElementById('room_name').innerHTML = `${room_name}`;
+            if(mission)
+            {
+                songTitle.innerText = `${mission[0]["MapName"]} \n 제작자 : ${mission[0]["MapProducer"]}`;
+            }
+        });
+    }
+    else
+    {
+        songTitle.innerText = `다른 유저들이 플레이중인 곡이 끝나면 참가 하실 수 있습니다. 잠시만 기다려주세요.`;
+    }
 });
 
 function showHostContent(game_status) {

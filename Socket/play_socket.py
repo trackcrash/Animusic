@@ -21,7 +21,6 @@ def skip_song(room):
     else:
         before_data,new_data = get_info_for_room(room)
         emit('EndOfData', {'before_data': before_data,'new_data':new_data,'players': room_data_manager._data_store[room]['user']}, room=room)
-
 def get_info_for_room(room_name):
     data = room_data_manager._data_store[room_name]['user']
     user_info = {}
@@ -81,7 +80,9 @@ def play_Socket(socketio):
         else:
             name = current_user.name
             emit('single_message', {'name': name, 'msg': msg},room=request.sid)
-
+    @socketio.on("Skip")
+    def skip(room):
+        skip_song(room)
     @socketio.on('message')
     def handle_message(data):
         msg = data['content']
@@ -89,12 +90,15 @@ def play_Socket(socketio):
         name = current_user.name
         if music_data_manager.check_answer(room, msg) and music_data_manager.retrieve_data(room).get('is_answered') == 'false':
             current_data = music_data_manager.retrieve_data(room)
-            current_data['is_answered'] = 'true'
-            startTime = float(current_data['startTime'])
-            emit('correctAnswer', {'name':name,'data':current_data,'startTime':startTime}, room=room)
-            room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
-            update_room_player_count(room, "님이 정답을 맞췄습니다.", name)
-            emit('message', {'name': name, 'msg': msg}, room=room)
+            if data["timeOut"]:
+                current_data['is_answered'] = 'true'
+                startTime = float(current_data['startTime'])
+                emit('correctAnswer', {'name':name,'data':current_data,'startTime':startTime}, room=room)
+                room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
+                emit('message', {'name': name, 'msg': msg}, room=room)
+                update_room_player_count(room, "님이 정답을 맞췄습니다.", name)
+            else : 
+                emit('message', {'name': name, 'msg': msg}, room=room)
         else:
             emit('message', {'name': name, 'msg': msg}, room=room)
     #다음 데이터 요청
@@ -130,28 +134,6 @@ def play_Socket(socketio):
         mission = show_mission_byid(data['selected_id'])
         room_data_manager.Mission_select(room_name, mission)
         emit('MissionSelect_get', {'room_name' : room_name, "map_data": mission }, broadcast= True)
-
-
-    @socketio.on('autoSkip')
-    def handle_auto_skip(data):
-        room = data.get("room")
-        user = current_user.name
-        required_votes = data['requiredSkipVotes']
-
-        if room not in socket_class.vote_counts:
-            socket_class.vote_counts[room] = 0
-        if user not in socket_class.voted_users:
-            socket_class.voted_users[room] = [] 
-        if user in socket_class.voted_users[room]:
-            return
-
-        socket_class.vote_counts[room] += 1
-        socket_class.voted_users[room].append(user)
-
-        if socket_class.vote_counts[room] >= required_votes:
-            socket_class.vote_counts[room] = 0
-            socket_class.voted_users[room] = []
-            skip_song(room)
 
     #스킵투표
     @socketio.on('voteSkip')
