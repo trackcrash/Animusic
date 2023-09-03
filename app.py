@@ -15,6 +15,7 @@ from Socket.socket import socketio
 from Socket.connect_socket import connect_MySocket
 from Socket.play_socket import play_Socket
 from Socket.room_socket import room_Socket
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 

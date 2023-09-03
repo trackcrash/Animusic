@@ -44,10 +44,8 @@ def connect_MySocket(socketio):
                         if user_name in socket_class.voted_users[room_name]:
                             socket_class.vote_counts[room_name] = socket_class.vote_counts[room_name] - 1
                             socket_class.voted_users[room_name].remove(user_name)
-                        if room_name not in socket_class.vote_counts:
-                            emit('user_change', {'count': socket_class.vote_counts[room_name], 'totalPlayers': socket_class.totalPlayers}, room=room_name)
-                        else:
-                            emit("user_change", {'count': 0, 'totalPlayers': socket_class.totalPlayers}, room=room_name)
+                        emit('user_change', {'count': socket_class.vote_counts[room_name], 'totalPlayers': socket_class.totalPlayers}, room=room_name)
+                    
         for room_name in removed_rooms:
             room_data_manager.remove_room(room_name)  # 방 제거 메서드 호출
             emit('room_removed', room_name, broadcast=True)

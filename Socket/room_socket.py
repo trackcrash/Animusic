@@ -6,6 +6,7 @@ from Socket.socket import socket_class
 from models.room_model import update_room_player_count
 import time
 
+tempRoomdict = {}
 def room_Socket(socketio):
 
     @socketio.on('room_check')
@@ -16,14 +17,23 @@ def room_Socket(socketio):
         if booldata :
             emit('Do_not_create_duplicates', room=session_id)
         else : 
-            emit('Join_room', room_name, room=session_id)
+            if(room_name in tempRoomdict):
+                emit('Do_not_create_duplicates', room=session_id)
+            else :
+                tempRoomdict[room_name] = {"room_password" :data["room_password"], "room_max_human": data["room_max_human"]}
+                emit('Join_room', room_name, room=session_id)
 
     @socketio.on('create_room')
     def create_room_sock(data):
         session_id = request.sid
         room_name = data['room_name']
         if room_data_manager.create_room(room_name,session_id):
-            emit('room_update', room_name, broadcast=True)
+            if room_name is tempRoomdict:
+                room_data_manager._data_store[room_name]["room_info"]['room_password'] = tempRoomdict[room_name]["room_password"]
+                room_data_manager._data_store[room_name]["room_info"]['room_full_user'] = tempRoomdict[room_name]["room_max_human"]
+                tempRoomdict.pop(room_name)
+            max_user = room_data_manager._data_store[room_name]["room_info"]["room_full_user"]
+            emit('room_update', {'room_name': room_name, "max_user": max_user}, broadcast=True)
 
     @socketio.on('join')
     def join_sock(data):
@@ -43,7 +53,13 @@ def room_Socket(socketio):
         except:
             pass
         
-
+    @socketio.on("passwordCheckToServer")
+    def password_check(data):
+        print("passwordCheck", room_data_manager._data_store[data["room_name"]]["room_info"]["room_password"], " ", data["password"])
+        if data["password"] == room_data_manager._data_store[data["room_name"]]["room_info"]["room_password"]:
+            emit('Join_room', data["room_name"], room=request.sid)
+        else:
+            emit('passwordFail',room=request.sid)
     @socketio.on('user_check')
     def user_check(data):
         user_name = current_user.name
@@ -52,8 +68,11 @@ def room_Socket(socketio):
         if room_data_manager.is_user_in_room(user_name,room_name):
             emit('user_check_not_ok', room=session_id)
         else :
-            if room_data_manager.room_user_check(room_name) < room_data_manager._data_store[room_name]["room_info"]["room_full_user"]:
-                emit('Join_room',room_name, room=session_id)
+            if room_data_manager.room_user_check(room_name) < int(room_data_manager._data_store[room_name]["room_info"]["room_full_user"]):
+                if room_data_manager._data_store[room_name]["room_info"]["room_password"] is not None and room_data_manager._data_store[room_name]["room_info"]["room_password"] is not "":
+                    emit("passwordCheck",room_name, room=session_id)
+                else:
+                    emit('Join_room',room_name, room=session_id)
             else : 
                 emit("room_full_user", room_name, room=session_id)
 
@@ -68,6 +87,5 @@ def room_Socket(socketio):
     def playingroom_hidden(room_name):
         room_data_manager.game_status(room_name, False)
         room_status = room_data_manager._data_store[room_name]["room_info"]["room_status"]
-        print("wpqkf",room_status)
         room_data_manager.game_init(room_name)
         emit('request_room_changed', {"room_name":room_name,"room_status":room_status},  broadcast = True)

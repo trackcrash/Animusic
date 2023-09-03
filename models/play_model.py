@@ -4,6 +4,7 @@ from models.user_model import get_user_by_id
 from flask import jsonify
 from flask_login import current_user
 from models.user_model import get_userinfo_by_name
+from controllers.map_controller import show_mission_byid
 class RoomDataManger:
     def __init__(self):
         self._data_store = dict()
@@ -39,9 +40,11 @@ class RoomDataManger:
             room_data = {
                 "room_info":{
                     "session_id":session_id,
-                    #room_password, room_status, playing\
+                    "room_password": None,
                     "room_status" : False,
-                    "room_full_user" : 8
+                    "room_full_user" : 8,
+                    "room_mission" : None,
+                    "is_skip" : True
                 },
                 "user":
                 {
@@ -115,7 +118,8 @@ class RoomDataManger:
     
     def game_status(self, room_name, booldata):
         self._data_store[room_name]['room_info']['room_status'] = booldata
-
+    def Mission_select(self, room_name, mission):
+        self._data_store[room_name]['room_info']['room_mission'] = mission
     def game_init(self, room_name):
         dictionaryData = self._data_store[room_name]['user']
         for key, value in dictionaryData.items():
@@ -231,6 +235,11 @@ def dict_create(dict_name,dict_index,dict_value):
 
 def get_room_dict():
     room_dict = room_data_manager._data_store
+    
+    return jsonify(room_dict)
+
+def get_thisroom_dict(room_name):
+    room_dict = room_data_manager._data_store[room_name]
     
     return jsonify(room_dict)
 

@@ -2,7 +2,7 @@
 let totalPlayers = 0;
 let skipvote = 0;
 let currentvideolink = "";
-let selectedId = 0;
+let selectedId = null;
 let player_name = document.getElementById('User_Name').innerText;
 let isHost = false;
 let player;
@@ -10,11 +10,14 @@ let GameTimer = 0;
 let doMessage = true;
 let playerStateChangeHandler; // 이벤트 핸들러를 저장할 변수
 let gameTimerInterval; //setInteval 이벤트
-let isSkipFlag = true;
 let currentData = null;
 let isVideoPlaying = false;
 let AbleCheckAnswerTime;
 let Num = 0;
+
+function fetchData(url, callback) {
+    $.getJSON(url, callback);
+}
 // DOM Elements
 const elements = {
     messages: document.getElementById('messages'),
@@ -61,11 +64,8 @@ function showHint(hint) {
 }
 
 function voteSkip() {
-    console.log("voteSkip호출됨");
     elements.nextButton.disabled = true;
-    socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) }, () => {
-        isSkipFlag = true;
-    });
+    socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
 }
 
 
@@ -125,12 +125,12 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
     });
 
     videoOverlay.style.display = 'block';
-
 }
 
 
 function onPlayerEvent(startTime) {
     player.playVideo();
+    socket.emit("skipAble", {"room": room_name});
     if (startTime > 0) {
         seekTo(startTime);
     }
@@ -145,7 +145,6 @@ function OnNextPlay(startTime, endTime, totalSong, nowSong, callback) {
     if (startTime > 0) {
         seekTo(startTime);
     }
-
     callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
 }
 
@@ -160,18 +159,15 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
         if (AbleCheckAnswerTime != 0) {
             AbleCheckAnswerTime--;
         }
-        if (GameTimer <= 0) {
+        if (GameTimer < 1) {
             clearInterval(gameTimerInterval);
-            if (!isSkipFlag) {
-                voteSkip();
-            }
-            return;
+            voteSkip();
+            return;  
         }
         GameTimer--;
     }, 1000);
     document.querySelector("#AllNumber").innerText = totalSong;
     document.querySelector("#nowNumber").innerText = nowSong;
-    isSkipFlag = false;
     // videoFrame 요소의 title 속성이 표시되지 않게 함 (주소는 지울 수가 없음...)
     document.getElementById("videoFrame").removeAttribute("title");
     elements.nextButton.disabled = false;
@@ -197,7 +193,7 @@ function seekTo(seconds) {
 }
 
 function requiredSkipVotes(players) {
-    return players <= 2 ? players : players <= 6 ? Math.ceil(players / 2) : Math.ceil(players * 0.7);
+    return players <= 2 ? players : players - 1;
 }
 
 function updateVoteCountUI(count) {
@@ -211,16 +207,12 @@ function initEventListeners() {
         if (event.key === 'Enter') sendMessage();
     });
     elements.nextButton.addEventListener('click', () => {
-        if (!isSkipFlag) {
-            voteSkip();
-        }
+        voteSkip();
     });
     // 키보드의 end 버튼을 눌러도 nextButton이 눌리게끔 하는 동작
     document.addEventListener('keydown', (event) => {
         if (event.key === 'End' && elements.nextButton.disabled === false) {
-            if (!isSkipFlag) {
-                voteSkip();
-            }
+            voteSkip();
         }
     });
     elements.hintButton.addEventListener('click', () => {
@@ -228,7 +220,7 @@ function initEventListeners() {
     });
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
-        socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId });
+        socket.emit('playTheGame', { "room_name": room_name, "selected_id": selectedId });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
     elements.textClear.addEventListener('click', () => {
@@ -254,6 +246,7 @@ function initializeSocketEvents() {
         elements.nextButton.style.display = "block";
         elements.hintButton.style.display = "block";
         elements.StartButton.style.display = "none";
+        songTitle.innerHTML = "";
         nextButton.disabled = false;
         updateVoteCountUI(0);
         showHostContent(true);
@@ -285,6 +278,8 @@ function initializeSocketEvents() {
     //게임 끝났을 때 init
     socket.on('EndOfData', function(data) {
         // 기존의 게임 상태 및 UI 초기화 코드
+        player.stopVideo();
+        clearInterval(gameTimerInterval);
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
@@ -296,8 +291,6 @@ function initializeSocketEvents() {
         document.getElementById('skipVoteCount').innerText = "";
         nextButton.style.display = "none";
         hintButton.style.display = "none";
-        player.stopVideo();
-        clearInterval(gameTimerInterval);
         socket.emit('playingStatus_false', room_name);
         showHostContent(false);
         currentData = data;
@@ -382,7 +375,10 @@ function initializeSocketEvents() {
     });
 
     socket.on('MissionSelect_get', data => {
-        socket.emit("playTheGame", data);
+        const map_name =data['map_data'][0]['MapName'];
+        const Producer = data['map_data'][0]['MapProducer']
+        console.log(data['map_data'][0]['MapName']);
+        songTitle.innerText = `${map_name} \n 제작자 : ${Producer}`;
     });
 
     socket.on('correctAnswer', data => {
@@ -393,9 +389,7 @@ function initializeSocketEvents() {
             elements.videoOverlay.style.display = 'none';
             showSongInfo(data.data.title, data.data.song, data.name);
             if (document.querySelector("#NextVideo").checked) {
-                if (!isSkipFlag) {
-                    voteSkip();
-                }
+                voteSkip();
             }
         }
     });
@@ -428,6 +422,7 @@ window.onload = () => {
             showHostContent(false);
         })
     });
+
 };
 window.addEventListener('scroll', function() {
     let scrollYvalue = window.scrollY;
@@ -441,6 +436,10 @@ socket.on("user_change", (data) => {
     let count = data["count"];
     totalPlayers = data["totalPlayers"];
     updateVoteCountUI(count);
+    if (count >= totalPlayers)
+    {
+
+    }
 })
 
 socket.on('host_updated', (data) => {
@@ -450,6 +449,21 @@ socket.on('host_updated', (data) => {
         isHost = true; // 방장이면 isHost를 true로 설정
     }
     showHostContent(game_status);
+    if(!game_status)
+    {
+        fetchData(`/get-thisroom-dict?room_name=${room_name}`, (data) => {
+            const mission = data["room_info"]["room_mission"];
+            document.getElementById('room_name').innerHTML = `${room_name}`;
+            if(mission)
+            {
+                songTitle.innerText = `${mission[0]["MapName"]} \n 제작자 : ${mission[0]["MapProducer"]}`;
+            }
+        });
+    }
+    else
+    {
+        songTitle.innerText = `다른 유저들이 플레이중인 곡이 끝나면 참가 하실 수 있습니다. 잠시만 기다려주세요.`;
+    }
 });
 
 function showHostContent(game_status) {
@@ -539,6 +553,8 @@ function selectAndClose(id) {
     setSelectedId(id);
     // Close the modal
     document.getElementById('mapModal').classList.add('hidden');
+    socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId });
+    
 }
 
 function closeModal() {
@@ -550,7 +566,9 @@ function setSelectedId(id) {
     selectedId = id;
     videoOverlay.style.display = 'block';
 }
-
+socket.on('MapNotSelect', () => {
+    alert("맵을 선택 후 시작해주세요");
+});
 socket.on('room_players_update', (data) => {;
     if (data.room_name == room_name) {
         const item = document.createElement('div');

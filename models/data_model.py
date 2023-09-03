@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column
 
-from db.database import Base, session
+from db.database import Base, create_session,close_session
 from flask_login import current_user
 
 from collections import deque
@@ -56,10 +56,11 @@ class Mission(Base):
         self.MapProducer = MapProducer
         self.Thumbnail = Thumbnail
         self.MapProducer_id = MapProducer_id
-
+        
 
 # 코드 구조개선 --kyaru 16/08/23 12:00
 def save_to_db(data):
+    engine,session = create_session()
     try:
         MissionMapName = data[-1]['MapName']
         MissionMapProducer = data[-1]['MapProducer']
@@ -86,9 +87,10 @@ def save_to_db(data):
         return f'Error saving data: {str(e)}'
     # 세션닫기 추가
     finally:
-        session.close()
+       close_session(engine,session)
 
 def update_to_db(data):
+    engine, session = create_session()
     try:
         data = deque(data)
         mission_data = data.pop()
@@ -137,4 +139,4 @@ def update_to_db(data):
         print(error_msg)
         return error_msg
     finally:
-        session.close()
+        close_session(engine,session)
