@@ -6,6 +6,7 @@ from models.play_model import make_answer, music_data_manager, room_data_manager
 from Socket.socket import socket_class
 from models.room_model import update_room_player_count
 from models.user_model import get_userinfo_by_name, update_level_info
+from controllers.map_controller import show_mission_byid
 #반복이라 함수로 분리
 def skip_song(room):
     next_data = music_data_manager.retrieve_next_data(room)
@@ -106,22 +107,29 @@ def play_Socket(socketio):
             emit('hint', {'hint': current_data['hint']}, room=room_name)
 
     @socketio.on("playTheGame")
-    def playTheGame(room_name):
-        socket_class.totalPlayers = len(room_data_manager._data_store[room_name]['user'])
-        first_data = music_data_manager.retrieve_data(room_name)
-        totalSong = len(music_data_manager._data_store[room_name]['data'])
-        nowSong = int(music_data_manager._data_store.get(room_name, {})['current_index']) + 1
-        if first_data:
-            youtube_embed_url = first_data['youtube_embed_url']
-            start_time = float(first_data['startTime'])
-            end_time = float(first_data['endTime'])
-            emit('PlayGame', {'totalPlayers': socket_class.totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime': end_time, 'totalSong': totalSong, 'nowSong': nowSong}, room=room_name)
-
+    def playTheGame(data):
+        room_name = data["room_name"]
+        mission_id = data["selected_id"]
+        if mission_id is not None:
+            make_answer(mission_id ,room_name)    
+            socket_class.totalPlayers = len(room_data_manager._data_store[room_name]['user'])
+            first_data = music_data_manager.retrieve_data(room_name)
+            totalSong = len(music_data_manager._data_store[room_name]['data'])
+            nowSong = int(music_data_manager._data_store.get(room_name, {})['current_index']) + 1
+            if first_data:
+                youtube_embed_url = first_data['youtube_embed_url']
+                start_time = float(first_data['startTime'])
+                end_time = float(first_data['endTime'])
+                emit('PlayGame', {'totalPlayers': socket_class.totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime': end_time, 'totalSong': totalSong, 'nowSong': nowSong}, room=room_name)
+        else : 
+            emit("MapNotSelect", room=request.sid)
     @socketio.on('MissionSelect')
     def send_saved_data(data):
         room_name = data.get("room_name")
-        make_answer(map_controller.get_music_data(data['selected_id']), room_name)
-        emit('MissionSelect_get', room_name, room=room_name)
+        # make_answer(map_controller.get_music_data(data['selected_id']), room_name)
+        mission = show_mission_byid(data['selected_id'])
+        room_data_manager.Mission_select(room_name, mission)
+        emit('MissionSelect_get', {'room_name' : room_name, "map_data": mission }, broadcast= True)
 
 
     @socketio.on('autoSkip')
@@ -148,22 +156,30 @@ def play_Socket(socketio):
     #스킵투표
     @socketio.on('voteSkip')
     def handle_vote_skip(data):
-                room = data.get("room")
-                user = current_user.name
-                if room not in socket_class.vote_counts:
-                    socket_class.vote_counts[room] = 0
-                if user not in socket_class.voted_users:
-                    socket_class.voted_users[room] = [] 
-                # 이름 기준으로 이미 투표한 사용자는 다시 투표할 수 없도록 처리
-                if user in socket_class.voted_users[room]:
-                    return
-                socket_class.vote_counts[room] += 1
-                socket_class.voted_users[room].append(user)
-                required_votes = data['requiredSkipVotes']
-                if socket_class.vote_counts[room] >= required_votes:
-                    player_count = socket_class.vote_counts[room]
-                    socket_class.vote_counts[room] = 0
-                    socket_class.voted_users[room] = [] #초기화
-                    skip_song(room)
-                else:
-                    emit('updateVoteCount', {'count': socket_class.vote_counts[room]}, room=room)
+        room = data.get("room")
+        user = current_user.name
+        # 이름 기준으로 이미 투표한 사용자는 다시 투표할 수 없도록 처리
+        if user in socket_class.voted_users[room]:
+            return
+        socket_class.vote_counts[room] += 1
+        socket_class.voted_users[room].append(user)
+        required_votes = data['requiredSkipVotes']
+        if socket_class.vote_counts[room] >= required_votes:
+            if room_data_manager._data_store[room]["room_info"]["is_skip"]:
+                room_data_manager._data_store[room]["room_info"]["is_skip"] = False
+                skip_song(room)
+        else:
+            emit('updateVoteCount', {'count': socket_class.vote_counts[room]}, room=room)
+            
+    @socketio.on('skipAble')
+    def skipAble(data):
+        room = data.get("room")
+        user = current_user.name
+        if room not in socket_class.vote_counts:
+            socket_class.vote_counts[room] = 0
+        if user not in socket_class.voted_users:
+            socket_class.voted_users[room] = [] 
+        socket_class.vote_counts[room] = 0
+        socket_class.voted_users[room] = [] 
+        room_data_manager._data_store[room]["room_info"]["is_skip"] = True
+

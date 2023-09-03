@@ -1,10 +1,10 @@
 const roomNameElementIdPrefix = 'room-count-';
-
+const roomNameElementMissionPrefix = 'room-Mission-'
 function fetchData(url, callback) {
     $.getJSON(url, callback);
 }
 
-function createRoomElement(room_name, room_status, user_count) {
+function createRoomElement(room_name, room_status, user_count, mission) {
     const roomContainer = document.createElement('div');
     roomContainer.id = `roomContainer_${room_name}`;
     roomContainer.classList.add('room-container', 'grid', 'grid-rows-1', 'gap-4', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition', 'duration-300', 'hover:bg-gray-100');
@@ -17,17 +17,27 @@ function createRoomElement(room_name, room_status, user_count) {
     const roomCountElement = document.createElement('span');
     roomCountElement.id = `${roomNameElementIdPrefix}${room_name}`;
     roomCountElement.classList.add('room-count', 'text-sm', 'text-gray-600');
-    roomCountElement.textContent = user_count ? `${user_count}명` : "0명";
+    roomCountElement.textContent = `인원 : ${user_count ? user_count+"명" : "1명"}`;
 
     const InnerDivContainer = document.createElement('div');
     InnerDivContainer.classList.add('grid', 'grid-rows-3', 'gap-4', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition', 'duration-300', 'hover:bg-gray-100');
-    
+
+    const roomMissionElement = document.createElement('span');
+    roomMissionElement.id = `${roomNameElementMissionPrefix}1-${room_name}`;
+    roomMissionElement.classList.add('text-sm', 'text-gray-600');
+    roomMissionElement.textContent = `맵 : ${ mission ? mission[0]['MapName']: "미설정"}`;
+    const MissionProducerElement = document.createElement('span');
+    MissionProducerElement.id = `${roomNameElementMissionPrefix}2-${room_name}`;
+    MissionProducerElement.classList.add('text-sm', 'text-gray-600');
+    MissionProducerElement.textContent = `맵 제작자 : ${ mission ? mission[0]['MapProducer']: "미설정"}`;
     const roomStatusElement = document.createElement('span');
     roomStatusElement.classList.add('room-status', 'text-sm', 'text-gray-600');
     roomStatusElement.textContent = room_status ? "게임중" : "대기중";
 
     roomContainer.appendChild(button);
     InnerDivContainer.appendChild(roomCountElement);
+    InnerDivContainer.appendChild(roomMissionElement);
+    InnerDivContainer.appendChild(MissionProducerElement);
     InnerDivContainer.appendChild(roomStatusElement); // 여기에 roomStatusElement 추가
     roomContainer.appendChild(InnerDivContainer);
     ContaineraddClickListener(roomContainer, room_name);
@@ -44,8 +54,16 @@ function ContaineraddClickListener(roomContainer, room_name)
 function updateRoomCount(room_name, playerCount) {
     const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${room_name}`);
     if (roomCountElement) {
-        roomCountElement.textContent = `${playerCount}명`;
+        roomCountElement.textContent = `인원 : ${playerCount}명`;
     }
+}
+function updateMission(room_name, mission)
+{
+    const roomMissionName = document.getElementById(`${roomNameElementMissionPrefix}1-${room_name}`);
+    const roomMissionProducer = document.getElementById(`${roomNameElementMissionPrefix}2-${room_name}`);
+
+    roomMissionName.innerText = `맵 : ${mission[0]['MapName']}`;
+    roomMissionProducer.innerText = `맵 제작자 : ${mission[0]['MapProducer']}`;
 }
 
 function create_room_button() {
@@ -93,17 +111,21 @@ function firstCreateRoom() {
                 const roomInfo = room_dict[room_name]["room_info"];
                 const roomStatus = roomInfo["room_status"];
                 const user_info = room_dict[room_name]["user"];
+                const Mission = roomInfo["room_mission"];
                 const user_count = Object.keys(user_info).length;
                 // roomStatus를 이용하여 원하는 작업 수행
-                roomButtonsContainer.appendChild(createRoomElement(room_name, roomStatus,user_count));
+                roomButtonsContainer.appendChild(createRoomElement(room_name, roomStatus,user_count,Mission));
             }
         });
     });
 }
 
-function addRoomToList(room_name) {
+function addRoomToList(room_name, mission) {
     const roomButtonsContainer = document.getElementById('room-buttons');
-    roomButtonsContainer.appendChild(createRoomElement(room_name,false));
+    roomButtonsContainer.appendChild(createRoomElement(room_name,false,false,false));
+
+    
+
 }
 
 function removeRoomFromList(room_name) {
@@ -174,4 +196,10 @@ socket.on('request_room_changed', (data) => {
 socket.on("room_full_user", (data) =>
 {
     alert(data+"방의 인원이 가득 차있습니다.");
+})
+socket.on("MissionSelect_get", (data) =>
+{
+    const room_name = data["room_name"];
+    const mission = data['map_data'];
+    updateMission(room_name,mission);
 })

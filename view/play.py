@@ -1,4 +1,4 @@
-from models.play_model import make_answer ,get_room_dict, get_user
+from models.play_model import make_answer ,get_room_dict, get_user,get_thisroom_dict
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import current_user, login_required
 from models.play_model import room_data_manager
@@ -12,6 +12,14 @@ def single_play():
 @login_required
 def get_room_dictAll():
     return get_room_dict()
+
+
+@play_bp.get("/get-thisroom-dict")
+@login_required
+def get_thisroom_dictAll():
+    room_name = request.args.get('room_name')
+    return get_thisroom_dict(room_name)
+
 
 @play_bp.get("/get_user_info")
 @login_required
