@@ -109,8 +109,8 @@ function push_exceldata(excelFile_data) {
             song_info.push(excelFile_data[i]['맵 제작 프리셋 양식파일'])
             song_info.push(excelFile_data[i]['__EMPTY'])
 
-            let answer_list = new Set(excelFile_data[i]['__EMPTY_1'].split(','));
-            for (let i of answer_list) {answer_list.add(i.replace(/\s/g, ""))};
+            let answer_list = new Set(excelFile_data[i]['__EMPTY_1'].split(',').filter(Boolean));
+            for (let i of answer_list) {answer_list.add(i.replace(/\s+/g, ""))};
             song_info.push(Array.from(answer_list).join(","));
 
             song_info.push(excelFile_data[i]['__EMPTY_2'])
