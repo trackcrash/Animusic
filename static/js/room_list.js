@@ -14,7 +14,7 @@ function createRoomElement(room_key, room_name, room_status, user_count, mission
     titleContainer.classList.add('flex', 'justify-between', 'items-center');
 
     const button = document.createElement('a');
-    button.textContent = `${room_name}`;
+    button.textContent = `${room_key} ${room_name}`;
     button.classList.add('room-button', 'text-2xl', 'font-semibold', 'text-blue-500', 'hover:text-blue-600');
     button.dataset.room_key = room_key;
 
@@ -33,7 +33,7 @@ function createRoomElement(room_key, room_name, room_status, user_count, mission
     const roomCountElement = document.createElement('span');
     roomCountElement.id = `${roomNameElementIdPrefix}${room_key}`;
     roomCountElement.classList.add('block', 'text-sm', 'text-gray-500', 'font-medium');
-    roomCountElement.textContent = `👥 ${user_count ? user_count + "명" : "1명"} / ${max_user}명`;
+    roomCountElement.textContent = `👥 ${user_count ? user_count + "명" : "0명"} / ${max_user}명`;
 
     const roomMissionElement = document.createElement('span');
     roomMissionElement.id = `${roomNameElementMissionPrefix}1-${room_key}`;
@@ -42,6 +42,7 @@ function createRoomElement(room_key, room_name, room_status, user_count, mission
 
     const thumbnailContainer = document.createElement('div');
     thumbnailContainer.classList.add('flex', 'justify-center', 'items-center', 'bg-gray-100', 'rounded-lg', 'overflow-hidden', 'mb-4');
+    thumbnailContainer.id = `thumbnail_${room_key}`;
 
     if (mission && mission[0]['Thumbnail']) {
         const thumbnail = document.createElement('img');
@@ -62,6 +63,7 @@ function createRoomElement(room_key, room_name, room_status, user_count, mission
     MissionProducerElement.textContent = `👤 ${mission ? mission[0]['MapProducer'] : "미설정"}`;
 
     const roomStatusElement = document.createElement('span');
+    roomStatusElement.id = `room_status_${room_key}`
     roomStatusElement.classList.add('block', 'text-sm', 'font-semibold', 'text-gray-700');
     roomStatusElement.textContent = room_status ? "🟢 게임중" : "🔴 대기중";
 
@@ -90,18 +92,10 @@ function ContaineraddClickListener(roomContainer, room_key) {
 function updateRoomCount(room_key, playerCount) {
     const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${room_key}`);
     if (roomCountElement) {
-        roomCountElement.textContent = `인원 : ${playerCount}명`;
+        const textContents = roomCountElement.textContent.split('/');
+        roomCountElement.textContent = `👥 ${playerCount ? playerCount + "명" : "0명"} / ${textContents[1]}`;
     }
 }
-
-function updateMission(room_key, mission) {
-    const roomMissionName = document.getElementById(`${roomNameElementMissionPrefix}1-${room_key}`);
-    const roomMissionProducer = document.getElementById(`${roomNameElementMissionPrefix}2-${room_key}`);
-
-    roomMissionName.innerText = `맵 : ${mission[0]['MapName']}`;
-    roomMissionProducer.innerText = `맵 제작자 : ${mission[0]['MapProducer']}`;
-}
-
 function create_room_button() {
     // 사용자 정보를 가져옵니다.
     $('#CreateRoomModal').removeClass('hidden');
@@ -211,13 +205,12 @@ socket.on('update_waiting_userlist', (data) => {
     userlist.innerText = "현재 대기실 인원 수: " + Object.keys(data).length + "명\n" + Object.keys(data).join('\n');
 });
 
-// 해당 방을 안보이게 처리함
 socket.on('request_room_changed', (data) => {
     let playing = data["room_status"];
     if (playing) {
-        document.getElementById('roomContainer_' + data["room_key"]).querySelector('.room-status').innerText = "게임중";
+        document.getElementById(`room_status_${data['room_key']}`).innerText = "🟢 게임중";
     } else {
-        document.getElementById('roomContainer_' + data["room_key"]).querySelector('.room-status').innerText = "대기중";
+        document.getElementById(`room_status_${data['room_key']}`).innerText = "🔴 대기중";
     }
 });
 socket.on("room_full_user", (data) => {
@@ -228,6 +221,29 @@ socket.on("MissionSelect_get", (data) => {
     const mission = data['map_data'];
     updateMission(room_key, mission);
 })
+
+function updateMission(room_key, mission) {
+    console.log(room_key);
+    const roomMissionName = document.getElementById(`${roomNameElementMissionPrefix}1-${room_key}`);
+    const roomMissionProducer = document.getElementById(`${roomNameElementMissionPrefix}2-${room_key}`);
+    const thumbnailContainer = document.getElementById(`thumbnail_${room_key}`);
+    thumbnailContainer.innerHTML = "";
+    if (mission && mission[0]['Thumbnail']) {
+        const thumbnail = document.createElement('img');
+        thumbnail.src = mission[0]['Thumbnail'];
+        thumbnail.alt = 'Mission Thumbnail';
+        thumbnail.classList.add('w-full', 'h-48', 'object-cover', 'shadow-md', 'transition', 'duration-300', 'hover:shadow-lg');
+        thumbnailContainer.appendChild(thumbnail);
+    } else {
+        const placeholderText = document.createElement('p');
+        placeholderText.textContent = '맵 선택 중';
+        thumbnailContainer.appendChild(placeholderText);
+    }
+
+    roomMissionName.innerText = `🗺️ ${mission ? mission[0]['MapName'] : "미설정"}`;
+    roomMissionProducer.innerText = `👤 ${mission ? mission[0]['MapProducer'] : "미설정"}`;
+}
+
 
 socket.on("passwordCheck", (data) => {
     let password = prompt("비밀번호를 입력해주세요")
@@ -270,8 +286,12 @@ socket.on("room_data_update", (data) => {
     const room_name = data["room_name"];
     const room_private = data["room_private"];
     const room_max_human = data["room_max_human"];
+    const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${room_key}`);
+    if (roomCountElement) {
+        const textContents = roomCountElement.textContent.split('/');
+        roomCountElement.textContent = `${textContents[0]} / ${room_max_human}명`;
+    }
     document.getElementById(`roomContainer_${room_key}`).getElementsByTagName('a')[0].innerText = `${room_key} ${room_name}`;
-    document.getElementById(`max-user-${room_key}`).innerText = `최대인원 : ${room_max_human}`;
     document.getElementById(`room-private-${room_key}`).innerText = room_private ? "private" : "public";
-
+    document.getElementById(`room-private-${room_key}`).style.backgroundColor = room_private ? "#F87171" : "#34D399";
 });
