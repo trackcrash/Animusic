@@ -17,8 +17,8 @@ def get_room_dictAll():
 @play_bp.get("/get-thisroom-dict")
 @login_required
 def get_thisroom_dictAll():
-    room_name = request.args.get('room_name')
-    return get_thisroom_dict(room_name)
+    room_key = request.args.get('room_key')
+    return get_thisroom_dict(room_key)
 
 
 @play_bp.get("/get_user_info")
@@ -29,9 +29,9 @@ def get_user_info():
 @play_bp.get('/multi_game')
 @login_required
 def chat():
-    room_name = request.args.get('room_name')
+    room_key = request.args.get('room_key')
     user_name = current_user.name
-    if room_data_manager.is_user_in_room(user_name, room_name):
+    if room_data_manager.is_user_in_room(user_name, room_key):
          flash("이미 방에 입장해 있습니다.", "warning")
          return redirect(url_for('index'))
     return render_template('multi_game/multi_game.html',current_user=current_user)
@@ -40,5 +40,5 @@ def chat():
 @login_required
 def chat_post():
     mission_id = request.args.get('id')
-    make_answer(mission_id, request.args.get('room_name'))
+    make_answer(mission_id, request.args.get('room_key'))
     return render_template('multi_game/multi_game.html',current_user=current_user)

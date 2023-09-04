@@ -20,6 +20,7 @@ function fetchData(url, callback) {
 }
 // DOM Elements
 const elements = {
+    room_setting : document.getElementById("room_setting"),
     messages: document.getElementById('messages'),
     inputMessage: document.getElementById('inputMessage'),
     videoOverlay: document.getElementById('videoOverlay'),
@@ -31,14 +32,14 @@ const elements = {
     textClear: document.getElementById('text_clear')
 };
 
-const room_name = new URLSearchParams(window.location.search).get('room_name');
+const room_key = new URLSearchParams(window.location.search).get('room_key');
 
 function sendMessage() {
     if (doMessage) {
         doMessage = false;
         const content = elements.inputMessage.value.trim();
         if (content) {
-            socket.emit('message', { content, room: room_name, timeOut: (AbleCheckAnswerTime == 0 ? true : false) });
+            socket.emit('message', { content, room: room_key, timeOut: (AbleCheckAnswerTime == 0 ? true : false) });
             elements.inputMessage.value = '';
         }
         setTimeout(() => {
@@ -65,7 +66,7 @@ function showHint(hint) {
 
 function voteSkip() {
     elements.nextButton.disabled = true;
-    socket.emit('voteSkip', { "room": room_name, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
+    socket.emit('voteSkip', { "room": room_key, "requiredSkipVotes": requiredSkipVotes(totalPlayers) });
 }
 
 
@@ -130,7 +131,7 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
 
 function onPlayerEvent(startTime) {
     player.playVideo();
-    socket.emit("skipAble", {"room": room_name});
+    socket.emit("skipAble", {"room": room_key});
     if (startTime > 0) {
         seekTo(startTime);
     }
@@ -216,11 +217,12 @@ function initEventListeners() {
         }
     });
     elements.hintButton.addEventListener('click', () => {
-        socket.emit('showHint', { "room": room_name });
+        socket.emit('showHint', { "room": room_key });
     });
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
-        socket.emit('playTheGame', { "room_name": room_name, "selected_id": selectedId });
+        console.log("play");
+        socket.emit('playTheGame', { "room_key": room_key, "selected_id": selectedId });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
     elements.textClear.addEventListener('click', () => {
@@ -250,7 +252,7 @@ function initializeSocketEvents() {
         nextButton.disabled = false;
         updateVoteCountUI(0);
         showHostContent(true);
-        socket.emit('playingStatus_true', room_name, () => {
+        socket.emit('playingStatus_true', room_key, () => {
             let scoreItem = document.querySelectorAll(".ScoreSpan")
             for (const element of scoreItem) {
                 element.innerHTML = 0;
@@ -291,7 +293,7 @@ function initializeSocketEvents() {
         document.getElementById('skipVoteCount').innerText = "";
         nextButton.style.display = "none";
         hintButton.style.display = "none";
-        socket.emit('playingStatus_false', room_name);
+        socket.emit('playingStatus_false', room_key);
         showHostContent(false);
         currentData = data;
         const scores = data.before_data;
@@ -376,8 +378,7 @@ function initializeSocketEvents() {
 
     socket.on('MissionSelect_get', data => {
         const map_name =data['map_data'][0]['MapName'];
-        const Producer = data['map_data'][0]['MapProducer']
-        console.log(data['map_data'][0]['MapName']);
+        const Producer = data['map_data'][0]['MapProducer'];
         songTitle.innerText = `${map_name} \n 제작자 : ${Producer}`;
     });
 
@@ -415,11 +416,31 @@ function initializeSocketEvents() {
 }
 
 window.onload = () => {
-    socket.emit('create_room', { room_name: room_name }, () => {
-        socket.emit('join', { room_name: room_name }, () => {
+    socket.emit('create_room',{"room_key":room_key}, () => {
+        socket.emit('join', { room_key: room_key}, () => {
             initEventListeners();
             initializeSocketEvents();
             showHostContent(false);
+            fetchData(`/get-thisroom-dict?room_key=${room_key}`, (data) => {
+                const mission = data["room_info"]["room_mission"];
+                const game_status = data["room_info"]["room_status"]
+                const room_name = data["room_info"]["room_name"];
+                document.getElementById("room_title").value = room_name;
+                document.getElementById("room_password").value = data["room_info"]["room_password"];
+                document.getElementById("room_max_human").value = data["room_info"]["room_full_user"];
+                document.getElementById('room_name').innerHTML = `${room_name}`;
+                if(!game_status)
+                {
+                    if(mission)
+                    {
+                        songTitle.innerText = `${mission[0]["MapName"]} \n 제작자 : ${mission[0]["MapProducer"]}`;
+                    }
+                }
+                else
+                {
+                    songTitle.innerText = `다른 유저들이 플레이중인 곡이 끝나면 참가 하실 수 있습니다. 잠시만 기다려주세요.`;
+                }
+            });
         })
     });
 
@@ -433,12 +454,13 @@ window.addEventListener('scroll', function() {
     }
 });
 socket.on("user_change", (data) => {
+    console.log("test");
     let count = data["count"];
     totalPlayers = data["totalPlayers"];
     updateVoteCountUI(count);
     if (count >= totalPlayers)
     {
-
+        socket.emit("Skip", {"room_key":room_key});
     }
 })
 
@@ -449,25 +471,12 @@ socket.on('host_updated', (data) => {
         isHost = true; // 방장이면 isHost를 true로 설정
     }
     showHostContent(game_status);
-    if(!game_status)
-    {
-        fetchData(`/get-thisroom-dict?room_name=${room_name}`, (data) => {
-            const mission = data["room_info"]["room_mission"];
-            document.getElementById('room_name').innerHTML = `${room_name}`;
-            if(mission)
-            {
-                songTitle.innerText = `${mission[0]["MapName"]} \n 제작자 : ${mission[0]["MapProducer"]}`;
-            }
-        });
-    }
-    else
-    {
-        songTitle.innerText = `다른 유저들이 플레이중인 곡이 끝나면 참가 하실 수 있습니다. 잠시만 기다려주세요.`;
-    }
 });
 
 function showHostContent(game_status) {
     if (isHost) {
+        elements.room_setting.style.display = "block";
+        elements.room_setting.disabled = false;
         if (game_status == false) {
             elements.StartButton.style.display = "block";
             elements.MapSelect.style.display = "block";
@@ -486,6 +495,8 @@ function showHostContent(game_status) {
 
         }
     } else {
+        elements.room_setting.style.display = "none";
+        elements.room_setting.disabled = true;
         elements.StartButton.style.display = "none";
         elements.MapSelect.style.display = "none";
         elements.StartButton.disabled = true;
@@ -553,7 +564,7 @@ function selectAndClose(id) {
     setSelectedId(id);
     // Close the modal
     document.getElementById('mapModal').classList.add('hidden');
-    socket.emit('MissionSelect', { "room_name": room_name, "selected_id": selectedId });
+    socket.emit('MissionSelect', { "room_key": room_key, "selected_id": selectedId });
     
 }
 
@@ -569,8 +580,9 @@ function setSelectedId(id) {
 socket.on('MapNotSelect', () => {
     alert("맵을 선택 후 시작해주세요");
 });
-socket.on('room_players_update', (data) => {;
-    if (data.room_name == room_name) {
+socket.on('room_players_update', (data) => {
+    console.log(data)
+    if (data.room_key == room_key) {
         const item = document.createElement('div');
         item.innerHTML = `<span class="font-semibold">${data.player}</span> ${data.msg}`;
         elements.messages.appendChild(item);
@@ -623,3 +635,42 @@ function playerListGet(players) {
         index++;
     });
 }
+function Setting_room_btn() {
+    // 사용자 정보를 가져옵니다.
+    $('#SettingRoomModal').removeClass('hidden');
+}
+$('#SettingRoomModalCloseBtn').click(function() {
+    console.log("클릭");
+    $('#SettingRoomModal').addClass('hidden');
+});
+$('#SettingRoomBtn').click(function() {
+    $('#SettingRoomModal').addClass('hidden');
+        const room_name = $("#room_title").val();
+        const room_password = $("#room_password").val();
+        const room_max_human = $("#room_max_human").val();
+
+        if (room_name && room_name.trim() !== '') {
+            socket.emit('room_setting_change', {room_key:room_key,room_name: room_name, room_password: room_password, room_max_human:room_max_human});
+        } else if (room_name !== null) { // 취소 버튼을 클릭하지 않은 경우
+            alert("올바른 방 이름을 입력해주세요.");
+        }
+    }
+);
+socket.on("room_data_update_inroom",(data)=>
+{
+    const thisroom_key = data["room_key"];
+    if(thisroom_key == room_key)
+    {
+        const room_name = data["room_name"];
+        const room_max_human = data["room_max_human"];
+        document.getElementById('room_name').innerText = room_name;
+        document.getElementById("room_title").value = room_name;
+        document.getElementById("room_password").value=data["room_password"];
+        document.getElementById("room_max_human").value = room_max_human;
+    }
+});
+socket.on("failed_user_change",()=>
+{
+    alert("현재 유저수가 변경할 인원수 보다 많습니다.");
+});
+

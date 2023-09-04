@@ -5,15 +5,16 @@ from flask import jsonify
 from flask_login import current_user
 from models.user_model import get_userinfo_by_name
 from controllers.map_controller import show_mission_byid
+import copy
 class RoomDataManger:
     def __init__(self):
         self._data_store = dict()
-    def remove_room(self, room_name):
-        if room_name in self._data_store:
-            del self._data_store[room_name]
-    def user_left(self, room_name, user_id):
-        if room_name in self._data_store and "user" in self._data_store[room_name]:
-            users = self._data_store[room_name]["user"]
+    def remove_room(self, room_key):
+        if room_key in self._data_store:
+            del self._data_store[room_key]
+    def user_left(self, room_key, user_id):
+        if room_key in self._data_store and "user" in self._data_store[room_key]:
+            users = self._data_store[room_key]["user"]
         
         if len(users) > 0:
             if user_id in users and users[user_id]["host"] == 1:
@@ -22,23 +23,24 @@ class RoomDataManger:
                 users[longest_present_user]["host"] = 1
                 return longest_present_user
             
-    def room_check(self, room_name):
-        if room_name in self._data_store:
+    def room_check(self, room_key):
+        if room_key in self._data_store:
             return True
         else:
             return False
         
-    def create_room(self,room_name,session_id):
-            if room_name in self._data_store:
+    def create_room(self,room_key,session_id):
+            if room_key in self._data_store:
                 return False
             
             # 방 중복생성 금지 (클라이언트에 해당 이벤트 요청)
             #방을 생성할 사용자의 정보를 room_data_manager에 저장
             #해당 사용자의 세션 id
-            print(f"해당 사용자의 방 생성 정보: {session_id, room_name}")
+            print(f"해당 사용자의 방 생성 정보: {session_id, room_key}")
             #방 정보 room_data_manager에 담기 위한 data
             room_data = {
                 "room_info":{
+                    "room_name" : "temp",
                     "session_id":session_id,
                     "room_password": None,
                     "room_status" : False,
@@ -51,43 +53,42 @@ class RoomDataManger:
 
                 }
             }
-            dict_create(self._data_store,room_name,room_data)
-            print(f"{room_name}님이 방을 생성하셨습니다.")
+            dict_create(self._data_store,room_key,room_data)
             return True
     
-    def join(self, room_name, session_id, current_user,time):
+    def join(self, room_key, session_id, current_user,time):
         user_name = current_user.name
         user=get_user_by_id(current_user.id)
         character = user.character
         level = user.level
         character_link = str(character)
-        print(f"{room_name}방에 연결되었습니다.")
+        print(f"{room_key}방에 연결되었습니다.")
         user_data = {'username': user_name , 'host':0 ,'score':0 ,'joined_time' : time.time(), 'character':character_link,'level':level}  # 유저 데이터를 리스트로 생성
-        dict_join(self._data_store[room_name]["user"], session_id, user_data)
+        dict_join(self._data_store[room_key]["user"], session_id, user_data)
     
     def get_all_session_ids_in_rooms(self):
         session_ids = []
 
         # 모든 방에 대해서 반복
-        for room_name, room_data in self._data_store.items():
+        for room_key, room_data in self._data_store.items():
             if "user" in room_data:
                 # 방에 있는 모든 세션 아이디를 리스트에 추가
                 session_ids.extend(room_data["user"].keys())
 
         return session_ids
-    def user_update(self, room_name, session_id):
-        user_name=self._data_store[room_name]["user"][session_id]['username']
+    def user_update(self, room_key, session_id):
+        user_name=self._data_store[room_key]["user"][session_id]['username']
         user = get_userinfo_by_name(user_name)
         character = user.character
         level = user.level
         character_link = str(character)
-        previous_user = self._data_store[room_name]["user"][session_id]
+        previous_user = self._data_store[room_key]["user"][session_id]
         user_data = {'username': user_name , 'host':previous_user['host'] ,'score':previous_user['score'] ,'joined_time' :previous_user['joined_time'], 'character':character_link,'level':level}
-        dict_join(self._data_store[room_name]["user"], session_id, user_data)
+        dict_join(self._data_store[room_key]["user"], session_id, user_data)
 
-    def host_setting(self,room_name, callback=None):  
-        if room_name in self._data_store and "user" in self._data_store[room_name]:
-            users = self._data_store[room_name]["user"]
+    def host_setting(self,room_key, callback=None):  
+        if room_key in self._data_store and "user" in self._data_store[room_key]:
+            users = self._data_store[room_key]["user"]
             if users:  # 유저 정보가 있는 경우
                 first_user_key = next(iter(users))  # 첫 번째 유저의 키를 가져옵니다.
                 if first_user_key in users:
@@ -106,27 +107,27 @@ class RoomDataManger:
         if callback:
             callback()  # 콜백 함수 호출
 
-    def is_user_in_room(self, user_name, room_name):
-        if room_name not in self._data_store:  # 방 이름이 존재하지 않는 경우
+    def is_user_in_room(self, user_name, room_key):
+        if room_key not in self._data_store:  # 방 이름이 존재하지 않는 경우
             return False  # 사용자는 방에 없는 것으로 간주
 
-        dictionaryData = self._data_store[room_name]['user']
+        dictionaryData = self._data_store[room_key]['user']
         for key, value in dictionaryData.items():
             if 'username' in value and value['username'] == user_name:
                 return True
         return False
     
-    def game_status(self, room_name, booldata):
-        self._data_store[room_name]['room_info']['room_status'] = booldata
-    def Mission_select(self, room_name, mission):
-        self._data_store[room_name]['room_info']['room_mission'] = mission
-    def game_init(self, room_name):
-        dictionaryData = self._data_store[room_name]['user']
+    def game_status(self, room_key, booldata):
+        self._data_store[room_key]['room_info']['room_status'] = booldata
+    def Mission_select(self, room_key, mission):
+        self._data_store[room_key]['room_info']['room_mission'] = mission
+    def game_init(self, room_key):
+        dictionaryData = self._data_store[room_key]['user']
         for key, value in dictionaryData.items():
             value['score'] = 0
 
-    def room_user_check(self, room_name):
-        playerNum = len(self._data_store[room_name]['user'])
+    def room_user_check(self, room_key):
+        playerNum = len(self._data_store[room_key]['user'])
         return playerNum
                 
 room_data_manager = RoomDataManger()
@@ -134,20 +135,20 @@ class MusicDataManager:
     def __init__(self):
         self._data_store = dict()
 
-    def store_data(self, room_name, data):
-        self._data_store[room_name] = {
+    def store_data(self, room_key, data):
+        self._data_store[room_key] = {
             'data': data,
             'current_index': 0
         }
-    def index_data(self, room_name):
-        return self._data_store.get(room_name, {}).get('current_index', 0)
+    def index_data(self, room_key):
+        return self._data_store.get(room_key, {}).get('current_index', 0)
     
-    def retrieve_data(self, room_name):
-        index = self._data_store.get(room_name, {}).get('current_index', 0)
-        return self._data_store.get(room_name, {}).get('data', [])[index]
+    def retrieve_data(self, room_key):
+        index = self._data_store.get(room_key, {}).get('current_index', 0)
+        return self._data_store.get(room_key, {}).get('data', [])[index]
 
-    def retrieve_next_data(self, room_name):
-        room_data = self._data_store.get(room_name, {})
+    def retrieve_next_data(self, room_key):
+        room_data = self._data_store.get(room_key, {})
         room_data['current_index'] += 1
         data = room_data.get('data', [])
         idx = room_data.get('current_index', 0)
@@ -156,12 +157,12 @@ class MusicDataManager:
             return next_item
         return None
 
-    def remove_data(self, room_name):
-        if room_name in self._data_store:
-            del self._data_store[room_name]
+    def remove_data(self, room_key):
+        if room_key in self._data_store:
+            del self._data_store[room_key]
     
-    def check_answer(self, room_name, answer):
-        room_data = self._data_store.get(room_name, {})
+    def check_answer(self, room_key, answer):
+        room_data = self._data_store.get(room_key, {})
         data = room_data.get('data', [])
         idx = room_data.get('current_index', 0)
         # Data is available
@@ -173,7 +174,7 @@ class MusicDataManager:
 
 music_data_manager = MusicDataManager()
 
-def make_answer(mission_id, room_name):
+def make_answer(mission_id, room_key):
     data = show_table_bymissionid(mission_id)
     result = []
 
@@ -196,8 +197,8 @@ def make_answer(mission_id, room_name):
 
     random.shuffle(result)
 
-    music_data_manager.store_data(room_name, result)
-    return room_name
+    music_data_manager.store_data(room_key, result)
+    return room_key
 
 
 def single_make_answer(mission_id):
@@ -234,12 +235,13 @@ def dict_create(dict_name,dict_index,dict_value):
         dict_name[dict_index] = dict_value
 
 def get_room_dict():
-    room_dict = room_data_manager._data_store
-    
+    room_dict = copy.deepcopy(room_data_manager._data_store)
+    for key, value in room_dict.items():
+        room_dict[key]["room_info"]["room_password"] = False if room_dict[key]["room_info"]["room_password"] in ('', None) else True 
     return jsonify(room_dict)
 
-def get_thisroom_dict(room_name):
-    room_dict = room_data_manager._data_store[room_name]
+def get_thisroom_dict(room_key):
+    room_dict = copy.deepcopy(room_data_manager._data_store[room_key])
     
     return jsonify(room_dict)
 

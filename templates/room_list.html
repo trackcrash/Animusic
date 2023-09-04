@@ -1,31 +1,40 @@
 <head>
     <title>Chat Room List</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="{{ url_for('static', filename='js/socket_function.js') }}"></script>
     <style>
         .scrollable {
-            max-height: 300px;
             overflow-y: auto;
+            max-height: 80vh;
+        }
+        
+        #room-buttons {
+            min-height: 50%;
+            margin-left: 10%;
+            margin-right: 10%;
+        }
+        
+        #room-list>div {
+            min-height: 200px;
         }
     </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-200 h-screen">
+
     {% include "header.html" %}
-    <div class="container mx-auto mb-16">
-        <h1 class="text-center text-3xl font-bold mb-8">대기실</h1>
-        <ul id="room-list" class="grid grid-cols-5 gap-6 scrollable mb-4">
-        </ul>
-        <div id="room-buttons" class="grid grid-cols-2 gap-4 scrollable mb-4"></div>
+    <h1 class="text-center text-4xl font-semibold text-gray-700 mb-10">대기실</h1>
+    <div id="room-buttons" class="grid grid-cols-2 gap-4 scrollable mb-8 shadow-lg p-4 rounded bg-white"></div>
     </div>
+
     <div class="fixed bottom-4 left-4">
-        <div id="userlist" class="bg-white p-4 rounded shadow-md scrollable"></div>
+        <div id="userlist" class="bg-white p-4 rounded-lg shadow-lg max-h-60 scrollable"></div>
     </div>
 
     <div class="fixed bottom-4 right-4">
-        <button onclick="create_room_button()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Create Room</button>
+        <button onclick="create_room_button()" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition duration-300 shadow-lg">Create Room</button>
     </div>
 
     <div id="CreateRoomModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -38,13 +47,16 @@
                         <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                             방 생성
                         </h3>
-                        <div class="flex items-center justify-between"><p class="w-1/4">방제목 : </p><input id ="room_title" type="text" class="border p-4 my-1 w-3/4"></div>
-                        <div class="flex items-center justify-between"><p class="w-1/4">패스워드 : </p><input id ="room_password" type="text" class="border p-4 my-1 w-3/4"></div>
-                        <div class="flex items-center justify-between"><p class="w-1/4">인원 : </p><input id ="room_max_human"  type="number" min="1" max="8" value="8" class="border p-4 my-1 w-3/4"></div>
+                        <div class="flex items-center justify-between">
+                            <p class="w-1/4">방제목 : </p><input id="room_title" type="text" class="border p-4 my-1 w-3/4"></div>
+                        <div class="flex items-center justify-between">
+                            <p class="w-1/4">패스워드 : </p><input id="room_password" type="text" class="border p-4 my-1 w-3/4"></div>
+                        <div class="flex items-center justify-between">
+                            <p class="w-1/4">인원 : </p><input id="room_max_human" type="number" min="1" max="8" value="8" class="border p-4 my-1 w-3/4"></div>
                     </div>
                 </div>
                 <div class="mt-5 sm:mt-6">
-                    <button id="CreateRoomBtn" type="button"  class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm">
+                    <button id="CreateRoomBtn" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm">
                         CreateRoom
                     </button>
                     <button id="CreateRoomModalCloseBtn" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm">

@@ -22,6 +22,7 @@
     <div id="dummy" style="display: none;">
 
     </div>
+    <button id="room_setting" onclick="Setting_room_btn()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg transition duration-300 ease-in-out" >방설정 변경</button>
     <div id = "room_name" class="text-sm font-bold text-center text-3xl"></div>
     <div class="flex mt-1 mx-4">
         <!-- Left Players Section -->
@@ -153,6 +154,32 @@
             <button id="levelUpModalCloseBtn" class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">OK</button>
         </div>
     </div>
+    </div>
+    <div id="SettingRoomModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-6">
+                <div class="sm:flex sm:items-start">
+                    <div class="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            방 설정 변경
+                        </h3>
+                        <div class="flex items-center justify-between"><p class="w-1/4">방제목 : </p><input id ="room_title" type="text" class="border p-4 my-1 w-3/4"></div>
+                        <div class="flex items-center justify-between"><p class="w-1/4">패스워드 : </p><input id ="room_password" type="text" class="border p-4 my-1 w-3/4"></div>
+                        <div class="flex items-center justify-between"><p class="w-1/4">인원 : </p><input id ="room_max_human"  type="number" min="1" max="8" value="8" class="border p-4 my-1 w-3/4"></div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-6">
+                    <button id="SettingRoomBtn" type="button"  class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm">
+                        SettingRoom
+                    </button>
+                    <button id="SettingRoomModalCloseBtn" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 
