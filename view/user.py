@@ -1,5 +1,7 @@
 #user_main --author: NewKyaru 30/08/2023
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from decouple import config
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, Flask
+from flask_mail import Mail
 from flask_login import logout_user, login_required, current_user
 from controllers.user_controller import user_controller, google_login, google_callback
 from controllers.user_controller import register as user_register
@@ -7,7 +9,15 @@ from models.user_model import delete_account, account_insert, account_insert_in_
 
 
 user_bp = Blueprint('user', __name__, url_prefix='')
+app = Flask(__name__)
+app.config['MAIL_SERVER'] = config('MAIL_SERVER')
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = config('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = config('MAIL_PASSWORD')
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
 
+mail = Mail(app)
 @user_bp.get('/delete_account_confirm')
 @login_required
 def delete_account_confirm():
@@ -98,3 +108,8 @@ def select_character():
 def insert_character():
     character_number = request.get_json().get('character_number')
     return insert_character_number(character_number)
+
+@user_bp.route('/send_verification_email', methods=['POST'])
+def send_verification_email():
+    email = request.get_json().get('email')
+    return user_register(email)
