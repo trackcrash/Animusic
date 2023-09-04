@@ -154,6 +154,9 @@ def play_Socket(socketio):
             
     @socketio.on("ReadyPlay")
     def ReadyPlay(data):
+        if data["playerState"] != 5:
+            emit("PlayVideoReadyNotOk",  room= request.sid)
+            return
         room_key = data["room_key"]
         if room_key not in socket_class.play_vote :
             socket_class.play_vote[room_key] = []
