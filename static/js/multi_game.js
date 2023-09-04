@@ -392,7 +392,10 @@ function initializeSocketEvents() {
         playvideo(videolink, data.data.endTime);
         showSongInfo(data.data.title, data.data.song, data.name);
         if (document.querySelector("#NextVideo").checked) {
-            voteSkip();
+            setTimeout(function()
+            {
+                voteSkip();
+            },1000)
         }
     });
 
