@@ -12,16 +12,6 @@ class RoomDataManger:
     def remove_room(self, room_key):
         if room_key in self._data_store:
             del self._data_store[room_key]
-    def user_left(self, room_key, user_id):
-        if room_key in self._data_store and "user" in self._data_store[room_key]:
-            users = self._data_store[room_key]["user"]
-        
-        if len(users) > 0:
-            if user_id in users and users[user_id]["host"] == 1:
-            # 가장 오랜 시간 동안 머문 사용자를 새로운 방장으로 설정
-                longest_present_user = max(users, key=lambda user: users[user]["joined_time"])
-                users[longest_present_user]["host"] = 1
-                return longest_present_user
             
     def room_check(self, room_key):
         if room_key in self._data_store:
@@ -86,24 +76,24 @@ class RoomDataManger:
         user_data = {'username': user_name , 'host':previous_user['host'] ,'score':previous_user['score'] ,'joined_time' :previous_user['joined_time'], 'character':character_link,'level':level}
         dict_join(self._data_store[room_key]["user"], session_id, user_data)
 
-    def host_setting(self,room_key, callback=None):  
+    def host_setting(self, room_key, callback=None):
         if room_key in self._data_store and "user" in self._data_store[room_key]:
             users = self._data_store[room_key]["user"]
+            print("users",users)
             if users:  # 유저 정보가 있는 경우
-                first_user_key = next(iter(users))  # 첫 번째 유저의 키를 가져옵니다.
-                if first_user_key in users:
+                all_hosts_zero = all(user["host"] == 0 for user in users.values())
+                if all_hosts_zero:
+                    first_user_key = list(users.keys())[0] # 첫 번째 사용자의 키를 가져옵니다.
                     users[first_user_key]["host"] = 1  # host를 1로 변경합니다.
                     # 변경된 정보 출력
-                    print("First user's data after modification:", users[first_user_key])
+                    print(f"Host setting for user {first_user_key}: {users[first_user_key]}")
                     return first_user_key
                 else:
-                    print("First user not found in the user dictionary.")
+                    print("Not all users have host set to 0.")
             else:
                 print("No user data in the room.")
-                return ""
         else:
             print("Room not found or no user data in the room.")
-            return ""
         if callback:
             callback()  # 콜백 함수 호출
 
