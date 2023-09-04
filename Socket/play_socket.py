@@ -141,7 +141,6 @@ def play_Socket(socketio):
             
     @socketio.on("ReadyPlay")
     def ReadyPlay(data):
-        print("this",data)
         room_key = data["room_key"]
         current_data = music_data_manager.retrieve_data(room_key)
         current_data['totalSong'] =len(music_data_manager._data_store[room_key]['data'])

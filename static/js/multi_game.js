@@ -131,7 +131,6 @@ function playvideo(videolink,endTime = null) {
         }
     });
     videoOverlay.style.display = 'block';
-    console.log(player);
 }
 
 
@@ -143,7 +142,10 @@ function onPlayerReady(event, endTime) {
 }
 
 function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
-    player.playVideo();
+    setTimeout(function()
+    {
+        player.playVideo();
+    },1000)
     let endTime = fendTime;
 
     setVolume(document.querySelector("#VolumeBar").value);
@@ -281,10 +283,12 @@ function initializeSocketEvents() {
     });
     //게임 끝났을 때 init
     socket.on('EndOfData', function(data) {
-        // 기존의 게임 상태 및 UI 초기화 코드
-        console.log(player);
-        player.stopVideo();
+        // 기존의 게임 상태 및 UI 초기화 코드        
         clearInterval(gameTimerInterval);
+        setTimeout(function()
+        {
+            player.stopVideo();
+        },1000)
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
@@ -394,8 +398,9 @@ function initializeSocketEvents() {
         if (document.querySelector("#NextVideo").checked) {
             setTimeout(function()
             {
+                console.log("자동스킵");
                 voteSkip();
-            },1000)
+            },2000)
         }
     });
 
@@ -471,6 +476,7 @@ socket.on("PlayVideoReadyOk", (data)=>
 })
 socket.on("PlayVideoReadyNotOk", (data)=>
 {
+    console.log("실패");
     playvideo(data['current_data']["youtube_embed_url"],data['endTime']);
 })
 socket.on("user_change", (data) => {
