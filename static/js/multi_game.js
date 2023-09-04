@@ -282,6 +282,7 @@ function initializeSocketEvents() {
     //게임 끝났을 때 init
     socket.on('EndOfData', function(data) {
         // 기존의 게임 상태 및 UI 초기화 코드
+        console.log(player);
         player.stopVideo();
         clearInterval(gameTimerInterval);
         songTitle.innerText = "";
@@ -387,7 +388,6 @@ function initializeSocketEvents() {
     socket.on('correctAnswer', data => {
         isAnswer =false;
         const videolink = data["data"]["youtube_embed_url"];
-        console.log(videolink);
         clearInterval(gameTimerInterval);
         playvideo(videolink, data.data.endTime);
         showSongInfo(data.data.title, data.data.song, data.name);
