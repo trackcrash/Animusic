@@ -195,6 +195,8 @@ document.getElementById("register-btn").addEventListener("click", (e) => {
     const end_seconds = (endH * 3600) + (endM * 60) + endS + endMS;
     const endTime = String(end_seconds);
 
+    if (start_seconds >= end_seconds) {endTime = '0'};
+
     const inputList =  document.querySelectorAll('#submission-form input:not([id="MapName-input"])');
     const h4List = document.querySelectorAll('#grid-container .box h4');
     const boxList = document.querySelectorAll('#grid-container .box');
