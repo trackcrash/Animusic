@@ -112,7 +112,7 @@ def play_Socket(socketio):
     def playTheGame(data):
         room_key = data['room_key']
         mission_id = data['selected_id']
-        if mission_id is not None:
+        if mission_id != None:
             make_answer(mission_id ,room_key)
             socket_class.totalPlayers[room_key] = len(room_data_manager._data_store[room_key]['user'])
             first_data = music_data_manager.retrieve_data(room_key)

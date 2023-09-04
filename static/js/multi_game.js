@@ -135,7 +135,7 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong) {
 
 
 function onPlayerEvent() {
-    socket.emit("ReadyPlay", {"room_key":room_key ,"end_time": endTime})
+    socket.emit("ReadyPlay", {"room_key":room_key ,"end_time": player.endTime})
     //player.playVideo();
 
 }
