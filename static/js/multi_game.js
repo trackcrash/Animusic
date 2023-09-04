@@ -20,6 +20,7 @@ function fetchData(url, callback) {
 }
 // DOM Elements
 const elements = {
+    room_setting : document.getElementById("room_setting"),
     messages: document.getElementById('messages'),
     inputMessage: document.getElementById('inputMessage'),
     videoOverlay: document.getElementById('videoOverlay'),
@@ -424,6 +425,9 @@ window.onload = () => {
                 const mission = data["room_info"]["room_mission"];
                 const game_status = data["room_info"]["room_status"]
                 const room_name = data["room_info"]["room_name"];
+                document.getElementById("room_title").value = room_name;
+                document.getElementById("room_password").value = data["room_info"]["room_password"];
+                document.getElementById("room_max_human").value = data["room_info"]["room_full_user"];
                 document.getElementById('room_name').innerHTML = `${room_name}`;
                 if(!game_status)
                 {
@@ -471,6 +475,8 @@ socket.on('host_updated', (data) => {
 
 function showHostContent(game_status) {
     if (isHost) {
+        elements.room_setting.style.display = "block";
+        elements.room_setting.disabled = false;
         if (game_status == false) {
             elements.StartButton.style.display = "block";
             elements.MapSelect.style.display = "block";
@@ -489,6 +495,8 @@ function showHostContent(game_status) {
 
         }
     } else {
+        elements.room_setting.style.display = "none";
+        elements.room_setting.disabled = true;
         elements.StartButton.style.display = "none";
         elements.MapSelect.style.display = "none";
         elements.StartButton.disabled = true;
@@ -627,3 +635,42 @@ function playerListGet(players) {
         index++;
     });
 }
+function Setting_room_btn() {
+    // 사용자 정보를 가져옵니다.
+    $('#SettingRoomModal').removeClass('hidden');
+}
+$('#SettingRoomModalCloseBtn').click(function() {
+    console.log("클릭");
+    $('#SettingRoomModal').addClass('hidden');
+});
+$('#SettingRoomBtn').click(function() {
+    $('#SettingRoomModal').addClass('hidden');
+        const room_name = $("#room_title").val();
+        const room_password = $("#room_password").val();
+        const room_max_human = $("#room_max_human").val();
+
+        if (room_name && room_name.trim() !== '') {
+            socket.emit('room_setting_change', {room_key:room_key,room_name: room_name, room_password: room_password, room_max_human:room_max_human});
+        } else if (room_name !== null) { // 취소 버튼을 클릭하지 않은 경우
+            alert("올바른 방 이름을 입력해주세요.");
+        }
+    }
+);
+socket.on("room_data_update_inroom",(data)=>
+{
+    const thisroom_key = data["room_key"];
+    if(thisroom_key == room_key)
+    {
+        const room_name = data["room_name"];
+        const room_max_human = data["room_max_human"];
+        document.getElementById('room_name').innerText = room_name;
+        document.getElementById("room_title").value = room_name;
+        document.getElementById("room_password").value=data["room_password"];
+        document.getElementById("room_max_human").value = room_max_human;
+    }
+});
+socket.on("failed_user_change",()=>
+{
+    alert("현재 유저수가 변경할 인원수 보다 많습니다.");
+});
+

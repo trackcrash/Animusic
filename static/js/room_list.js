@@ -250,3 +250,14 @@ $('#CreateRoomBtn').click(function() {
         }
     });
 });
+socket.on("room_data_update",(data)=>
+{
+    const room_key = data["room_key"];
+    const room_name = data["room_name"];
+    const room_private= data["room_private"];
+    const room_max_human = data["room_max_human"];
+    document.getElementById(`roomContainer_${room_key}`).getElementsByTagName('a')[0].innerText = `${room_key} ${room_name}`;
+    document.getElementById(`max-user-${room_key}`).innerText = `최대인원 : ${room_max_human}`;
+    document.getElementById(`room-private-${room_key}`).innerText = room_private ? "private" : "public";
+
+});

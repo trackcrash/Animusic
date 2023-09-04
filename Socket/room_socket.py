@@ -87,3 +87,22 @@ def room_Socket(socketio):
         room_status = room_data_manager._data_store[room_key]["room_info"]["room_status"]
         room_data_manager.game_init(room_key)
         emit('request_room_changed', {"room_key":room_key,"room_status":room_status},  broadcast = True)
+    
+    @socketio.on("room_setting_change")
+    def room_setting_changehandler(data):
+        room_key = data['room_key']
+        room_name = data['room_name']
+        room_password = data['room_password']
+        room_max_human = data['room_max_human']
+        if int(room_max_human) < room_data_manager.room_user_check(room_key):
+            emit("failed_user_change", room = request.sid)
+            return
+        room_info = room_data_manager._data_store[room_key]["room_info"]
+        room_info["room_name"] = room_name
+        room_info["room_password"] = room_password
+        room_info["room_full_user"] = room_max_human
+        room_private = True
+        if room_info["room_password"] == "" or room_info["room_password"] == None:
+            room_private = False
+        emit("room_data_update_inroom", {"room_key": room_key, "room_name": room_name, "room_max_human": room_max_human, "room_password":room_password}, room = room_key)    
+        emit("room_data_update", {"room_key": room_key, "room_name": room_name, "room_max_human": room_max_human, "room_private":room_private}, broadcast = True)
