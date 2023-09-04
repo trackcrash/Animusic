@@ -152,18 +152,6 @@ def play_Socket(socketio):
         else:
             emit('updateVoteCount', {'count': socket_class.vote_counts[room]}, room=room)
             
-    @socketio.on('skipAble')
-    def skipAble(data):
-        room = data.get("room")
-        user = current_user.name
-        if room not in socket_class.vote_counts:
-            socket_class.vote_counts[room] = 0
-        if user not in socket_class.voted_users:
-            socket_class.voted_users[room] = [] 
-        socket_class.vote_counts[room] = 0
-        socket_class.voted_users[room] = [] 
-        room_data_manager._data_store[room]["room_info"]["is_skip"] = True
-
     @socketio.on("ReadyPlay")
     def ReadyPlay(data):
         room_key = data["room_key"]
@@ -173,4 +161,11 @@ def play_Socket(socketio):
         if len(socket_class.play_vote[room_key]) >= socket_class.totalPlayers[room_key] :
             emit("PlayVideoReadyOk", room=room_key)
             socket_class.play_vote[room_key] = []
-        
+            if room_key not in socket_class.vote_counts:
+                socket_class.vote_counts[room_key] = 0
+            if room_key not in socket_class.voted_users:
+                socket_class.voted_users[room_key] = [] 
+            socket_class.vote_counts[room_key] = 0
+            socket_class.voted_users[room_key] = [] 
+            room_data_manager._data_store[room_key]["room_info"]["is_skip"] = True
+            

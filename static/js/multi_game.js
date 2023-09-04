@@ -135,7 +135,6 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong) {
 
 
 function onPlayerEvent() {
-    socket.emit("skipAble", {"room": room_key});
     socket.emit("ReadyPlay", {"room_key":room_key})
     //player.playVideo();
 
