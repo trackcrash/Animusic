@@ -12,8 +12,21 @@ let playerStateChangeHandler; // 이벤트 핸들러를 저장할 변수
 let gameTimerInterval; //setInteval 이벤트
 let currentData = null;
 let isVideoPlaying = false;
-let AbleCheckAnswerTime;
 let Num = 0;
+let isAnswer = false;
+// let is_api_load= false;
+
+// function onYouTubeIframeAPIReady() {
+//     // 플레이어 생성 및 설정
+//     player = new YT.Player('player', {
+//         height: '360',
+//         width: '640',
+//         videoId: 'VIDEO_ID_HERE', // YouTube 비디오의 ID를 여기에 입력
+//         events: {
+//         }
+//     });
+//     is_api_load = true;
+// }
 function fetchData(url, callback) {
     $.getJSON(url, callback);
 }
@@ -38,7 +51,7 @@ function sendMessage() {
         doMessage = false;
         const content = elements.inputMessage.value.trim();
         if (content) {
-            socket.emit('message', { content, room: room_key, timeOut: (AbleCheckAnswerTime == 0 ? true : false) });
+            socket.emit('message', { content, room: room_key,gameTimer: GameTimer < 1 ? false : true, isAnswer:isAnswer});
             elements.inputMessage.value = '';
         }
         setTimeout(() => {
@@ -70,7 +83,7 @@ function voteSkip() {
 
 
 function dummyplay() {
-    let embedLink = "https://www.youtube.com/embed/LN1ASBClb0Q?autoplay=1&loop=1";
+    let embedLink = "http://www.youtube.com/embed/LN1ASBClb0Q?autoplay=1&loop=1";
     const iframe = document.createElement("iframe");
     iframe.src = embedLink;
     iframe.allow = "autoplay";
@@ -82,19 +95,18 @@ function dummyplay() {
     dummy.appendChild(iframe);
 }
 
-function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong) {
+function playvideo(videolink,endTime = null) {
     const videoId = getYoutubeVideoId(videolink);
     let videoFrame;
-    AbleCheckAnswerTime = 1;
     if (!videoId) {
         console.error("Invalid YouTube URL provided");
         return;
     }
+
     if (player) {
         player.destroy();
         document.querySelector("div #videoFrame").remove();
         isVideoPlaying = false;
-        player = "";
         videoFrame = document.createElement("div");
         videoFrame.id = "videoFrame";
         videoFrame.classList.add("absolute", "top-0", "left-0", "w-full", "h-full")
@@ -112,48 +124,44 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong) {
             'rel': 0,
         },
         events: {
-            'onReady': onPlayerReady,
+            'onReady': function(event)
+            {
+                onPlayerReady(event,endTime)   
+            }
         }
     });
-
-    player.startTime = startTime;
-    player.endTime = endTime;
-    player.totalSong= totalSong;
-    player.nowSong = nowSong;
-
     videoOverlay.style.display = 'block';
+    console.log(player);
 }
 
 
-function onPlayerReady(event) {
+function onPlayerReady(event, endTime) {
     // YouTube 플레이어가 준비되었을 때 호출됩니다.
-
     const playerState = player.getPlayerState();
-    socket.emit("ReadyPlay", {"room_key":room_key ,"end_time": player.endTime,"playerState": playerState})
+    socket.emit("ReadyPlay", {"room_key":room_key ,"endTime": endTime,"playerState": playerState})
     
 }
 
 function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
     player.playVideo();
     let endTime = fendTime;
-    if (endTime == "stop") {
-        clearInterval(gameTimerInterval)
-        elements.videoOverlay.style.display = 'none';
-        return;
-    }
+
     setVolume(document.querySelector("#VolumeBar").value);
     if (startTime > 0) {
         seekTo(startTime);
     }  
+    if (endTime == "stop") {
+        clearInterval(gameTimerInterval)
+        elements.videoOverlay.style.display = 'none';
+        isAnswer= false;
+        return;
+    }
     if (endTime == 0 || endTime > player.getDuration()) {
         endTime = player.getDuration();
     }
     GameTimer = endTime - startTime;
     gameTimerInterval = setInterval(() => {
         document.querySelector("#GameTimer span").innerText = parseInt(GameTimer);
-        if (AbleCheckAnswerTime != 0) {
-            AbleCheckAnswerTime--;
-        }
         if (GameTimer < 1) {
             clearInterval(gameTimerInterval);
             voteSkip();
@@ -166,6 +174,7 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
     // videoFrame 요소의 title 속성이 표시되지 않게 함 (주소는 지울 수가 없음...)
     document.getElementById("videoFrame").removeAttribute("title");
     elements.nextButton.disabled = false;
+    isAnswer = true;
 }
 
 function getYoutubeVideoId(url) {
@@ -235,9 +244,8 @@ function initializeSocketEvents() {
     socket.on("PlayGame", data => {
         totalPlayers = data.totalPlayers;
         currentvideolink = data.youtubeLink;
-        totalSong = data.totalSong;
-        nowSong = data.nowSong;
-        playvideo(currentvideolink, data.startTime, data.endTime, totalSong, nowSong);
+        console.log(currentvideolink);
+        playvideo(currentvideolink);
         elements.MapSelect.style.display = "none";
         elements.nextButton.style.display = "block";
         elements.hintButton.style.display = "block";
@@ -255,12 +263,12 @@ function initializeSocketEvents() {
     });
     //다음 곡 진행
     socket.on('NextData', (data) => {
+        isAnswer = false;
+        console.log(data);
         currentvideolink = data.youtubeLink;
         totalPlayers = data['totalPlayers'];
         clearInterval(gameTimerInterval);
-        nowSong = data.nowSong;
-        totalSong = data.totalSong
-        playvideo(currentvideolink, data.startTime, data.endTime, totalSong, nowSong);
+        playvideo(currentvideolink);
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
@@ -377,14 +385,14 @@ function initializeSocketEvents() {
     });
 
     socket.on('correctAnswer', data => {
-        nowSong = data.nowSong;
-        totalSong = data.totalSong;
-        if (GameTimer > 0) {
-            playvideo(currentvideolink, data.startTime, "stop", totalSong, nowSong);
-            showSongInfo(data.data.title, data.data.song, data.name);
-            if (document.querySelector("#NextVideo").checked) {
-                voteSkip();
-            }
+        isAnswer =false;
+        const videolink = data["data"]["youtube_embed_url"];
+        console.log(videolink);
+        clearInterval(gameTimerInterval);
+        playvideo(videolink, data.data.endTime);
+        showSongInfo(data.data.title, data.data.song, data.name);
+        if (document.querySelector("#NextVideo").checked) {
+            voteSkip();
         }
     });
 
@@ -431,7 +439,7 @@ window.onload = () => {
                 }
                 else
                 {
-                    songTitle.innerText = `다른 유저들이 플레이중인 곡이 끝나면 참가 하실 수 있습니다. 잠시만 기다려주세요.`;
+                    songTitle.innerText = `로딩중입니다. 잠시만 기다려주세요.`;
                 }
             });
         })
@@ -446,6 +454,22 @@ window.addEventListener('scroll', function() {
 
     }
 });
+socket.on("failed_user_change",()=>
+{
+    alert("현재 유저수가 변경할 인원수 보다 많습니다.");
+});
+// EndTimeTest(startTime, fendTime, totalSong, nowSong)
+socket.on("PlayVideoReadyOk", (data)=>
+{
+    setTimeout(function()
+    {
+        EndTimeTest(data['startTime'], data['endTime'], data['current_data']['totalSong'],data['current_data']['nowSong']);
+    },1000)
+})
+socket.on("PlayVideoReadyNotOk", (data)=>
+{
+    playvideo(data['current_data']["youtube_embed_url"],data['endTime']);
+})
 socket.on("user_change", (data) => {
     console.log("test");
     let count = data["count"];
@@ -664,17 +688,4 @@ socket.on("room_data_update_inroom",(data)=>
         document.getElementById("room_password").value=data["room_password"];
         document.getElementById("room_max_human").value = room_max_human;
     }
-});
-socket.on("failed_user_change",()=>
-{
-    alert("현재 유저수가 변경할 인원수 보다 많습니다.");
-});
-// EndTimeTest(startTime, fendTime, totalSong, nowSong)
-socket.on("PlayVideoReadyOk", ()=>
-{
-    EndTimeTest(player.startTime, player.endTime, player.totalSong,player.nowSong)    
-})
-socket.on("PlayVideoReadyNotOk", ()=>
-{
-        playvideo(currentvideolink, player.startTime, player.endTime, player.totalSong, player.nowSong);
-})
+}); 
