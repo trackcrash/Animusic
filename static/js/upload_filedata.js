@@ -182,6 +182,8 @@ function push_exceldata(excelFile_data) {
                     end_time = end_number;
                 } else {start_time = 0};
 
+                if (start_time >= end_time) {end_time = 0};
+
                 song_info.push(start_time);
                 song_info.push(end_time);
 

@@ -14,7 +14,7 @@ function open_tutorial() {
             <button onclick="close_tutorial()" type="button" class="px-2 py-1 mt-1 ml-2 bg-red-500 text-white rounded hover:bg-red-600">&times;</button>
         </div>
         <span onclick="manual_make()" class="flex justify-start mt-10 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600" style="font-size: 20px;">직접 입력하는 방법</span>
-        <span onclick="auto_make()" class="flex justify-start mt-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600" style="font-size: 20px;">엑셀파일로 한번에 만드는 방법</span>
+        <span onclick="auto_make()" class="flex justify-start mt-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600" style="font-size: 20px;">엑셀파일을 이용하는 방법</span>
     `;
 };
 
@@ -67,8 +67,8 @@ function manual_make() {
         </div>
         <div class="flex" style="position: fixed; bottom: 30px; width: 90%;">
             <div class="w-1/2"></div>
-            <div class=" w-1/2 flex mt-10">
-                <button type="button" onclick="open_tutorial()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">&#x25C0; 이전페이지</button>
+            <div class="w-1/2 flex mt-10">
+                <div class="w-1/2"></div>
                 <button type="button" onclick="manual2_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">다음페이지 &#x25B6;</button>
             </div>
         </div>
@@ -229,7 +229,217 @@ function manual4_make() {
             tutorial_songURL.textContent = '';
         };
     });
+};
 
+function manual5_make() {
+    tutorial_Content.innerHTML =`
+        <div class="flex items-center justify-end">
+            <button onclick="open_tutorial()" type="button" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600">처음으로 돌아가기</button>
+            <button onclick="close_tutorial()" type="button" class="px-2 py-1 mt-1 ml-2 bg-red-500 text-white rounded hover:bg-red-600">&times;</button>
+        </div>
+        <div class="mt-10 y-full">
+            <span style="font-size: 24px">5. 시작 시간 및 종료 시간</span>
+        </div>
+        <div class="mt-2 y-full tutorial-font border border-solid border-green-500 rounded">
+            <p><span>시작 시간 및 종료 시간은</span></p>
+            <p><span>플레이 시 재생시킬 영상의 구간을 정합니다.</span></p>
+            <p><span>빈칸으로 두는 경우 시작 시간은 0초 부터</span></p>
+            <p><span>종료 시간은 영상의 끝 까지 재생됩니다.</span></p>
+            <p><span>시작 시간과 종료 시간 둘 중 한 곳만 적으셔도 되고</span></p>
+            <p><span>각 시간 칸의 일부분만 비워두실 경우 비워진 칸은 0으로 처리됩니다.</span></p>
+            <p><span>또한 시작 시간보다 종료 시간이 더 작은 경우</span></p>
+            <p><span>종료 시간은 0으로 처리됩니다.</span></p>
+        </div>
+        <div class="mt-5 y-full p-2 border border-solid border-black rounded bg-gray-100">
+            <label>시작 시간 및 종료 시간</label>
+                <div id="tutorial-Timeclass" class="flex space-x-0.5 time-style">
+                    <input id="tutorial-startTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
+                    <span>:</span>
+                    <input id="tutorial-startTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+                    <span>:</span>
+                    <input id="tutorial-startTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
+                    <span>.</span>
+                    <input id="tutorial-startTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
+                    <span>~</span>
+                    <input id="tutorial-endTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
+                    <span>:</span>
+                    <input id="tutorial-endTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+                    <span>:</span>
+                    <input id="tutorial-endTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
+                    <span>.</span>
+                    <input id="tutorial-endTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)"  placeholder="소숫점">
+                </div>
+        </div>
+        <div class="flex flex-col mt-5 y-full p-2 border border-solid border-black rounded bg-gray-100" style="font-size: 18px;">
+            <label>실제 적용되는 곡의 구간</label>
+            <label id="tutorial-Time"></label>
+        </div>
+        <div class="flex" style="position: fixed; bottom: 30px; width: 90%;">
+            <div class="w-1/2"></div>
+            <div class=" w-1/2 flex mt-10">
+                <button type="button" onclick="manual4_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">&#x25C0; 이전페이지</button>
+                <button type="button" onclick="manual6_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">다음페이지 &#x25B6;</button>
+            </div>
+        </div>
+    `;
+    const tutorial_Timeclass = document.getElementById('tutorial-Timeclass');
+    const tutorial_Timeinputlist = Array.from(tutorial_Timeclass.querySelectorAll('input'));
+    const tutorial_Time = document.getElementById('tutorial-Time');
+
+    tutorial_Timeinputlist.forEach(input => {
+        input.addEventListener('input', (e) => {
+            tutorial_Time.textContent = '';
+
+            let tutorial_startTime = 0, tutorial_endTime = 0;
+            let tutorial_startText = '', tutorial_endText = '';
+
+            if (tutorial_Timeinputlist[0].value) {tutorial_startTime += parseInt(tutorial_Timeinputlist[0].value) * 3600}
+            if (tutorial_Timeinputlist[1].value) {tutorial_startTime += parseInt(tutorial_Timeinputlist[1].value) * 60}
+            if (tutorial_Timeinputlist[2].value) {tutorial_startTime += parseInt(tutorial_Timeinputlist[2].value)}
+            if (tutorial_Timeinputlist[3].value) {tutorial_startTime += parseFloat('0.' + String(tutorial_Timeinputlist[3].value))}
+
+            if (tutorial_Timeinputlist[4].value) {tutorial_endTime += parseInt(tutorial_Timeinputlist[4].value) * 3600}
+            if (tutorial_Timeinputlist[5].value) {tutorial_endTime += parseInt(tutorial_Timeinputlist[5].value) * 60}
+            if (tutorial_Timeinputlist[6].value) {tutorial_endTime += parseInt(tutorial_Timeinputlist[6].value)}
+            if (tutorial_Timeinputlist[7].value) {tutorial_endTime += parseFloat('0.' + String(tutorial_Timeinputlist[7].value))}
+
+            // 거지같은 부동소숫점 계산
+
+            let ms1_num = String(tutorial_Timeinputlist[3].value).length
+            let ms2_num = String(tutorial_Timeinputlist[7].value).length
+
+            if (tutorial_startTime > 0) {
+                const s_time_h = Math.floor(tutorial_startTime / 3600);
+                const s_time_m = Math.floor((tutorial_startTime % 3600) / 60);
+                const s_time_s = Math.floor((tutorial_startTime % 3600) % 60);
+                const s_time_ms = parseFloat('0.' + String(tutorial_startTime).split('.')[1]) || 0;
+
+                const s_seconds_length = String(s_time_s).length + ms1_num + 1;
+
+                if (s_time_h) {tutorial_startText += s_time_h + '시간 '};
+                if (s_time_m) {tutorial_startText += s_time_m + '분 '};
+                if (s_time_s || s_time_ms) {
+                    tutorial_startText += String(s_time_s + s_time_ms).slice(0, s_seconds_length) + '초';
+                };
+            }
+
+            if (tutorial_endTime > 0) {
+                const e_time_h = Math.floor(tutorial_endTime / 3600);
+                const e_time_m = Math.floor((tutorial_endTime % 3600) / 60);
+                const e_time_s = Math.floor((tutorial_endTime % 3600) % 60);
+                const e_time_ms = parseFloat('0.' + String(tutorial_endTime).split('.')[1]) || 0;
+
+                const e_seconds_length = String(e_time_s).length + ms2_num + 1;
+
+                if (e_time_h) {tutorial_endText += e_time_h + '시간 '};
+                if (e_time_m) {tutorial_endText += e_time_m + '분 '};
+                if (e_time_s || e_time_ms) {
+                    tutorial_endText += String(e_time_s + e_time_ms).slice(0, e_seconds_length) + '초';
+                };
+            }
+
+            if (tutorial_startTime < tutorial_endTime) {
+
+                if (tutorial_startText) {tutorial_Time.textContent = tutorial_startText + " ~ " + tutorial_endText}
+                else {tutorial_Time.textContent = '0초 ~ ' + tutorial_endText};
+
+            } else {
+
+                if (tutorial_startText) {tutorial_Time.textContent = tutorial_startText + " ~ 영상의 끝 까지"}
+                else {tutorial_Time.textContent = '0초 ~ 영상의 끝 까지'};
+            };
+        });
+    });
+};
+
+function manual6_make() {
+    tutorial_Content.innerHTML =`
+        <div class="flex items-center justify-end">
+            <button onclick="open_tutorial()" type="button" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600">처음으로 돌아가기</button>
+            <button onclick="close_tutorial()" type="button" class="px-2 py-1 mt-1 ml-2 bg-red-500 text-white rounded hover:bg-red-600">&times;</button>
+        </div>
+        <div class="mt-10 y-full">
+            <span style="font-size: 24px">6. 등록하기</span>
+        </div>
+        <div class="mt-2 y-full tutorial-font border border-solid border-green-500 rounded">
+            <p><span class="p-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">등록하기</span>
+                <span>버튼은 작성한 곡의 내용을 임시로 저장하는 버튼입니다.</span></p>
+            <p><span>저장되면 작성한 내용이 화면 우측상단의 박스 형태로 저장되고</span></p>
+            <p><span>새로운 곡의 내용을 입력할 준비가 됩니다.</span></p>
+            <p><span>이미 등록한 곡의 내용을 수정하고 싶다면</span></p>
+            <p><span>우측상단의 등록했던 곡을 클릭하셔서 내용을 수정하고</span></p>
+            <p><span class="p-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">수정하기</span>
+                <span>버튼을 누르면 반영됩니다.</span></p>
+        </div>
+        <div class="mt-5 y-full tutorial-font border border-solid border-blue-500 rounded">
+            <p><span>최종적으로 서버에 맵이 저장 또는 내용이 수정되는 과정은</span></p>
+            <p><span class="p-1 bg-green-500 text-white rounded hover:bg-green-600 transition">맵 저장하기</span>
+                <span>또는</span>
+                <span class="p-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">정보 수정하기</span>
+                <span>버튼을 누르면</span>
+            <p><span>우측상단에 임시로 저장되었던 곡들의 내용을 바탕으로</span></p>
+            <p><span>서버에 반영됩니다.</span></p>
+        </div>
+        <div class="flex" style="position: fixed; bottom: 30px; width: 90%;">
+            <div class="w-1/2"></div>
+            <div class=" w-1/2 flex mt-10">
+                <button type="button" onclick="manual5_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">&#x25C0; 이전페이지</button>
+                <button type="button" onclick="manual7_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">다음페이지 &#x25B6;</button>
+            </div>
+        </div>
+    `;
+}
+
+function manual7_make() {
+    tutorial_Content.innerHTML = `
+        <div class="flex items-center justify-end">
+            <button onclick="open_tutorial()" type="button" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600">처음으로 돌아가기</button>
+            <button onclick="close_tutorial()" type="button" class="px-2 py-1 mt-1 ml-2 bg-red-500 text-white rounded hover:bg-red-600">&times;</button>
+        </div>
+        <div class="mt-10 y-full">
+            <span style="font-size: 24px">7. 주의사항</span>
+        </div>
+        <div class="mt-2 y-full tutorial-font border border-solid border-green-500 rounded">
+            <p><span>1. 맵 이름은 필수 입력사항입니다.</span></p>
+            <div class="py-1"></div>
+            <p><span>비어있을 경우 </span>
+                <span class="p-1 bg-green-500 text-white rounded hover:bg-green-600 transition">맵 저장하기</span>
+                <span>또는</span>
+                <span class="p-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">정보 수정하기</span>
+                <span>를 눌러도</span></p>
+            <p><span>해당 맵은 등록되거나 수정되지가 않습니다.</span></p>
+        </div>
+        <div class="mt-2 y-full tutorial-font border border-solid border-blue-500 rounded">
+            <p><span>2. 제목, 곡 이름, 정답, 곡 링크도 필수 입력사항입니다.</span></p>
+            <div class="py-1"></div>
+            <p><span class="p-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">등록하기</span>
+                <span>또는</span>
+                <span class="p-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">수정하기</span>
+                <span>버튼을 누르면</span></p>
+            <p><span>우측상단의 아이템 박스에 등록 또는 내용이 반영되지만</span></p>
+            <p><span>최종적으로 서버에 반영될 때에는 해당 곡은 제외됩니다.</span></p>
+        </div>
+        <div class="mt-2 y-full tutorial-font border border-solid border-yellow-500 rounded">
+            <p><span>3. 마지막 작업을 하신 후</span></p>
+            <p><span class="p-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">등록하기</span>
+                <span>또는</span>
+                <span class="p-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">수정하기</span>
+                <span>버튼을 누른 후</span></p>
+            <p><span class="p-1 bg-green-500 text-white rounded hover:bg-green-600 transition">맵 저장하기</span>
+                <span>또는</span>
+                <span class="p-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">정보 수정하기</span>
+                <span>를 누르셔야 합니다.</span></p>
+            <div class="py-1"></div>
+            <p><span>실제 서버에 반영되는 동작은</span></p>
+            <p><span>우측상단의 아이템 박스의 내용을 기준으로 반영됩니다.</span></p>
+        </div>
+        <div class="flex" style="position: fixed; bottom: 30px; width: 90%;">
+            <div class="w-1/2"></div>
+            <div class=" w-1/2 flex mt-10">
+                <button type="button" onclick="manual6_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">&#x25C0; 이전페이지</button>
+            </div>
+        </div>
+    `;
 }
 
 //-------------------------------액셀파일로 만드는 방법 튜토리얼 부분---------------------------//
