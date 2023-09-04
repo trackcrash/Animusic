@@ -11,13 +11,13 @@ from controllers.map_controller import show_mission_byid
 def skip_song(room):
     next_data = music_data_manager.retrieve_next_data(room)
     if next_data:
-        socket_class.totalPlayers = len(room_data_manager._data_store[room]['user'])
+        socket_class.totalPlayers[room] = len(room_data_manager._data_store[room]['user'])
         youtube_embed_url = next_data['youtube_embed_url']
         startTime = float(next_data['startTime'])
         endTime = float(next_data['endTime'])
         totalSong = len(music_data_manager._data_store[room]['data'])
         nowSong = int(music_data_manager._data_store.get(room, {})['current_index'])+1
-        emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers, "startTime": startTime, "endTime":endTime, 'totalSong':totalSong,'nowSong':nowSong}, room=room)
+        emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers[room], "startTime": startTime, "endTime":endTime, 'totalSong':totalSong,'nowSong':nowSong}, room=room)
     else:
         before_data,new_data = get_info_for_room(room)
         emit('EndOfData', {'before_data': before_data,'new_data':new_data,'players': room_data_manager._data_store[room]['user']}, room=room)
@@ -114,7 +114,7 @@ def play_Socket(socketio):
         mission_id = data['selected_id']
         if mission_id is not None:
             make_answer(mission_id ,room_key)
-            socket_class.totalPlayers = len(room_data_manager._data_store[room_key]['user'])
+            socket_class.totalPlayers[room_key] = len(room_data_manager._data_store[room_key]['user'])
             first_data = music_data_manager.retrieve_data(room_key)
             totalSong = len(music_data_manager._data_store[room_key]['data'])
             nowSong = int(music_data_manager._data_store.get(room_key, {})['current_index']) + 1
@@ -123,7 +123,7 @@ def play_Socket(socketio):
                 youtube_embed_url = first_data['youtube_embed_url']
                 start_time = float(first_data['startTime'])
                 end_time = float(first_data['endTime'])
-                emit('PlayGame', {'totalPlayers': socket_class.totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime': end_time, 'totalSong': totalSong, 'nowSong': nowSong}, room=room_key)
+                emit('PlayGame', {'totalPlayers': socket_class.totalPlayers[room_key], 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime': end_time, 'totalSong': totalSong, 'nowSong': nowSong}, room=room_key)
         else : 
             emit("MapNotSelect", room=request.sid)
     @socketio.on('MissionSelect')
@@ -164,3 +164,13 @@ def play_Socket(socketio):
         socket_class.voted_users[room] = [] 
         room_data_manager._data_store[room]["room_info"]["is_skip"] = True
 
+    @socketio.on("ReadyPlay")
+    def ReadyPlay(data):
+        room_key = data["room_key"]
+        if room_key not in socket_class.play_vote :
+            socket_class.play_vote[room_key] = []
+        socket_class.play_vote[room_key].append(request.sid)
+        if len(socket_class.play_vote[room_key]) >= socket_class.totalPlayers[room_key] :
+            emit("PlayVideoReadyOk", room=room_key)
+            socket_class.play_vote[room_key] = []
+        

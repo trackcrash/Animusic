@@ -39,12 +39,12 @@ def connect_MySocket(socketio):
                     removed_rooms.append(room_key)
                 else:
                     if room_data_manager._data_store[room_key]['room_info']['room_status']:
-                        socket_class.totalPlayers = len(room_data_manager._data_store[room_key]['user'])
+                        socket_class.totalPlayers[room_key] = len(room_data_manager._data_store[room_key]['user'])
                         
                         if user_name in socket_class.voted_users[room_key]:
                             socket_class.vote_counts[room_key] = socket_class.vote_counts[room_key] - 1
                             socket_class.voted_users[room_key].remove(user_name)
-                        emit('user_change', {'count': socket_class.vote_counts[room_key], 'totalPlayers': socket_class.totalPlayers}, room=room_key)
+                        emit('user_change', {'count': socket_class.vote_counts[room_key], 'totalPlayers': socket_class.totalPlayers[room_key]}, room=room_key)
                     
         for room_key in removed_rooms:
             room_data_manager.remove_room(room_key)  # 방 제거 메서드 호출

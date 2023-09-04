@@ -83,7 +83,7 @@ function dummyplay() {
     dummy.appendChild(iframe);
 }
 
-function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, callback = null) {
+function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong) {
     const videoId = getYoutubeVideoId(videolink);
     let videoFrame;
     AbleCheckAnswerTime = 1;
@@ -113,44 +113,53 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong, ca
         },
         events: {
             'onReady': (event) => {
-                onPlayerEvent(startTime, endTime);
+                onPlayerEvent();
             },
-            'onStateChange': (event) => {
-                const playerState = event.data;
-                if (playerState === 1 && !isVideoPlaying) {
-                    OnNextPlay(startTime, endTime, totalSong, nowSong, callback)
-                    isVideoPlaying = true;
-                }
-            }
+            // 'onStateChange': (event) => {
+            //     const playerState = event.data;
+            //     if (playerState === 1 && !isVideoPlaying) {
+            //         OnNextPlay(startTime, endTime, totalSong, nowSong, callback)
+            //         isVideoPlaying = true;
+            //     }
+            // }
         }
     });
+
+    player.startTime = startTime;
+    player.endTime = endTime;
+    player.totalSong= totalSong;
+    player.nowSong = nowSong;
 
     videoOverlay.style.display = 'block';
 }
 
 
-function onPlayerEvent(startTime) {
-    player.playVideo();
+function onPlayerEvent() {
     socket.emit("skipAble", {"room": room_key});
-    if (startTime > 0) {
-        seekTo(startTime);
-    }
+    socket.emit("ReadyPlay", {"room_key":room_key})
+    //player.playVideo();
+
 }
 
-function OnNextPlay(startTime, endTime, totalSong, nowSong, callback) {
-    setVolume(document.querySelector("#VolumeBar").value);
-    if (endTime == "stop") {
-        clearInterval(gameTimerInterval)
-        return;
-    }
-    if (startTime > 0) {
-        seekTo(startTime);
-    }
-    callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
+function OnNextPlay(startTime, endTime, totalSong, nowSong) {
+
+    // callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
 }
 
 function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
     let endTime = fendTime;
+    if (endTime == "stop") {
+        clearInterval(gameTimerInterval)
+        return;
+    }
+    player.playVideo();
+    if (startTime > 0) {
+        seekTo(startTime);
+    }
+    setVolume(document.querySelector("#VolumeBar").value);
+    if (startTime > 0) {
+        seekTo(startTime);
+    }  
     if (endTime == 0 || endTime > player.getDuration()) {
         endTime = player.getDuration();
     }
@@ -243,7 +252,7 @@ function initializeSocketEvents() {
         currentvideolink = data.youtubeLink;
         totalSong = data.totalSong;
         nowSong = data.nowSong;
-        playvideo(currentvideolink, data.startTime, data.endTime, totalSong, nowSong, EndTimeTest);
+        playvideo(currentvideolink, data.startTime, data.endTime, totalSong, nowSong);
         elements.MapSelect.style.display = "none";
         elements.nextButton.style.display = "block";
         elements.hintButton.style.display = "block";
@@ -266,7 +275,7 @@ function initializeSocketEvents() {
         clearInterval(gameTimerInterval);
         nowSong = data.nowSong;
         totalSong = data.totalSong
-        playvideo(currentvideolink, data.startTime, data.endTime, totalSong, nowSong, EndTimeTest);
+        playvideo(currentvideolink, data.startTime, data.endTime, totalSong, nowSong);
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
@@ -386,7 +395,7 @@ function initializeSocketEvents() {
         nowSong = data.nowSong;
         totalSong = data.totalSong;
         if (GameTimer > 0) {
-            playvideo(currentvideolink, data.startTime, "stop", totalSong, nowSong, null);
+            playvideo(currentvideolink, data.startTime, "stop", totalSong, nowSong);
             elements.videoOverlay.style.display = 'none';
             showSongInfo(data.data.title, data.data.song, data.name);
             if (document.querySelector("#NextVideo").checked) {
@@ -673,4 +682,8 @@ socket.on("failed_user_change",()=>
 {
     alert("현재 유저수가 변경할 인원수 보다 많습니다.");
 });
-
+// EndTimeTest(startTime, fendTime, totalSong, nowSong)
+socket.on("PlayVideoReadyOk", ()=>
+{
+    EndTimeTest(player.startTime, player.endTime, player.totalSong,player.nowSong)    
+})
