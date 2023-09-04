@@ -135,7 +135,7 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong) {
 
 
 function onPlayerEvent() {
-    socket.emit("ReadyPlay", {"room_key":room_key})
+    socket.emit("ReadyPlay", {"room_key":room_key ,"end_time": endTime})
     //player.playVideo();
 
 }
@@ -146,12 +146,12 @@ function OnNextPlay(startTime, endTime, totalSong, nowSong) {
 }
 
 function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
+    player.playVideo();
     let endTime = fendTime;
     if (endTime == "stop") {
         clearInterval(gameTimerInterval)
         return;
     }
-    player.playVideo();
     if (startTime > 0) {
         seekTo(startTime);
     }
