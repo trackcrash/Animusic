@@ -131,7 +131,6 @@ def update_to_db(data):
         for delete_id in idset_for_delete: # 해당 id를 가진 모든 곡을 삭제
             delete_music_info = session.query(Music).filter_by(id=delete_id).first()
             session.delete(delete_music_info)
-
         session.commit()
     except SQLAlchemyError as e:
         session.rollback()

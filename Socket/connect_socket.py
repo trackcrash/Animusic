@@ -25,30 +25,30 @@ def connect_MySocket(socketio):
         removed_rooms = []  # 나간 방의 이름을 저장할 리스트
         user_name = ""  # 유저 이름을 저장할 변수
 
-        for room_name, room_data in list(room_data_manager._data_store.items()):
+        for room_key, room_data in list(room_data_manager._data_store.items()):
             if 'user' in room_data and request.sid in room_data['user']:
                 user_name = room_data['user'][request.sid]['username']
-                room = room_data_manager.user_left(room_name, request.sid)
-                game_status = room_data_manager._data_store[room_name]['room_info']['room_status']
+                room = room_data_manager.user_left(room_key, request.sid)
+                game_status = room_data_manager._data_store[room_key]['room_info']['room_status']
                 print(game_status,"game_statust")
-                emit("host_updated", {"user": room, "game_status": game_status}, room=room)
+                emit("host_updated", {"user": room, "game_status": game_status}, room=room_key)
                 del room_data['user'][request.sid]  # 해당 유저 제거
                 if user_name:
-                    update_room_player_count(room_name, "님이 퇴장 하셨습니다.", user_name)  # 플레이어 수 업데이트
+                    update_room_player_count(room_key, "님이 퇴장 하셨습니다.", user_name)  # 플레이어 수 업데이트
                 if not room_data['user']:  # 방에 더 이상 유저가 없으면 방 제거
-                    removed_rooms.append(room_name)
+                    removed_rooms.append(room_key)
                 else:
-                    if room_data_manager._data_store[room_name]['room_info']['room_status']:
-                        socket_class.totalPlayers = len(room_data_manager._data_store[room_name]['user'])
+                    if room_data_manager._data_store[room_key]['room_info']['room_status']:
+                        socket_class.totalPlayers = len(room_data_manager._data_store[room_key]['user'])
                         
-                        if user_name in socket_class.voted_users[room_name]:
-                            socket_class.vote_counts[room_name] = socket_class.vote_counts[room_name] - 1
-                            socket_class.voted_users[room_name].remove(user_name)
-                        emit('user_change', {'count': socket_class.vote_counts[room_name], 'totalPlayers': socket_class.totalPlayers}, room=room_name)
+                        if user_name in socket_class.voted_users[room_key]:
+                            socket_class.vote_counts[room_key] = socket_class.vote_counts[room_key] - 1
+                            socket_class.voted_users[room_key].remove(user_name)
+                        emit('user_change', {'count': socket_class.vote_counts[room_key], 'totalPlayers': socket_class.totalPlayers}, room=room_key)
                     
-        for room_name in removed_rooms:
-            room_data_manager.remove_room(room_name)  # 방 제거 메서드 호출
-            emit('room_removed', room_name, broadcast=True)
+        for room_key in removed_rooms:
+            room_data_manager.remove_room(room_key)  # 방 제거 메서드 호출
+            emit('room_removed', room_key, broadcast=True)
         try:
             if current_user.name in socket_class.waitingroom_userlist:
                 del socket_class.waitingroom_userlist[current_user.name]

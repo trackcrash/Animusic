@@ -21,8 +21,8 @@ def skip_song(room):
     else:
         before_data,new_data = get_info_for_room(room)
         emit('EndOfData', {'before_data': before_data,'new_data':new_data,'players': room_data_manager._data_store[room]['user']}, room=room)
-def get_info_for_room(room_name):
-    data = room_data_manager._data_store[room_name]['user']
+def get_info_for_room(room_key):
+    data = room_data_manager._data_store[room_key]['user']
     user_info = {}
     update_info = {}
     for session_id, name in data.items():
@@ -36,14 +36,12 @@ def get_info_for_room(room_name):
                 'nextexp' : nextexp,
                 'level' : user.level
             }
-            user_update_info = exp_calculator(username,user.exp, user.nextexp, name['score'], user.level, room_name,session_id)
+            user_update_info = exp_calculator(username,user.exp, user.nextexp, name['score'], user.level, room_key,session_id)
             update_info[username] = user_update_info
-            print(user_info)
-            print(update_info)
     
     return user_info, update_info
 
-def exp_calculator(name, exp, nextexp, score, level, room_name,session_id):
+def exp_calculator(name, exp, nextexp, score, level, room_key,session_id):
     if level == -1:
         return {
             'exp': exp,
@@ -64,7 +62,7 @@ def exp_calculator(name, exp, nextexp, score, level, room_name,session_id):
         else:
             break
     update_level_info(name, level, exp, int(nextexp))
-    room_data_manager.user_update(room_name,session_id)
+    room_data_manager.user_update(room_key,session_id)
     return {
         'exp': exp,
         'nextexp': int(nextexp),
@@ -81,8 +79,8 @@ def play_Socket(socketio):
             name = current_user.name
             emit('single_message', {'name': name, 'msg': msg},room=request.sid)
     @socketio.on("Skip")
-    def skip(room):
-        skip_song(room)
+    def skip(data):
+        skip_song(data["room_key"])
     @socketio.on('message')
     def handle_message(data):
         msg = data['content']
@@ -90,7 +88,7 @@ def play_Socket(socketio):
         name = current_user.name
         if music_data_manager.check_answer(room, msg) and music_data_manager.retrieve_data(room).get('is_answered') == 'false':
             current_data = music_data_manager.retrieve_data(room)
-            if data["timeOut"]:
+            if data['timeOut']:
                 current_data['is_answered'] = 'true'
                 startTime = float(current_data['startTime'])
                 emit('correctAnswer', {'name':name,'data':current_data,'startTime':startTime}, room=room)
@@ -105,35 +103,36 @@ def play_Socket(socketio):
 
     @socketio.on('showHint')
     def showHint(data):
-        room_name = data.get("room")
-        current_data = music_data_manager.retrieve_data(room_name)
+        room_key = data.get("room")
+        current_data = music_data_manager.retrieve_data(room_key)
         if current_data:
-            emit('hint', {'hint': current_data['hint']}, room=room_name)
+            emit('hint', {'hint': current_data['hint']}, room=room_key)
 
     @socketio.on("playTheGame")
     def playTheGame(data):
-        room_name = data["room_name"]
-        mission_id = data["selected_id"]
+        room_key = data['room_key']
+        mission_id = data['selected_id']
         if mission_id is not None:
-            make_answer(mission_id ,room_name)    
-            socket_class.totalPlayers = len(room_data_manager._data_store[room_name]['user'])
-            first_data = music_data_manager.retrieve_data(room_name)
-            totalSong = len(music_data_manager._data_store[room_name]['data'])
-            nowSong = int(music_data_manager._data_store.get(room_name, {})['current_index']) + 1
+            make_answer(mission_id ,room_key)
+            socket_class.totalPlayers = len(room_data_manager._data_store[room_key]['user'])
+            first_data = music_data_manager.retrieve_data(room_key)
+            totalSong = len(music_data_manager._data_store[room_key]['data'])
+            nowSong = int(music_data_manager._data_store.get(room_key, {})['current_index']) + 1
+            print(first_data)
             if first_data:
                 youtube_embed_url = first_data['youtube_embed_url']
                 start_time = float(first_data['startTime'])
                 end_time = float(first_data['endTime'])
-                emit('PlayGame', {'totalPlayers': socket_class.totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime': end_time, 'totalSong': totalSong, 'nowSong': nowSong}, room=room_name)
+                emit('PlayGame', {'totalPlayers': socket_class.totalPlayers, 'youtubeLink': youtube_embed_url, 'startTime': start_time, 'endTime': end_time, 'totalSong': totalSong, 'nowSong': nowSong}, room=room_key)
         else : 
             emit("MapNotSelect", room=request.sid)
     @socketio.on('MissionSelect')
     def send_saved_data(data):
-        room_name = data.get("room_name")
+        room_key = data.get("room_key")
         # make_answer(map_controller.get_music_data(data['selected_id']), room_name)
         mission = show_mission_byid(data['selected_id'])
-        room_data_manager.Mission_select(room_name, mission)
-        emit('MissionSelect_get', {'room_name' : room_name, "map_data": mission }, broadcast= True)
+        room_data_manager.Mission_select(room_key, mission)
+        emit('MissionSelect_get', {'room_name' : room_key, "map_data": mission}, broadcast= True)
 
     #스킵투표
     @socketio.on('voteSkip')
