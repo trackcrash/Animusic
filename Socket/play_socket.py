@@ -132,7 +132,7 @@ def play_Socket(socketio):
         # make_answer(map_controller.get_music_data(data['selected_id']), room_name)
         mission = show_mission_byid(data['selected_id'])
         room_data_manager.Mission_select(room_key, mission)
-        emit('MissionSelect_get', {'room_name' : room_key, "map_data": mission}, broadcast= True)
+        emit('MissionSelect_get', {'room_key' : room_key, "map_data": mission}, broadcast= True)
 
     #스킵투표
     @socketio.on('voteSkip')
