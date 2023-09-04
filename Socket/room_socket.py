@@ -37,8 +37,8 @@ def room_Socket(socketio):
     def join_sock(data):
         room_key = data['room_key']
         session_id = request.sid
-        room_data_manager.join(room_key,session_id,current_user, time)
         join_room(room_key)
+        room_data_manager.join(room_key,session_id,current_user, time)
         user_id = room_data_manager.host_setting(room_key)
         game_status = room_data_manager._data_store[room_key]['room_info']['room_status']
         if user_id != "":
@@ -67,7 +67,7 @@ def room_Socket(socketio):
             emit('user_check_not_ok', room=session_id)
         else :
             if room_data_manager.room_user_check(room_key) < int(room_data_manager._data_store[room_key]["room_info"]["room_full_user"]):
-                if room_data_manager._data_store[room_key]["room_info"]["room_password"] is not None and room_data_manager._data_store[room_key]["room_info"]["room_password"] is not "":
+                if room_data_manager._data_store[room_key]["room_info"]["room_password"] != None and room_data_manager._data_store[room_key]["room_info"]["room_password"] != "":
                     emit("passwordCheck",room_key, room=session_id)
                 else:
                     emit('Join_room',room_key, room=session_id)

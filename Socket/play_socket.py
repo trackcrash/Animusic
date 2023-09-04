@@ -112,7 +112,7 @@ def play_Socket(socketio):
     def playTheGame(data):
         room_key = data['room_key']
         mission_id = data['selected_id']
-        if mission_id is not None:
+        if mission_id != None:
             make_answer(mission_id ,room_key)
             socket_class.totalPlayers[room_key] = len(room_data_manager._data_store[room_key]['user'])
             first_data = music_data_manager.retrieve_data(room_key)
@@ -152,25 +152,24 @@ def play_Socket(socketio):
         else:
             emit('updateVoteCount', {'count': socket_class.vote_counts[room]}, room=room)
             
-    @socketio.on('skipAble')
-    def skipAble(data):
-        room = data.get("room")
-        user = current_user.name
-        if room not in socket_class.vote_counts:
-            socket_class.vote_counts[room] = 0
-        if user not in socket_class.voted_users:
-            socket_class.voted_users[room] = [] 
-        socket_class.vote_counts[room] = 0
-        socket_class.voted_users[room] = [] 
-        room_data_manager._data_store[room]["room_info"]["is_skip"] = True
-
     @socketio.on("ReadyPlay")
     def ReadyPlay(data):
+        if data["playerState"] != 5:
+            emit("PlayVideoReadyNotOk",  room= request.sid)
+            return
         room_key = data["room_key"]
         if room_key not in socket_class.play_vote :
             socket_class.play_vote[room_key] = []
         socket_class.play_vote[room_key].append(request.sid)
         if len(socket_class.play_vote[room_key]) >= socket_class.totalPlayers[room_key] :
             emit("PlayVideoReadyOk", room=room_key)
-            socket_class.play_vote[room_key] = []
-        
+            if data["end_time"] != "stop":
+                socket_class.play_vote[room_key] = []
+                if room_key not in socket_class.vote_counts:
+                    socket_class.vote_counts[room_key] = 0
+                if room_key not in socket_class.voted_users:
+                    socket_class.voted_users[room_key] = [] 
+                socket_class.vote_counts[room_key] = 0
+                socket_class.voted_users[room_key] = [] 
+                room_data_manager._data_store[room_key]["room_info"]["is_skip"] = True
+            

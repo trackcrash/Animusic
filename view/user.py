@@ -1,5 +1,7 @@
 #user_main --author: NewKyaru 30/08/2023
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from decouple import config
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, Flask
+
 from flask_login import logout_user, login_required, current_user
 from controllers.user_controller import user_controller, google_login, google_callback
 from controllers.user_controller import register as user_register
@@ -98,3 +100,8 @@ def select_character():
 def insert_character():
     character_number = request.get_json().get('character_number')
     return insert_character_number(character_number)
+
+@user_bp.route('/send_verification_email', methods=['POST'])
+def send_verification_email():
+    email = request.get_json().get('email')
+    return user_register(email)

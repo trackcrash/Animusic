@@ -14,7 +14,6 @@ let currentData = null;
 let isVideoPlaying = false;
 let AbleCheckAnswerTime;
 let Num = 0;
-
 function fetchData(url, callback) {
     $.getJSON(url, callback);
 }
@@ -95,6 +94,7 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong) {
         player.destroy();
         document.querySelector("div #videoFrame").remove();
         isVideoPlaying = false;
+        player = "";
         videoFrame = document.createElement("div");
         videoFrame.id = "videoFrame";
         videoFrame.classList.add("absolute", "top-0", "left-0", "w-full", "h-full")
@@ -112,16 +112,7 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong) {
             'rel': 0,
         },
         events: {
-            'onReady': (event) => {
-                onPlayerEvent();
-            },
-            // 'onStateChange': (event) => {
-            //     const playerState = event.data;
-            //     if (playerState === 1 && !isVideoPlaying) {
-            //         OnNextPlay(startTime, endTime, totalSong, nowSong, callback)
-            //         isVideoPlaying = true;
-            //     }
-            // }
+            'onReady': onPlayerReady,
         }
     });
 
@@ -134,27 +125,21 @@ function playvideo(videolink, startTime = 0, endTime = 0, totalSong, nowSong) {
 }
 
 
-function onPlayerEvent() {
-    socket.emit("skipAble", {"room": room_key});
-    socket.emit("ReadyPlay", {"room_key":room_key})
-    //player.playVideo();
+function onPlayerReady(event) {
+    // YouTube 플레이어가 준비되었을 때 호출됩니다.
 
-}
-
-function OnNextPlay(startTime, endTime, totalSong, nowSong) {
-
-    // callback(startTime, endTime, totalSong, nowSong); // endTime을 콜백으로 전달
+    const playerState = player.getPlayerState();
+    socket.emit("ReadyPlay", {"room_key":room_key ,"end_time": player.endTime,"playerState": playerState})
+    
 }
 
 function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
+    player.playVideo();
     let endTime = fendTime;
     if (endTime == "stop") {
         clearInterval(gameTimerInterval)
+        elements.videoOverlay.style.display = 'none';
         return;
-    }
-    player.playVideo();
-    if (startTime > 0) {
-        seekTo(startTime);
     }
     setVolume(document.querySelector("#VolumeBar").value);
     if (startTime > 0) {
@@ -396,7 +381,6 @@ function initializeSocketEvents() {
         totalSong = data.totalSong;
         if (GameTimer > 0) {
             playvideo(currentvideolink, data.startTime, "stop", totalSong, nowSong);
-            elements.videoOverlay.style.display = 'none';
             showSongInfo(data.data.title, data.data.song, data.name);
             if (document.querySelector("#NextVideo").checked) {
                 voteSkip();
@@ -474,11 +458,14 @@ socket.on("user_change", (data) => {
 })
 
 socket.on('host_updated', (data) => {
+    console.log(isHost);
+    console.log(data.user);
     // 방장 정보가 업데이트되었을 때 클라이언트에서 수행할 동작
     const game_status = data['game_status'];
     if (data.user === socket.id) {
         isHost = true; // 방장이면 isHost를 true로 설정
     }
+    console.log(isHost);
     showHostContent(game_status);
 });
 
@@ -686,4 +673,8 @@ socket.on("failed_user_change",()=>
 socket.on("PlayVideoReadyOk", ()=>
 {
     EndTimeTest(player.startTime, player.endTime, player.totalSong,player.nowSong)    
+})
+socket.on("PlayVideoReadyNotOk", ()=>
+{
+        playvideo(currentvideolink, player.startTime, player.endTime, player.totalSong, player.nowSong);
 })
