@@ -19,7 +19,7 @@ const delete_btn = document.getElementById('delete-btn');
 if (delete_btn) {delete_btn.addEventListener("click", ()=> {delete_mission()})}
 
 function zero_space_text(answer) {
-    const answerList = answer.split(',').map(str => str.trim());
+    const answerList = answer.split(',').map(str => str.trim()).filter(Boolean);
     const zeroSpaceList = answerList.map(str => str.replace(/\s+/g, ''));
 
     const combinedList = answerList.concat(zeroSpaceList);
@@ -432,7 +432,7 @@ document.getElementById('MapName-insert').addEventListener('click', () => {
         document.getElementById('MapName-input').classList.remove('hidden');
         MapName_insert.classList.remove('w-full');
         MapName_insert.classList.add('w-1/2');
-        MapName_insert.innerText = '저장하기';
+        MapName_insert.innerText = '제목 저장하기';
     } else {
         document.getElementById('MapName-input').classList.add('hidden');
         MapName_insert.classList.remove('w-1/2');
