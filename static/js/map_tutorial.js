@@ -446,10 +446,21 @@ function manual7_make() {
 function auto_make() {
     tutorial_Content.innerHTML = `
         <div class="flex items-center justify-end">
-            <button id="return-tutorial" type="button" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600">처음으로 돌아가기</button>
-            <button id="tutorial-close" type="button" class="px-2 py-1 mt-1 ml-2 bg-red-500 text-white rounded hover:bg-red-600">&times;</button>
+            <button onclick="open_tutorial()" type="button" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600">처음으로 돌아가기</button>
+            <button onclick="close_tutorial()" type="button" class="px-2 py-1 mt-1 ml-2 bg-red-500 text-white rounded hover:bg-red-600">&times;</button>
+        </div>
+        <div class="mt-10 y-full">
+            <span style="font-size: 24px">1. 몰?루</span>
+        </div>
+        <div class="mt-2 y-full tutorial-font border border-solid border-green-500 rounded">
+
+        </div>
+        <div class="flex" style="position: fixed; bottom: 30px; width: 90%;">
+            <div class="w-1/2"></div>
+            <div class=" w-1/2 flex mt-10">
+                <button type="button" onclick="auto2_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">다음페이지 &#x25B6;</button>
+            </div>
         </div>
     `;
-    document.getElementById('tutorial-close').addEventListener('click', () => {close_tutorial()});
-    document.getElementById('return-tutorial').addEventListener('click', () => {open_tutorial()});
+
 }

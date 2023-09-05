@@ -90,6 +90,39 @@ async function file_load() {
             workbook = XLSX.read(data, { type: 'binary' });
             const firstSheetName = workbook.SheetNames[0];
             const firstSheet = workbook.Sheets[firstSheetName];
+
+            /* 빈칸이 발생한 경우 해당 값이 빈 칸인 요소를 생성하여 추가함 */
+
+            // 셀의 최대 행 번호를 구함
+
+            let cellList = [];
+
+            for (let i in firstSheet) {cellList.push(i)};
+
+            cellList.sort((i, j) => {
+                let cellNumber_i = parseInt(i.match(/\d+/g));
+                let cellNumber_j = parseInt(j.match(/\d+/g));
+                return cellNumber_i - cellNumber_j;
+            });
+
+            const maxCell = parseInt(cellList[cellList.length - 4].match(/\d+/g))
+
+            // 최대 행 번호까지 빈 칸인 셀을 생성해서 채움
+
+            cellCollist = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+            for (let i = 0; i <= cellCollist.length - 1; i++) {
+                const cellCol = cellCollist[i];
+                for (let j = 9; j <= maxCell; j++) {
+                    const cellName = cellCol + String(j);
+                    if (!(cellName in firstSheet)) {
+                                              // 아래 값은 json으로 변환 시 undefined 값이 됨
+                        firstSheet[cellName] = {t: 's', v: '', r: '<t></t>', h: '', w: ''};
+                    }
+                }
+            }
+            /*---------------------------------------------------*/
+
             excelFile_data = XLSX.utils.sheet_to_json(firstSheet);
             resolve();
         };
@@ -106,29 +139,44 @@ function push_exceldata(excelFile_data) {
     for (let i in excelFile_data) {
         if (j > 6) {
             let song_info = [];
-            song_info.push(excelFile_data[i]['맵 제작 프리셋 양식파일'])
-            song_info.push(excelFile_data[i]['__EMPTY'])
 
-            let answer_list = new Set(excelFile_data[i]['__EMPTY_1'].split(',').filter(Boolean));
-            for (let i of answer_list) {answer_list.add(i.replace(/\s+/g, ""))};
-            song_info.push(Array.from(answer_list).join(","));
+            /* 제목 부분 */
+
+            song_info.push(excelFile_data[i]['맵 제작 프리셋 양식파일']);
+
+            /* 곡 부분 */
+
+            song_info.push(excelFile_data[i]['__EMPTY']);
+
+            /* 정답 부분 */
+
+            let answer = excelFile_data[i]['__EMPTY_1'];
+
+            if (!answer || !answer.replace(/,/g, "").trim()) {
+                song_info.push("");
+            } else {
+                let answerList = new Set(answer.split(',').map(item => item.trim()).filter(Boolean));
+                for (let i of answerList) {answerList.add(i.replace(/\s+/g, ""))};
+                song_info.push(Array.from(answerList).join(","));
+            };
+
+            /* 힌트 부분 */
 
             song_info.push(excelFile_data[i]['__EMPTY_2'])
 
-            if (excelFile_data[i]['__EMPTY_3'] === undefined) {break};
+            /* 곡 링크 부분 */
 
             if (excelFile_data[i]['__EMPTY_3'].split('v=')[1]) {
                 song_info.push(excelFile_data[i]['__EMPTY_3'].split('v=')[1].substring(0, 11));
             } else if (excelFile_data[i]['__EMPTY_3'].split('/')[3]) {
                 song_info.push(excelFile_data[i]['__EMPTY_3'].split('/')[3].substring(0, 11));
-            } else {song_info.push(null)};
+            } else {song_info.push("")};
 
-            if (song_info[0] === undefined || song_info[1] === undefined || song_info[2] === undefined) {break};
-            if (song_info[3] === undefined) {song_info[3] = null};
+            /* 재생 시간 부분 */
 
             let play_time = excelFile_data[i]['__EMPTY_4'];
-            if (play_time === undefined) {play_time = ""};
-            if (play_time !== "") {play_time = play_time.replace(/[^0-9:.~]/g, "")};
+
+            if (play_time) {play_time = play_time.replace(/[^0-9:.~]/g, "")};
             if (play_time.split("~").length === 2) {
 
                 let start_time = play_time.split("~")[0];
@@ -188,17 +236,20 @@ function push_exceldata(excelFile_data) {
                 song_info.push(end_time);
 
             } else {
-                song_info.push(null);
-                song_info.push(null);
+                song_info.push("");
+                song_info.push("");
             };
 
             if (document.querySelectorAll('h4')[j - 7]) {
                 song_info.push(document.querySelectorAll('h4')[j - 7].innerHTML);
-            } else {song_info.push(null)};
+            } else {song_info.push("")};
 
-            check_videoid_list.push(song_info[4]);
+            /* 올바른 곡 양식인지 체크 */
 
-            check_array.push(song_info);
+            if (song_info[0] && song_info[1] && song_info[2] && song_info[4]) {
+                check_array.push(song_info);
+                check_videoid_list.push(song_info[4]);
+            }
             song_info = [];
         };
         j++;
@@ -284,6 +335,7 @@ function trans_data(check_array) {
             });
         };
     };
+    console.log(data);
     return data;
 }
 
