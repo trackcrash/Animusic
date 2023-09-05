@@ -665,8 +665,6 @@ function playerListGet(players) {
                 <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
                 <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
             </div>
-            <button id = '${username}_kick_button' class="kick_button" hidden>강퇴</button>
-            <button id = '${username}_give_host' class="give_host" hidden>방장</button>
         `;
         }
         else
@@ -683,18 +681,21 @@ function playerListGet(players) {
         `;
         }
 
-
-        userDiv.querySelector(".kick_button").addEventListener("click", function() {
-            if (confirm("강퇴하시겠습니까?")) {
-                socket.emit("kick", { "room_key": room_key, "user_name": username });
-            }
-        })
-        userDiv.querySelector(".give_host").addEventListener("click", function() {
-            if (confirm("호스트를 변경 하시겠습니까?")) {
-                socket.emit("host_change", { "room_key": room_key, "user_name": username });
-                isHost = false;
-            }
-        })
+        if(userDiv.querySelectorAll(".kick_button").length > 0 && userDiv.querySelectorAll(".give_host").length > 0)
+        {
+            userDiv.querySelector(".kick_button").addEventListener("click", function() {
+                if (confirm("강퇴하시겠습니까?")) {
+                    socket.emit("kick", { "room_key": room_key, "user_name": username });
+                }
+            })
+            userDiv.querySelector(".give_host").addEventListener("click", function() {
+                if (confirm("호스트를 변경 하시겠습니까?")) {
+                    socket.emit("host_change", { "room_key": room_key, "user_name": username });
+                    isHost = false;
+                }
+            })
+        }
+        
         if (index % 2 === 0) {
             leftContainer.appendChild(userDiv);
         } else {

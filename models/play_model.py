@@ -110,7 +110,8 @@ class RoomDataManger:
             return False  # 사용자는 방에 없는 것으로 간주
         if room_key not in socket_class.BanList:
             socket_class.BanList[room_key] = []
-        if user_name in socket_class.BanList[room_key]:
+        user_id = get_userinfo_by_name(user_name).id
+        if user_id in socket_class.BanList[room_key]:
             return True
         dictionaryData = self._data_store[room_key]['user']
         for key, value in dictionaryData.items():

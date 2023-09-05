@@ -4,6 +4,7 @@ from flask_login import current_user
 from models.play_model import room_data_manager
 from Socket.socket import socket_class
 from models.room_model import update_room_player_count
+from models.user_model import get_userinfo_by_name
 import time
 
 tempRoomdict = {}
@@ -114,7 +115,9 @@ def room_Socket(socketio):
         user_name = data["user_name"]
         if room_key not in socket_class.BanList:
             socket_class.BanList[room_key] = []
-        socket_class.BanList[room_key].append(user_name)
+
+        userid=get_userinfo_by_name(user_name).id
+        socket_class.BanList[room_key].append(userid)
 
         # 찾고자 하는 user_name 값
 
