@@ -126,6 +126,7 @@ function playvideo(videolink,endTime = null) {
         events: {
             'onReady': function(event)
             {
+                console.log("OnReady");
                 onPlayerReady(event,endTime)   
             }
         }
@@ -136,16 +137,41 @@ function playvideo(videolink,endTime = null) {
 
 function onPlayerReady(event, endTime) {
     // YouTube 플레이어가 준비되었을 때 호출됩니다.
-    const playerState = player.getPlayerState();
-    socket.emit("ReadyPlay", {"room_key":room_key ,"endTime": endTime,"playerState": playerState})
-    
+    socket.emit("ReadyPlay", {"room_key":room_key ,"endTime": endTime})    
 }
-
-function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
-    setTimeout(function()
+socket.on("CheckPlayer",function(data)
+{
+    const endTime = data['endTime'];
+ 
+    console.log("체크",data["vote"], data["totalPlayer"]);
+    if(player && player.playVideo)
     {
-        player.playVideo();
-    },1000)
+        console.log("레디");
+        socket.emit("ReadyPlayer", {"room_key": room_key, "endTime":endTime});
+    }
+    else
+    {
+        console.log("제거");
+        socket.emit("WaitPlay",{"room_key":room_key, "endTime": endTime});
+    }
+})
+socket.on("reCheck", function(data)
+{
+    const endTime = data['endTime'];
+    if(player && player.playVideo)
+    {
+        console.log("레디");
+        socket.emit("ReadyPlayer", {"room_key": room_key, "endTime":endTime});
+    }
+    else
+    {
+        console.log("제거");
+        socket.emit("WaitPlay",{"room_key":room_key, "endTime": endTime});
+    }
+});
+function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
+    clearInterval(gameTimerInterval);
+    player.playVideo();
     let endTime = fendTime;
 
     setVolume(document.querySelector("#VolumeBar").value);
@@ -153,7 +179,6 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
         seekTo(startTime);
     }  
     if (endTime == "stop") {
-        clearInterval(gameTimerInterval)
         elements.videoOverlay.style.display = 'none';
         isAnswer= false;
         return;
@@ -226,7 +251,6 @@ function initEventListeners() {
     });
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
-        console.log("play");
         socket.emit('playTheGame', { "room_key": room_key, "selected_id": selectedId });
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
@@ -246,7 +270,6 @@ function initializeSocketEvents() {
     socket.on("PlayGame", data => {
         totalPlayers = data.totalPlayers;
         currentvideolink = data.youtubeLink;
-        console.log(currentvideolink);
         playvideo(currentvideolink);
         elements.MapSelect.style.display = "none";
         elements.nextButton.style.display = "block";
@@ -266,7 +289,6 @@ function initializeSocketEvents() {
     //다음 곡 진행
     socket.on('NextData', (data) => {
         isAnswer = false;
-        console.log(data);
         currentvideolink = data.youtubeLink;
         totalPlayers = data['totalPlayers'];
         clearInterval(gameTimerInterval);
@@ -285,10 +307,7 @@ function initializeSocketEvents() {
     socket.on('EndOfData', function(data) {
         // 기존의 게임 상태 및 UI 초기화 코드        
         clearInterval(gameTimerInterval);
-        setTimeout(function()
-        {
-            player.stopVideo();
-        },1000)
+        player.stopVideo();
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
@@ -396,11 +415,7 @@ function initializeSocketEvents() {
         playvideo(videolink, data.data.endTime);
         showSongInfo(data.data.title, data.data.song, data.name);
         if (document.querySelector("#NextVideo").checked) {
-            setTimeout(function()
-            {
-                console.log("자동스킵");
-                voteSkip();
-            },2000)
+            voteSkip();
         }
     });
 
@@ -469,18 +484,9 @@ socket.on("failed_user_change",()=>
 // EndTimeTest(startTime, fendTime, totalSong, nowSong)
 socket.on("PlayVideoReadyOk", (data)=>
 {
-    setTimeout(function()
-    {
-        EndTimeTest(data['startTime'], data['endTime'], data['current_data']['totalSong'],data['current_data']['nowSong']);
-    },1000)
-})
-socket.on("PlayVideoReadyNotOk", (data)=>
-{
-    console.log("실패");
-    playvideo(data['current_data']["youtube_embed_url"],data['endTime']);
+    EndTimeTest(data['startTime'], data['endTime'], data['current_data']['totalSong'],data['current_data']['nowSong']);
 })
 socket.on("user_change", (data) => {
-    console.log("test");
     let count = data["count"];
     totalPlayers = data["totalPlayers"];
     updateVoteCountUI(count);
@@ -491,14 +497,11 @@ socket.on("user_change", (data) => {
 })
 
 socket.on('host_updated', (data) => {
-    console.log(isHost);
-    console.log(data.user);
     // 방장 정보가 업데이트되었을 때 클라이언트에서 수행할 동작
     const game_status = data['game_status'];
     if (data.user === socket.id) {
         isHost = true; // 방장이면 isHost를 true로 설정
     }
-    console.log(isHost);
     showHostContent(game_status);
 });
 
@@ -610,7 +613,6 @@ socket.on('MapNotSelect', () => {
     alert("맵을 선택 후 시작해주세요");
 });
 socket.on('room_players_update', (data) => {
-    console.log(data)
     if (data.room_key == room_key) {
         const item = document.createElement('div');
         item.innerHTML = `<span class="font-semibold">${data.player}</span> ${data.msg}`;
@@ -669,7 +671,6 @@ function Setting_room_btn() {
     $('#SettingRoomModal').removeClass('hidden');
 }
 $('#SettingRoomModalCloseBtn').click(function() {
-    console.log("클릭");
     $('#SettingRoomModal').addClass('hidden');
 });
 $('#SettingRoomBtn').click(function() {
