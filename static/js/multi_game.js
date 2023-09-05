@@ -307,7 +307,7 @@ function initializeSocketEvents() {
     socket.on('EndOfData', function(data) {
         // 기존의 게임 상태 및 UI 초기화 코드        
         clearInterval(gameTimerInterval);
-        player.stopVideo();
+        document.querySelector("div #videoFrame").remove();
         songTitle.innerText = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
