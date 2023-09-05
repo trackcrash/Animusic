@@ -4,6 +4,7 @@ from flask_login import current_user
 from models.play_model import room_data_manager
 from Socket.socket import socket_class
 from models.room_model import update_room_player_count
+from models.user_model import get_userinfo_by_name
 import time
 
 tempRoomdict = {}
@@ -37,13 +38,17 @@ def room_Socket(socketio):
     def join_sock(data):
         room_key = data['room_key']
         session_id = request.sid
+        if room_data_manager.is_user_in_room(current_user.name, room_key):
+            emit("duplicate", {"message": "이미 방에 입장해 있습니다."}, room=session_id)
+            return
         join_room(room_key)
         room_data_manager.join(room_key,session_id,current_user, time)
         user_id = room_data_manager.host_setting(room_key)
         game_status = room_data_manager._data_store[room_key]['room_info']['room_status']
+        emit("set_session_id", {"user":user_id, "session_id":session_id}, room=session_id)
+        update_room_player_count(room_key, "님이 참가 하셨습니다.", room_data_manager._data_store[room_key]['user'][session_id]['username'])
         if user_id != "":
             emit("host_updated", {"user":user_id, "game_status":game_status}, room=room_key)
-        update_room_player_count(room_key, "님이 참가 하셨습니다.", room_data_manager._data_store[room_key]['user'][session_id]['username'])
         try:
             if current_user.name in socket_class.waitingroom_userlist:
                 del socket_class.waitingroom_userlist[current_user.name]
@@ -106,3 +111,34 @@ def room_Socket(socketio):
             room_private = False
         emit("room_data_update_inroom", {"room_key": room_key, "room_name": room_name, "room_max_human": room_max_human, "room_password":room_password}, room = room_key)    
         emit("room_data_update", {"room_key": room_key, "room_name": room_name, "room_max_human": room_max_human, "room_private":room_private}, broadcast = True)
+
+    @socketio.on("kick")
+    def kickPlayer(data):
+        room_key = data["room_key"]
+        user_name = data["user_name"]
+        if room_key not in socket_class.BanList:
+            socket_class.BanList[room_key] = []
+
+        userid=get_userinfo_by_name(user_name).id
+        socket_class.BanList[room_key].append(userid)
+
+        # 찾고자 하는 user_name 값
+
+        # room_data 딕셔너리를 순회하면서 user_name 값을 비교하고 일치하는 키를 찾음
+
+        for key, value in room_data_manager._data_store[room_key]["user"].items():
+            if "username" in value and value["username"] == user_name:
+                emit("kick_player",{"user_name" : user_name, "session_id": key},room=room_key)
+
+    @socketio.on("host_change")
+    def host_change(data):
+        room_key = data["room_key"]
+        user_name = data["user_name"]
+        room_data_manager._data_store[room_key]["user"][request.sid]["host"] = 0
+        # room_data 딕셔너리를 순회하면서 user_name 값을 비교하고 일치하는 키를 찾음
+        game_status = room_data_manager._data_store[room_key]["room_info"]["room_status"]
+        for key, value in room_data_manager._data_store[room_key]["user"].items():
+            if "username" in value and value["username"] == user_name:
+                value["host"] = 1
+                user_id = key
+                emit("host_updated", {"user":user_id, "game_status":game_status}, room=room_key)
