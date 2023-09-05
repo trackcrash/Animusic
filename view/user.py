@@ -81,7 +81,7 @@ def move_google_callback():
 @login_required
 def logout():
     logout_user()
-    return redirect()
+    return redirect(url_for('index'))
 
 
 @user_bp.route('/register', methods=['GET', 'POST'])

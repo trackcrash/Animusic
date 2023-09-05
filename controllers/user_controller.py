@@ -102,4 +102,4 @@ def google_callback():
     # Use Flask-Login to login user
     login_user(user)
     session.close()
-    return redirect()
+    return redirect(url_for('index'))

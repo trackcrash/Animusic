@@ -33,7 +33,7 @@ def chat():
     user_name = current_user.name
     if room_data_manager.is_user_in_room(user_name, room_key):
          flash("이미 방에 입장해 있습니다.", "warning")
-         return redirect()
+         return redirect(url_for('index'))
     return render_template('multi_game/multi_game.html',current_user=current_user)
 
 @play_bp.post('/multi_game')
