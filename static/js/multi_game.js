@@ -503,22 +503,12 @@ function showHostContent(game_status) {
         elements.room_setting.style.display = "block";
         elements.room_setting.disabled = false;
         for (const element of kickButton) {
-            if (!element.classList.contains("me")) {
-                element.style.display = "block";
-                element.disabled = false;
-            } else {
-                element.style.display = "none";
-                element.disabled = true;
-            }
+            element.style.display = "block";
+            element.disabled = false;
         }
         for (const element of HostButton) {
-            if (!element.classList.contains("me")) {
-                element.style.display = "block";
-                element.disabled = false;
-            } else {
-                element.style.display = "none";
-                element.disabled = true;
-            }
+            element.style.display = "block";
+            element.disabled = false;
         }
         if (game_status == false) {
             elements.StartButton.style.display = "block";
@@ -666,17 +656,33 @@ function playerListGet(players) {
             "rounded", "shadow-lg", "opacity-100",
             "flex", "flex-col", "items-center", "justify-center"
         );
-        userDiv.innerHTML = `
+        if(session_id== key)
+        {
+            userDiv.innerHTML = `
             <div class="space-y-3 text-center me">
                 <p class="font-semibold">${level}</p>
                 <p class="font-semibold text-lg text-gray-800">${username}</p>
                 <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
                 <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
             </div>
-            <button id = '${username}_kick_button' class="kick_button ${session_id== key ? "me": ""}">강퇴</button>
-            <button id = '${username}_give_host' class="give_host ${session_id== key ? "me": ""}">방장</button>
-            
+            <button id = '${username}_kick_button' class="kick_button" hidden>강퇴</button>
+            <button id = '${username}_give_host' class="give_host" hidden>방장</button>
         `;
+        }
+        else
+        {
+            userDiv.innerHTML = `
+            <div class="space-y-3 text-center me">
+                <p class="font-semibold">${level}</p>
+                <p class="font-semibold text-lg text-gray-800">${username}</p>
+                <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
+                <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
+            </div>
+            <button id = '${username}_kick_button' class="kick_button">강퇴</button>
+            <button id = '${username}_give_host' class="give_host">방장</button>
+        `;
+        }
+
 
         userDiv.querySelector(".kick_button").addEventListener("click", function() {
             if (confirm("강퇴하시겠습니까?")) {
