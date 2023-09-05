@@ -504,11 +504,9 @@ function showHostContent(game_status) {
         elements.room_setting.disabled = false;
         for (const element of kickButton) {
             element.style.display = "block";
-            element.disabled = false;
         }
         for (const element of HostButton) {
             element.style.display = "block";
-            element.disabled = false;
         }
         if (game_status == false) {
             elements.StartButton.style.display = "block";
@@ -530,11 +528,9 @@ function showHostContent(game_status) {
     } else {
         for (const element of kickButton) {
             element.style.display = "none";
-            element.disabled = true;
         }
         for (const element of HostButton) {
             element.style.display = "none";
-            element.disabled = true;
         }
         elements.room_setting.style.display = "none";
         elements.room_setting.disabled = true;
@@ -669,16 +665,32 @@ function playerListGet(players) {
         }
         else
         {
-            userDiv.innerHTML = `
-            <div class="space-y-3 text-center me">
-                <p class="font-semibold">${level}</p>
-                <p class="font-semibold text-lg text-gray-800">${username}</p>
-                <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
-                <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
-            </div>
-            <button id = '${username}_kick_button' class="kick_button">강퇴</button>
-            <button id = '${username}_give_host' class="give_host">방장</button>
-        `;
+            if(!isHost)
+            {
+                userDiv.innerHTML = `
+                <div class="space-y-3 text-center me">
+                    <p class="font-semibold">${level}</p>
+                    <p class="font-semibold text-lg text-gray-800">${username}</p>
+                    <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
+                    <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
+                </div>
+                <button id = '${username}_kick_button' class="kick_button" style="display: none;">강퇴</button>
+                <button id = '${username}_give_host' class="give_host" style="display: none;">방장</button>
+            `;      
+            }else
+            {
+                userDiv.innerHTML = `
+                <div class="space-y-3 text-center me">
+                    <p class="font-semibold">${level}</p>
+                    <p class="font-semibold text-lg text-gray-800">${username}</p>
+                    <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
+                    <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
+                </div>
+                <button id = '${username}_kick_button' class="kick_button">강퇴</button>
+                <button id = '${username}_give_host' class="give_host">방장</button>
+            `;  
+            }
+          
         }
 
         if(userDiv.querySelectorAll(".kick_button").length > 0 && userDiv.querySelectorAll(".give_host").length > 0)
