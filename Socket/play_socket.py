@@ -14,6 +14,9 @@ def skip_song(room):
         socket_class.totalPlayers[room] = len(room_data_manager._data_store[room]['user'])
         youtube_embed_url = next_data['youtube_embed_url']
         emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers[room]}, room=room)
+        if room not in socket_class.isDuplication :
+            socket_class.isDuplication[room] = True
+        socket_class.isDuplication[room] = True
         if room not in socket_class.play_vote :
             socket_class.play_vote[room] = []
         socket_class.play_vote[room] = []
@@ -84,10 +87,13 @@ def play_Socket(socketio):
         msg = data['content']
         room = data.get('room')
         name = current_user.name
-        if music_data_manager.check_answer(room, msg) and data["gameTimer"] and data['isAnswer']:
+        if music_data_manager.check_answer(room, msg) and data['isAnswer'] and socket_class.isDuplication[room]:
             current_data = music_data_manager.retrieve_data(room)
             current_data['endTime'] = "stop"
             emit('correctAnswer', {'name':name,'data':current_data}, room=room)
+            if room not in socket_class.isDuplication :
+                socket_class.isDuplication[room] = False
+            socket_class.isDuplication[room] = False
             if room not in socket_class.play_vote :
                 socket_class.play_vote[room] = []
             socket_class.play_vote[room] = []
@@ -117,6 +123,9 @@ def play_Socket(socketio):
             if first_data:
                 youtube_embed_url = first_data['youtube_embed_url']
                 emit('PlayGame', {'totalPlayers': socket_class.totalPlayers[room_key], 'youtubeLink': youtube_embed_url}, room=room_key)
+                if room_key not in socket_class.isDuplication :
+                    socket_class.isDuplication[room_key] = True
+                socket_class.isDuplication[room_key] = True
                 if room_key not in socket_class.play_vote :
                     socket_class.play_vote[room_key] = []
                 socket_class.play_vote[room_key] = []

@@ -10,4 +10,5 @@ class socketClass:
         self.vote_counts = {}
         self.voted_users = {}
         self.play_vote = {}
+        self.isDuplication ={}
 socket_class = socketClass()
