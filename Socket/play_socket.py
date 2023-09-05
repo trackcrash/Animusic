@@ -21,6 +21,7 @@ def skip_song(room):
             socket_class.play_vote[room] = []
         socket_class.play_vote[room] = []
     else:
+        session_id = request.sid
         before_data,new_data = get_info_for_room(room)
         emit('EndOfData', {'before_data': before_data,'new_data':new_data,'players': room_data_manager._data_store[room]['user']}, room=room)
 def get_info_for_room(room_key):

@@ -11,4 +11,5 @@ class socketClass:
         self.voted_users = {}
         self.play_vote = {}
         self.isDuplication ={}
+        self.BanList = {}
 socket_class = socketClass()
