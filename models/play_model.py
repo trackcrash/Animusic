@@ -5,6 +5,7 @@ from flask import jsonify
 from flask_login import current_user
 from models.user_model import get_userinfo_by_name
 from controllers.map_controller import show_mission_byid
+from Socket.socket import socket_class
 import copy
 class RoomDataManger:
     def __init__(self):
@@ -12,7 +13,14 @@ class RoomDataManger:
     def remove_room(self, room_key):
         if room_key in self._data_store:
             del self._data_store[room_key]
-            
+        if room_key in socket_class.play_vote:
+            del socket_class.play_vote[room_key]
+        if room_key in socket_class.totalPlayers:
+            del socket_class.totalPlayers[room_key]
+        if room_key in socket_class.isDuplication:
+            del socket_class.isDuplication[room_key]
+        if room_key in socket_class.BanList:
+            del socket_class.BanList[room_key]
     def room_check(self, room_key):
         if room_key in self._data_store:
             return True
@@ -100,7 +108,10 @@ class RoomDataManger:
     def is_user_in_room(self, user_name, room_key):
         if room_key not in self._data_store:  # 방 이름이 존재하지 않는 경우
             return False  # 사용자는 방에 없는 것으로 간주
-
+        if room_key not in socket_class.BanList:
+            socket_class.BanList[room_key] = []
+        if user_name in socket_class.BanList[room_key]:
+            return True
         dictionaryData = self._data_store[room_key]['user']
         for key, value in dictionaryData.items():
             if 'username' in value and value['username'] == user_name:

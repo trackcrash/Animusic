@@ -14,6 +14,7 @@ let currentData = null;
 let isVideoPlaying = false;
 let Num = 0;
 let isAnswer = false;
+let session_id = "";
 // let is_api_load= false;
 
 // function onYouTubeIframeAPIReady() {
@@ -105,7 +106,10 @@ function playvideo(videolink,endTime = null) {
 
     if (player) {
         player.destroy();
-        document.querySelector("div #videoFrame").remove();
+        if(document.querySelector("div #videoFrame").length > 0)
+        {
+            document.querySelector("div #videoFrame").remove();
+        }
         isVideoPlaying = false;
         videoFrame = document.createElement("div");
         videoFrame.id = "videoFrame";
@@ -506,9 +510,38 @@ socket.on('host_updated', (data) => {
 });
 
 function showHostContent(game_status) {
+    kickButton = document.querySelectorAll(".kick_button");
+    HostButton = document.querySelectorAll(".give_host");
+
     if (isHost) {
         elements.room_setting.style.display = "block";
         elements.room_setting.disabled = false;
+        for(const element of kickButton)
+        {
+            if(!element.classList.contains("me"))
+            {
+                element.style.display = "block";
+                element.disabled = false;    
+            }
+            else
+            {
+                element.style.display = "none";
+                element.disabled = true;   
+            }
+        }
+        for(const element of HostButton)
+        {
+            if(!element.classList.contains("me"))
+            {
+                element.style.display = "block";
+                element.disabled = false;    
+            }
+            else
+            {
+                element.style.display = "none";
+                element.disabled = true;   
+            }
+        }
         if (game_status == false) {
             elements.StartButton.style.display = "block";
             elements.MapSelect.style.display = "block";
@@ -527,6 +560,16 @@ function showHostContent(game_status) {
 
         }
     } else {
+        for(const element of kickButton)
+        {
+            element.style.display = "none";
+            element.disabled = true;
+        }
+        for(const element of HostButton)
+        {
+            element.style.display = "none";
+            element.disabled = true;
+        }
         elements.room_setting.style.display = "none";
         elements.room_setting.disabled = true;
         elements.StartButton.style.display = "none";
@@ -545,7 +588,6 @@ function showHostContent(game_status) {
             elements.hintButton.style.display = "none";
             elements.hintButton.disabled = true;
         }
-
     }
 }
 document.querySelector("#VolumeBar").addEventListener("input", () => {
@@ -619,7 +661,6 @@ socket.on('room_players_update', (data) => {
         elements.messages.appendChild(item);
         elements.messages.scrollTop = elements.messages.scrollHeight;
         playerListGet(data.players);
-
     }
 });
 
@@ -643,26 +684,44 @@ function playerListGet(players) {
         let charImg = findKeysByValue(CharacterEnum, value['character']);
         let characterImageUrl = getCharacter(charImg);
         let userDiv = document.createElement("div");
+        console.log(key, session_id);
         userDiv.classList.add(
             "bg-white", "border-2", "border-gray-300", "p-4",
             "rounded", "shadow-lg", "opacity-100",
             "flex", "flex-col", "items-center", "justify-center"
         );
         userDiv.innerHTML = `
-            <div class="space-y-3 text-center">
+            <div class="space-y-3 text-center me">
                 <p class="font-semibold">${level}</p>
                 <p class="font-semibold text-lg text-gray-800">${username}</p>
                 <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
                 <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
             </div>
+            <button id = '${username}_kick_button' class="kick_button ${session_id== key ? "me": ""}">강퇴</button>
+            <button id = '${username}_give_host' class="give_host ${session_id== key ? "me": ""}">방장</button>
+            
         `;
-
+        
+        userDiv.querySelector(".kick_button").addEventListener("click", function()
+        {
+            if(confirm("강퇴하시겠습니까?"))
+            {
+                socket.emit("kick",{"room_key":room_key, "user_name":username});
+            }
+        })
+        userDiv.querySelector(".give_host").addEventListener("click", function()
+        {
+            if(confirm("호스트를 변경 하시겠습니까?"))
+            {
+                socket.emit("host_change",{"room_key":room_key, "user_name":username});
+                isHost = false;
+            }
+        })
         if (index % 2 === 0) {
             leftContainer.appendChild(userDiv);
         } else {
             rightContainer.appendChild(userDiv);
         }
-
         index++;
     });
 }
@@ -699,3 +758,20 @@ socket.on("room_data_update_inroom",(data)=>
         document.getElementById("room_max_human").value = room_max_human;
     }
 }); 
+socket.on("kick_player", (data)=>
+{
+    const user = data["user_name"];
+    const item = document.createElement('div');
+    item.innerHTML = `<span class="font-semibold">${user}</span> 님이 강퇴 당하였습니다.`;
+    elements.messages.appendChild(item);
+    elements.messages.scrollTop = elements.messages.scrollHeight;
+    if(data["session_id"] == session_id)
+    {
+        alert("강퇴당하셨습니다.");
+        window.location="/";
+    }
+})
+socket.on("set_session_id", (data)=>
+{
+    session_id = data["session_id"];
+})
