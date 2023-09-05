@@ -62,7 +62,7 @@ def login():
     if request.method == 'POST':
         login_successful = user_controller()
         if login_successful:
-            return redirect(url_for('index'))
+            return redirect()
 
         flash('Invalid email or password')
         return redirect(url_for('user.login'))
@@ -81,7 +81,7 @@ def move_google_callback():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect()
 
 
 @user_bp.route('/register', methods=['GET', 'POST'])
