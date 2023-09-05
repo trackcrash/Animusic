@@ -38,6 +38,9 @@ def room_Socket(socketio):
     def join_sock(data):
         room_key = data['room_key']
         session_id = request.sid
+        if room_data_manager.is_user_in_room(current_user.name, room_key):
+            emit("duplicate", {"message": "이미 방에 입장해 있습니다."}, room=session_id)
+            return
         join_room(room_key)
         room_data_manager.join(room_key,session_id,current_user, time)
         user_id = room_data_manager.host_setting(room_key)

@@ -652,8 +652,7 @@ function playerListGet(players) {
             "rounded", "shadow-lg", "opacity-100",
             "flex", "flex-col", "items-center", "justify-center"
         );
-        if(session_id== key)
-        {
+        if (session_id == key) {
             userDiv.innerHTML = `
             <div class="space-y-3 text-center me">
                 <p class="font-semibold">${level}</p>
@@ -662,11 +661,8 @@ function playerListGet(players) {
                 <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
             </div>
         `;
-        }
-        else
-        {
-            if(!isHost)
-            {
+        } else {
+            if (!isHost) {
                 userDiv.innerHTML = `
                 <div class="space-y-3 text-center me">
                     <p class="font-semibold">${level}</p>
@@ -676,9 +672,8 @@ function playerListGet(players) {
                 </div>
                 <button id = '${username}_kick_button' class="kick_button" style="display: none;">강퇴</button>
                 <button id = '${username}_give_host' class="give_host" style="display: none;">방장</button>
-            `;      
-            }else
-            {
+            `;
+            } else {
                 userDiv.innerHTML = `
                 <div class="space-y-3 text-center me">
                     <p class="font-semibold">${level}</p>
@@ -688,13 +683,12 @@ function playerListGet(players) {
                 </div>
                 <button id = '${username}_kick_button' class="kick_button">강퇴</button>
                 <button id = '${username}_give_host' class="give_host">방장</button>
-            `;  
+            `;
             }
-          
+
         }
 
-        if(userDiv.querySelectorAll(".kick_button").length > 0 && userDiv.querySelectorAll(".give_host").length > 0)
-        {
+        if (userDiv.querySelectorAll(".kick_button").length > 0 && userDiv.querySelectorAll(".give_host").length > 0) {
             userDiv.querySelector(".kick_button").addEventListener("click", function() {
                 if (confirm("강퇴하시겠습니까?")) {
                     socket.emit("kick", { "room_key": room_key, "user_name": username });
@@ -707,7 +701,7 @@ function playerListGet(players) {
                 }
             })
         }
-        
+
         if (index % 2 === 0) {
             leftContainer.appendChild(userDiv);
         } else {
@@ -760,4 +754,9 @@ socket.on("kick_player", (data) => {
 })
 socket.on("set_session_id", (data) => {
     session_id = data["session_id"];
+})
+
+socket.on("duplicate", (data) => {
+    alert(data.message);
+    window.location = "/";
 })
