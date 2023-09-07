@@ -44,6 +44,7 @@ class RoomDataManger:
                     "room_status" : False,
                     "room_full_user" : 8,
                     "room_mission" : None,
+                    "mission_id" : None,
                     "is_skip" : True
                 },
                 "user":
@@ -121,7 +122,8 @@ class RoomDataManger:
     
     def game_status(self, room_key, booldata):
         self._data_store[room_key]['room_info']['room_status'] = booldata
-    def Mission_select(self, room_key, mission):
+    def Mission_select(self, room_key, mission, selected_id):
+        self._data_store[room_key]['room_info']['mission_id'] = selected_id
         self._data_store[room_key]['room_info']['room_mission'] = mission
     def game_init(self, room_key):
         dictionaryData = self._data_store[room_key]['user']

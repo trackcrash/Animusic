@@ -24,7 +24,7 @@ def skip_song(room):
     else:
         session_id = request.sid
         before_data,new_data = get_info_for_room(room)
-        playNumUp(room_data_manager._data_store[room]["room_info"]["session_id"])
+        playNumUp(room_data_manager._data_store[room]["room_info"]["mission_id"])
         emit('EndOfData', {'before_data': before_data,'new_data':new_data,'players': room_data_manager._data_store[room]['user']}, room=room)
 def get_info_for_room(room_key):
     data = room_data_manager._data_store[room_key]['user']
@@ -139,7 +139,7 @@ def play_Socket(socketio):
         room_key = data.get("room_key")
         # make_answer(map_controller.get_music_data(data['selected_id']), room_name)
         mission = show_mission_byid(data['selected_id'])
-        room_data_manager.Mission_select(room_key, mission)
+        room_data_manager.Mission_select(room_key, mission, data['selected_id'])
         emit('MissionSelect_get', {'room_key' : room_key, "map_data": mission}, broadcast= True)
 
     #스킵투표
