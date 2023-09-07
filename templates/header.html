@@ -1,22 +1,81 @@
-<header class="bg-white shadow-sm p-5 flex justify-between items-center">
+<header class="bg-gradient-to-b from-gray-800 to-black shadow-sm p-5 md:flex-row flex flex-col justify-between items-center">
     <!--google ad-->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5318623516975787" crossorigin="anonymous"></script>
     <style>
-        .bg-pattern {
-            background-color: #2fcbc9;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23feffff' fill-opacity='0.6' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+        header {
+            background: linear-gradient(to bottom, #1f1f1f, #000000);
+        }
+        
+        header button {
+            min-width: 80px;
+            white-space: nowrap;
+            margin-right: 5px;
+            background: #333;
+            transition: transform 0.3s ease;
+        }
+        
+        header button:hover {
+            transform: scale(1.05);
+            background-color: #32CD32;
         }
     </style>
-    <a href="/">
-        <div id="logo" class="text-3xl font-bold text-blue-500"><img src="../static/img/icon.png" alt="" style="width: 50px;height: 50px;"></div>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5318623516975787" crossorigin="anonymous"></script>
+    <a href="/" class="flex items-center mb-4 md:mb-0">
+        <div id="logo" class="text-3xl font-bold text-green-500">아이거...</div>
     </a>
-    <div>
+
+    <!-- For Larger Screens -->
+    <div class="hidden md:flex items-center space-x-4 text-white">
         {% if current_user.is_authenticated %}
-        <span class="mr-4 text-blue-500"><p id="User_Name" style="display: inline;">{{ current_user.name }}</p>님, 환영합니다!</span>
-        <button id="logout-button" onclick="window.location.href='/logout'" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded transition duration-300">로그아웃</button>
-        <button id="MyMap-button" onclick="window.location.href='/Map'" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded transition duration-300 ">맵 관리</button>
-        <button id="account-Management-button" onclick="window.location.href='/account_confirm'" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded transition duration-300">회원정보 관리</button>
-        <button id="select-character-button" onclick="window.location.href='/select_character'" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded transition duration-300">캐릭터 변경</button>{% else %}
-        <button id="login-button" onclick="window.location.href='/login'" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded transition duration-300">로그인</button> {% endif %}
+        <span class="text-green-500">
+            <strong id="User_Name">{{ current_user.name }}</strong>님, 환영합니다!
+        </span>
+        <button onclick="window.location.href='/select_character'" class="text-white py-1 px-3 rounded transition duration-300">캐릭터 변경</button>
+        <button onclick="window.location.href='/account_confirm'" class="text-white py-1 px-3 rounded transition duration-300">회원정보 관리</button>
+        <button onclick="window.location.href='/Map'" class="text-white py-1 px-3 rounded transition duration-300">맵 관리</button>
+        <button onclick="window.location.href='/logout'" class="text-white py-1 px-3 rounded transition duration-300">로그아웃</button> {% else %}
+        <button onclick="window.location.href='/login'" class="text-white py-1 px-3 rounded transition duration-300">로그인</button> {% endif %}
+    </div>
+
+    <!-- Dropdown For Small Screens -->
+    <div class="md:hidden relative inline-block text-left ml-auto">
+        <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            메뉴 
+            <svg class="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+            </svg>
+        </button>
+
+        <!-- Dropdown menu -->
+        <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute right-0 mt-2">
+            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
+                {% if current_user.is_authenticated %}
+                <li>
+                    <a href="/select_character" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">캐릭터 변경</a>
+                </li>
+                <li>
+                    <a href="/account_confirm" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">회원정보 관리</a>
+                </li>
+                <li>
+                    <a href="/Map" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">맵 관리</a>
+                </li>
+                <li>
+                    <a href="/logout" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">로그아웃</a>
+                </li>
+                {% else %}
+                <li>
+                    <a href="/login" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">로그인</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
     </div>
 </header>
+
+<script>
+    const dropdownButton = document.getElementById('dropdownDefaultButton');
+    const dropdownMenu = document.getElementById('dropdown');
+
+    dropdownButton.addEventListener('click', () => {
+        dropdownMenu.classList.toggle('hidden');
+    });;
+</script>

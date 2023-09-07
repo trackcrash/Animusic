@@ -7,16 +7,31 @@
     <title>맵 선택</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <style>
+        body {
+            background: #121212;
+        }
+        
+        .igeo-card {
+            background: #181818;
+            transition: transform 0.3s ease;
+        }
+        
+        .igeo-card:hover {
+            background: #1DB954;
+            color: #121212;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="font-sans bg-black">
     {% include "header.html" %}
     <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
-        <h1 class="text-center text-3xl font-bold mb-8 text-gray-700">맵 선택</h1>
+        <h1 class="text-center text-3xl font-bold mb-8 text-white">맵 선택</h1>
         <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
             {% for mission in missions %}
-            <a href="/single-play?id={{ mission.id }}" class="block bg-white p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300">
-                <p class="text-xl mb-4 truncate">{{ mission.MapName }}</p>
+            <a href="/single-play?id={{ mission.id }}" class="block igeo-card p-6 shadow-lg hover:shadow-xl rounded transition duration-300">
+                <p class="text-xl mb-4 truncate text-white">{{ mission.MapName }}</p>
                 <div class="mb-4">
                     <img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" class="mx-auto w-full h-56 object-cover rounded-lg" />
                 </div>

@@ -66,7 +66,7 @@ function showSongInfo(title, song, correctusername) {
     const songTitle = document.getElementById('songTitle');
     const songArtist = document.getElementById('songArtist');
     const correctUser = document.getElementById('correctUser');
-    songTitle.innerText = title;
+    songTitle.innerText = "정답: " + title;
     songArtist.innerText = song;
     correctUser.innerText = "정답자: " + correctusername;
 }
@@ -577,12 +577,12 @@ function displayDataInModal(data) {
 
 function populateModalWithMissionData(data) {
     const mapItems = data.map(item => `
-        <a href="#" class="block bg-white p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300" data-id="${item.id}" onclick="selectAndClose(${item.id})">
-            <p class="text-xl mb-4 truncate">${item.MapName}</p>
+        <a href="#" class="block igeo-card-modal p-6 shadow-lg hover:shadow-xl rounded transition duration-300" data-id="${item.id}" onclick="selectAndClose(${item.id})">
+            <p class="text-xl mb-4 truncate text-white">${item.MapName}</p>
             <div class="mb-4">
                 <img src="${item.Thumbnail}" alt="${item.MapName}" class="mx-auto w-full h-56 object-cover rounded-lg" />
             </div>
-            <p class="text-gray-500 mb-2">제작자: ${item.MapProducer}</p>
+            <p class="text-gray-400 mb-2">제작자: ${item.MapProducer}</p>
             <p class="text-indigo-600">곡수: ${item.MusicNum}곡</p>
         </a>`).join('');
 
@@ -645,67 +645,56 @@ function playerListGet(players) {
         }
         let charImg = findKeysByValue(CharacterEnum, value['character']);
         let characterImageUrl = getCharacter(charImg);
-        let userDiv = document.createElement("div");
-        console.log(key, session_id);
-        userDiv.classList.add(
-            "bg-white", "border-2", "border-gray-300", "p-4",
-            "rounded", "shadow-lg", "opacity-100",
-            "flex", "flex-col", "items-center", "justify-center"
+        let userCard = document.createElement("div");
+
+        userCard.classList.add(
+            "player-card",
+            "flex", "flex-col", "items-center", "justify-between", "bg-gray-700", "p-4", "rounded-lg", "shadow-md", "my-2"
         );
-        if (session_id == key) {
-            userDiv.innerHTML = `
-            <div class="space-y-3 text-center me">
+
+        let userInfoHTML = `
+            <div class="space-y-3 text-center">
                 <p class="font-semibold">${level}</p>
-                <p class="font-semibold text-lg text-gray-800">${username}</p>
+                <p class="font-semibold text-lg text-white">${username}</p>
                 <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
-                <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
+                <p class="font-medium text-white">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
             </div>
         `;
-        } else {
-            if (!isHost) {
-                userDiv.innerHTML = `
-                <div class="space-y-3 text-center me">
-                    <p class="font-semibold">${level}</p>
-                    <p class="font-semibold text-lg text-gray-800">${username}</p>
-                    <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
-                    <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
-                </div>
-                <button id = '${username}_kick_button' class="kick_button" style="display: none;">강퇴</button>
-                <button id = '${username}_give_host' class="give_host" style="display: none;">방장</button>
-            `;
-            } else {
-                userDiv.innerHTML = `
-                <div class="space-y-3 text-center me">
-                    <p class="font-semibold">${level}</p>
-                    <p class="font-semibold text-lg text-gray-800">${username}</p>
-                    <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
-                    <p class="font-medium text-gray-700">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
-                </div>
-                <button id = '${username}_kick_button' class="kick_button">강퇴</button>
-                <button id = '${username}_give_host' class="give_host">방장</button>
-            `;
-            }
 
+        let actionButtonsHTML = session_id == key ? "" : `
+            <div class="flex justify-between mt-4">
+                <button id='${username}_kick_button' class='kick_button'>강퇴</button>
+                <button id='${username}_give_host' class='give_host'>방장</button>
+            </div>
+        `;
+
+        if (!isHost) {
+            actionButtonsHTML = "";
         }
 
-        if (userDiv.querySelectorAll(".kick_button").length > 0 && userDiv.querySelectorAll(".give_host").length > 0) {
-            userDiv.querySelector(".kick_button").addEventListener("click", function() {
+        userCard.innerHTML = userInfoHTML + actionButtonsHTML;
+
+        if (userCard.querySelector(".kick_button")) {
+            userCard.querySelector(".kick_button").addEventListener("click", function() {
                 if (confirm("강퇴하시겠습니까?")) {
                     socket.emit("kick", { "room_key": room_key, "user_name": username });
                 }
-            })
-            userDiv.querySelector(".give_host").addEventListener("click", function() {
+            });
+        }
+
+        if (userCard.querySelector(".give_host")) {
+            userCard.querySelector(".give_host").addEventListener("click", function() {
                 if (confirm("호스트를 변경 하시겠습니까?")) {
                     socket.emit("host_change", { "room_key": room_key, "user_name": username });
                     isHost = false;
                 }
-            })
+            });
         }
 
         if (index % 2 === 0) {
-            leftContainer.appendChild(userDiv);
+            leftContainer.appendChild(userCard);
         } else {
-            rightContainer.appendChild(userDiv);
+            rightContainer.appendChild(userCard);
         }
         index++;
     });

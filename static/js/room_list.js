@@ -8,20 +8,20 @@ function fetchData(url, callback) {
 function createRoomElement(room_key, room_name, room_status, user_count, mission, max_user, isPassword) {
     const roomContainer = document.createElement('div');
     roomContainer.id = `roomContainer_${room_key}`;
-    roomContainer.classList.add('room-container', 'p-6', 'bg-white', 'shadow-md', 'rounded-xl', 'transition', 'duration-300', 'hover:shadow-xl', 'cursor-pointer', 'space-y-4');
+    roomContainer.classList.add('room-container', 'p-6', 'bg-black', 'text-white', 'shadow-md', 'rounded-xl', 'transition', 'duration-300', 'hover:shadow-xl', 'cursor-pointer', 'space-y-4');
 
     const titleContainer = document.createElement('div');
     titleContainer.classList.add('flex', 'justify-between', 'items-center');
 
     const button = document.createElement('a');
     button.textContent = `${room_key} ${room_name}`;
-    button.classList.add('room-button', 'text-2xl', 'font-semibold', 'text-blue-500', 'hover:text-blue-600');
+    button.classList.add('room-button', 'text-2xl', 'font-semibold', 'text-green-500', 'hover:text-green-600');
     button.dataset.room_key = room_key;
 
     const roomPrivateElement = document.createElement('span');
     roomPrivateElement.id = `room-private-${room_key}`;
     roomPrivateElement.classList.add('text-xs', 'text-white', 'px-3', 'py-1', 'rounded-full');
-    roomPrivateElement.style.backgroundColor = isPassword ? "#F87171" : "#34D399"; // 빨간색은 private, 초록색은 public
+    roomPrivateElement.style.backgroundColor = isPassword ? "#E1306C" : "#1ED760"; // 빨간색은 private, 초록색은 public
     roomPrivateElement.textContent = isPassword ? "Private" : "Public";
 
     titleContainer.appendChild(button);
@@ -32,16 +32,16 @@ function createRoomElement(room_key, room_name, room_status, user_count, mission
 
     const roomCountElement = document.createElement('span');
     roomCountElement.id = `${roomNameElementIdPrefix}${room_key}`;
-    roomCountElement.classList.add('block', 'text-sm', 'text-gray-500', 'font-medium');
+    roomCountElement.classList.add('block', 'text-sm', 'font-medium');
     roomCountElement.textContent = `👥 ${user_count ? user_count + "명" : "0명"} / ${max_user}명`;
 
     const roomMissionElement = document.createElement('span');
     roomMissionElement.id = `${roomNameElementMissionPrefix}1-${room_key}`;
-    roomMissionElement.classList.add('block', 'text-sm', 'text-gray-500', 'font-medium');
+    roomMissionElement.classList.add('block', 'text-sm', 'font-medium');
     roomMissionElement.textContent = `🗺️ ${mission ? mission[0]['MapName'] : "미설정"}`;
 
     const thumbnailContainer = document.createElement('div');
-    thumbnailContainer.classList.add('flex', 'justify-center', 'items-center', 'bg-gray-100', 'rounded-lg', 'overflow-hidden', 'mb-4');
+    thumbnailContainer.classList.add('flex', 'justify-center', 'items-center', 'bg-gray-800', 'rounded-lg', 'overflow-hidden', 'mb-4');
     thumbnailContainer.id = `thumbnail_${room_key}`;
 
     if (mission && mission[0]['Thumbnail']) {
@@ -53,13 +53,13 @@ function createRoomElement(room_key, room_name, room_status, user_count, mission
     } else {
         const placeholderText = document.createElement('p');
         placeholderText.textContent = '맵 선택 중';
-        placeholderText.classList.add('text-lg', 'font-semibold', 'text-gray-500');
+        placeholderText.classList.add('text-lg', 'font-semibold', 'text-gray-400');
         thumbnailContainer.appendChild(placeholderText);
     }
 
     const MissionProducerElement = document.createElement('span');
     MissionProducerElement.id = `${roomNameElementMissionPrefix}2-${room_key}`;
-    MissionProducerElement.classList.add('block', 'text-sm', 'text-gray-500', 'font-medium');
+    MissionProducerElement.classList.add('block', 'text-sm', 'font-medium');
     MissionProducerElement.textContent = `👤 ${mission ? mission[0]['MapProducer'] : "미설정"}`;
 
     const roomStatusElement = document.createElement('span');
@@ -96,6 +96,7 @@ function updateRoomCount(room_key, playerCount) {
         roomCountElement.textContent = `👥 ${playerCount ? playerCount + "명" : "0명"} / ${textContents[1]}`;
     }
 }
+
 function create_room_button() {
     // 사용자 정보를 가져옵니다.
     $('#CreateRoomModal').removeClass('hidden');
@@ -145,9 +146,6 @@ function firstCreateRoom() {
 function addRoomToList(room_key, room_name, max_user, isPassword) {
     const roomButtonsContainer = document.getElementById('room-buttons');
     roomButtonsContainer.appendChild(createRoomElement(room_key, room_name, false, false, false, max_user, isPassword));
-
-
-
 }
 
 function removeRoomFromList(room_key) {

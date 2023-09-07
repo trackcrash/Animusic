@@ -11,14 +11,14 @@ function displayRanking(data) {
     let rank = 1;
     for (const element of data) {
         const newDiv = document.createElement("div");
-        newDiv.className = "bg-white rounded overflow-hidden shadow-lg p-4 space-y-3";
+        newDiv.className = "bg-gray-400 rounded overflow-hidden shadow-lg p-4 space-y-3";
 
         const rankLabel = document.createElement("span");
         rankLabel.className = "text-white text-xs font-bold py-1 px-2 rounded-full " + getRankingClass(rank);
         rankLabel.textContent = "#" + rank;
 
         const mapNameLabel = document.createElement("h3");
-        mapNameLabel.className = "text-xl font-bold";
+        mapNameLabel.className = "text-xl text-white font-bold";
         mapNameLabel.textContent = element["MapName"];
 
         const thumbnail = document.createElement("img");
@@ -27,7 +27,7 @@ function displayRanking(data) {
         thumbnail.className = "w-full h-48 object-cover";
 
         const mapProducerLabel = document.createElement("p");
-        mapProducerLabel.className = "text-lg";
+        mapProducerLabel.className = "text-lg text-white";
         mapProducerLabel.textContent = "제작자: " + element["MapProducer"];
 
         newDiv.appendChild(rankLabel);
