@@ -1,0 +1,48 @@
+<div class="flex items-center justify-end">
+    <button onclick="open_tutorial()" type="button" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600">처음으로 돌아가기</button>
+    <button onclick="close_tutorial()" type="button" class="px-2 py-1 mt-1 ml-2 bg-red-500 text-white rounded hover:bg-red-600">&times;</button>
+</div>
+<div class="mt-10 y-full">
+    <span style="font-size: 24px">5. 시작 시간 및 종료 시간</span>
+</div>
+<div class="mt-2 y-full tutorial-font border border-solid border-green-500 rounded">
+    <p><span>시작 시간 및 종료 시간은</span></p>
+    <p><span>플레이 시 재생시킬 영상의 구간을 정합니다.</span></p>
+    <p><span>빈칸으로 두는 경우 시작 시간은 0초 부터</span></p>
+    <p><span>종료 시간은 영상의 끝 까지 재생됩니다.</span></p>
+    <p><span>시작 시간과 종료 시간 둘 중 한 곳만 적으셔도 되고</span></p>
+    <p><span>각 시간 칸의 일부분만 비워두실 경우 비워진 칸은 0으로 처리됩니다.</span></p>
+    <p><span>또한 시작 시간보다 종료 시간이 더 작은 경우</span></p>
+    <p><span>종료 시간은 0으로 처리됩니다.</span></p>
+</div>
+<div class="mt-5 y-full p-2 border border-solid border-black rounded bg-gray-100">
+    <label>시작 시간 및 종료 시간</label>
+        <div id="tutorial-Timeclass" class="flex space-x-0.5 time-style">
+            <input id="tutorial-startTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
+            <span>:</span>
+            <input id="tutorial-startTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+            <span>:</span>
+            <input id="tutorial-startTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
+            <span>.</span>
+            <input id="tutorial-startTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
+            <span>~</span>
+            <input id="tutorial-endTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
+            <span>:</span>
+            <input id="tutorial-endTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+            <span>:</span>
+            <input id="tutorial-endTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
+            <span>.</span>
+            <input id="tutorial-endTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)"  placeholder="소숫점">
+        </div>
+</div>
+<div class="flex flex-col mt-5 y-full p-2 border border-solid border-black rounded bg-gray-100" style="font-size: 18px;">
+    <label>실제 적용되는 곡의 구간</label>
+    <label id="tutorial-Time"></label>
+</div>
+<div class="flex" style="position: fixed; bottom: 30px; width: 90%;">
+    <div class="w-1/2"></div>
+    <div class=" w-1/2 flex mt-10">
+        <button type="button" onclick="manual4_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">&#x25C0; 이전페이지</button>
+        <button type="button" onclick="manual6_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">다음페이지 &#x25B6;</button>
+    </div>
+</div>

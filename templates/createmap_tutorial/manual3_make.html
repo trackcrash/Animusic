@@ -1,0 +1,28 @@
+<div class="flex items-center justify-end">
+    <button onclick="open_tutorial()" type="button" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600">처음으로 돌아가기</button>
+    <button onclick="close_tutorial()" type="button" class="px-2 py-1 mt-1 ml-2 bg-red-500 text-white rounded hover:bg-red-600">&times;</button>
+</div>
+<div class="mt-10 y-full">
+    <span style="font-size: 24px">3. 정답</span>
+</div>
+<div class="mt-2 y-full tutorial-font border border-solid border-green-500 rounded">
+    <p><span>정답 칸은 ,(콤마)를 기준으로</span></p>
+    <p><span>한 곡에 여러개의 정답을 지정하실 수 있습니다.</span></p>
+    <p><span>이때 띄어쓰기가 없는 정답은 자동 제공됩니다.</span></p>
+    <p><span>또한 플레이 시 영문자 대소문자는 구분하지 않습니다.</span></p>
+</div>
+<div class="mt-5 y-full p-2 border border-solid border-black rounded bg-gray-100">
+    <label>정답:</label>
+    <input id="tutorial-answer-input" class="w-full p-2 border border-gray-300 rounded" style="margin-top: 5px" type="text">
+</div>
+<div class="flex flex-col mt-5 y-full p-2 border border-solid border-black rounded bg-gray-100" style="font-size: 18px;">
+    <label>실제 적용되는 정답 목록</label>
+    <label id="tutorial-answer"></label>
+</div>
+<div class="flex" style="position: fixed; bottom: 30px; width: 90%;">
+    <div class="w-1/2"></div>
+    <div class=" w-1/2 flex mt-10">
+        <button type="button" onclick="manual2_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">&#x25C0; 이전페이지</button>
+        <button type="button" onclick="manual4_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">다음페이지 &#x25B6;</button>
+    </div>
+</div>

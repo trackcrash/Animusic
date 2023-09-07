@@ -62,3 +62,15 @@ def check_videoid():
 def get_mission_table():
     mission_table_data = show_mission_active()
     return jsonify(mission_table_data)
+
+# 튜토리얼 html 요청
+@map_bp.route('/request_htmlContent', methods=['POST'])
+def open_tutorial():
+    data = request.get_json().get('data')
+    if data.split('.')[1] == 'html':
+        with open(f'templates/createmap_tutorial/{data}', 'r', encoding='utf-8') as file:
+            html_content = file.read()
+    elif data.split('.')[1] == 'js':
+        with open(f'static/js/createmap_tutorial/{data}', 'r', encoding='utf-8') as file:
+            html_content = file.read()
+    return html_content

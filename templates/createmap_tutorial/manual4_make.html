@@ -1,0 +1,27 @@
+<div class="flex items-center justify-end">
+    <button onclick="open_tutorial()" type="button" class="px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600">처음으로 돌아가기</button>
+    <button onclick="close_tutorial()" type="button" class="px-2 py-1 mt-1 ml-2 bg-red-500 text-white rounded hover:bg-red-600">&times;</button>
+</div>
+<div class="mt-10 y-full">
+    <span style="font-size: 24px">4. 곡 링크</span>
+</div>
+<div class="mt-2 y-full tutorial-font border border-solid border-green-500 rounded">
+    <p><span>곡 링크 칸은 Youtube 동영상 링크만 지원됩니다.</span></p>
+    <p><span>이때 거의 모든 유형의 Youtube 동영상 링크가 지원됩니다.</span></p>
+    <p><span>만약 잘못된 링크 일 경우 해당 곡은 등록되지 않습니다.</span></p>
+</div>
+<div class="mt-5 y-full p-2 border border-solid border-black rounded bg-gray-100">
+    <label>곡 링크:</label>
+    <input id="tutorial-songURL-input" class="w-full p-2 border border-gray-300 rounded" style="margin-top: 5px" type="text">
+</div>
+<div class="flex flex-col mt-5 y-full p-2 border border-solid border-black rounded bg-gray-100" style="font-size: 18px;">
+    <label>실제 적용되는 곡 링크 형태</label>
+    <label id="tutorial-songURL"></label>
+</div>
+<div class="flex" style="position: fixed; bottom: 30px; width: 90%;">
+    <div class="w-1/2"></div>
+    <div class=" w-1/2 flex mt-10">
+        <button type="button" onclick="manual3_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">&#x25C0; 이전페이지</button>
+        <button type="button" onclick="manual5_make()" class="py-1 mx-1 w-1/2 bg-red-300 text-white rounded hover:bg-red-400 transition">다음페이지 &#x25B6;</button>
+    </div>
+</div>
