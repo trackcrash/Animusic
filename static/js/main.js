@@ -1,22 +1,21 @@
 let videoId = "";
 let modifyIndex = null;
 modifyFunction();
-function delete_mission()
-{
+
+function delete_mission() {
     const urlParams = new URLSearchParams(window.location.search);
 
     // Get the 'id' parameter value
     const id = urlParams.get('id');
 
-    if(confirm("정말 삭제하시겠습니까?"))
-    {
+    if (confirm("정말 삭제하시겠습니까?")) {
         let delete_link = `/delete-mission?id=${id}`;
-        location.href=delete_link;
+        location.href = delete_link;
     }
 }
 
 const delete_btn = document.getElementById('delete-btn');
-if (delete_btn) {delete_btn.addEventListener("click", ()=> {delete_mission()})}
+if (delete_btn) { delete_btn.addEventListener("click", () => { delete_mission() }) }
 
 function zero_space_text(answer) {
     const answerList = answer.split(',').map(str => str.trim()).filter(Boolean);
@@ -27,10 +26,10 @@ function zero_space_text(answer) {
 
     return Array.from(combinedSet).join(',');
 }
- // 유튜브 영상링크 videoId분리 함수(일반링크, 공유링크)
+// 유튜브 영상링크 videoId분리 함수(일반링크, 공유링크)
 function split_ytLink(ytLink) {
-    if (ytLink.split('v=')[1]) {return ytLink.split('v=')[1].substring(0, 11)}
-    else {return ytLink.split('/')[3].substring(0, 11)}};
+    if (ytLink.split('v=')[1]) { return ytLink.split('v=')[1].substring(0, 11) } else { return ytLink.split('/')[3].substring(0, 11) }
+};
 
 function loadVideo() {
     videoId = split_ytLink(document.getElementById("song-link-input").value);
@@ -42,7 +41,7 @@ function loadVideo() {
     iframe.width = "1024";
     iframe.height = "720";
 
-    if (document.getElementById('autoplay-check').checked) {iframe.allow = "autoplay"}
+    if (document.getElementById('autoplay-check').checked) { iframe.allow = "autoplay" }
 
     const videoContainer = document.querySelector(".video-container");
     videoContainer.innerHTML = "";
@@ -58,15 +57,15 @@ function modifyFunction() {
     const addBox = document.querySelector('.add_box.grid-item');
     boxes.forEach((box, i) => {
         box.addEventListener('click', () => {
-            const title = box.querySelector('h3')?.innerText;
-            const song = box.querySelector('p')?.innerText;
-            const songURL = box.querySelector('input')?.value;
-            const answer = box.querySelector('h1')?.innerText;
-            const hint = box.querySelector('h2')?.innerText;
-            const id = box.querySelector('h4')?.innerText;
-            const startTime = box.querySelector('h5')?.innerText;
-            const endTime = box.querySelector('h6')?.innerText;
-    
+            const title = box.querySelector('h3') ? .innerText;
+            const song = box.querySelector('p') ? .innerText;
+            const songURL = box.querySelector('input') ? .value;
+            const answer = box.querySelector('h1') ? .innerText;
+            const hint = box.querySelector('h2') ? .innerText;
+            const id = box.querySelector('h4') ? .innerText;
+            const startTime = box.querySelector('h5') ? .innerText;
+            const endTime = box.querySelector('h6') ? .innerText;
+
             // 정보를 설정하면서 선택적 체이닝 사용
             document.getElementById('title-input').value = title || ''; // 속성이 없을 때는 빈 문자열
             document.getElementById('song-name-input').value = song || '';
@@ -84,7 +83,7 @@ function modifyFunction() {
             document.getElementById('id-input').value = id || '';
             loadVideo();
             document.getElementById('register-btn').innerText = "수정하기";
-    
+
             modifyIndex = i;
         });
     });
@@ -109,10 +108,10 @@ function modifyFunction() {
 
 function createInfoItem(title, song, songURL, thumbnail, answer, hint, startTime, endTime, id) {
     const box = document.createElement('div');
-    box.classList.add('box', 'grid-item');
+    box.classList.add('box', 'grid-item', 'igeo-box');
     const closeBtn = document.createElement('button');
     closeBtn.innerText = 'X';
-    closeBtn.classList.add('close-btn', 'bg-red-500', 'text-white', 'rounded-full', 'p-1', 'absolute', 'top-2', 'right-2');
+    closeBtn.classList.add('close-btn', 'igeo-close-btn');
     closeBtn.onclick = (event) => {
         event.stopPropagation();
         box.remove();
@@ -195,40 +194,30 @@ document.getElementById("register-btn").addEventListener("click", (e) => {
     const end_seconds = (endH * 3600) + (endM * 60) + endS + endMS;
     const endTime = String(end_seconds);
 
-    if (start_seconds >= end_seconds) {endTime = '0'};
+    if (start_seconds >= end_seconds) { endTime = '0' };
 
-    const inputList =  document.querySelectorAll('#submission-form input:not([id="MapName-input"])');
+    const inputList = document.querySelectorAll('#submission-form input:not([id="MapName-input"])');
     const h4List = document.querySelectorAll('#grid-container .box h4');
     const boxList = document.querySelectorAll('#grid-container .box');
 
-    if(id != null && id != "")
-    {
-        for(let i = 0; i < h4List.length; i++)
-        {
-            if(h4List[i].innerText == id)
-            {
+    if (id != null && id != "") {
+        for (let i = 0; i < h4List.length; i++) {
+            if (h4List[i].innerText == id) {
                 changeBox(boxList[i], title, song, songURL, thumbnailLink, answer, hint, startTime, endTime)
             }
         }
-    }
-    else
-    {
-        if(modifyIndex != null)
-        {
-            for(let i = 0; i < boxList.length; i++)
-            {
-                if(i == modifyIndex)
-                {
+    } else {
+        if (modifyIndex != null) {
+            for (let i = 0; i < boxList.length; i++) {
+                if (i == modifyIndex) {
                     changeBox(boxList[i], title, song, songURL, thumbnailLink, answer, hint, startTime, endTime)
 
                 }
             }
-        }else
-        {
+        } else {
             const box = createInfoItem(title, song, songURL, thumbnailLink, answer, hint, startTime, endTime, id);
             document.querySelector('.add_box').before(box);
-            for(const element of inputList)
-            {
+            for (const element of inputList) {
                 element.value = "";
             }
             modifyFunction();
@@ -236,7 +225,7 @@ document.getElementById("register-btn").addEventListener("click", (e) => {
     }
 });
 
-function changeBox(box,title, song, songURL, thumbnail, answer, hint, startTime, endTime) {
+function changeBox(box, title, song, songURL, thumbnail, answer, hint, startTime, endTime) {
     box.querySelector('h3').innerText = title;
     box.querySelector('p').innerText = song;
     box.querySelector('img').src = thumbnail;
@@ -269,11 +258,13 @@ function box_element(item) {
 
     const id = item.querySelector('h4').innerHTML || null;
 
-    let hint = null, startTime = null, endTime = null;
+    let hint = null,
+        startTime = null,
+        endTime = null;
 
-    if (item.querySelector('h2').innerText !== '') {hint = item.querySelector('h2').innerText};
-    if (parseFloat(item.querySelector('h5').innerText)) {startTime = item.querySelector('h5').innerText};
-    if (parseFloat(item.querySelector('h6').innerText)) {endTime = item.querySelector('h6').innerText};
+    if (item.querySelector('h2').innerText !== '') { hint = item.querySelector('h2').innerText };
+    if (parseFloat(item.querySelector('h5').innerText)) { startTime = item.querySelector('h5').innerText };
+    if (parseFloat(item.querySelector('h6').innerText)) { endTime = item.querySelector('h6').innerText };
 
     return {
         title: title,
@@ -294,7 +285,7 @@ function UploadBtn(event) {
     let upload_url, data = [];
     items.forEach(item => {
 
-        let {id, title, song, thumbnail, songURL, answer, hint, startTime, endTime} = box_element(item);
+        let { id, title, song, thumbnail, songURL, answer, hint, startTime, endTime } = box_element(item);
 
         let song_entry = {
             title: title,
@@ -307,7 +298,7 @@ function UploadBtn(event) {
             endTime: endTime
         };
 
-        if(id == "" || id == null) {
+        if (id == "" || id == null) {
             data.push(song_entry);
         } else {
             song_entry.Music_id = id;
@@ -358,13 +349,14 @@ $("#save-btn").on("click", UploadBtn);
 // grid-container 가로 세로 길이를 px단위로 정의함
 let container_width = document.getElementById('grid-container').clientWidth;
 let container_height = document.getElementById('grid-container').clientHeight;
-let box_width = 0, box_height = 0;
+let box_width = 0,
+    box_height = 0;
 
 // container_width, container_height 를 재 정의함
 function resize_variable_declaration() {
 
     //grid-container 안의 아이템의 가로 세로 길이를 px단위로 정의함
-    if (!document.querySelector('.box')) {return};
+    if (!document.querySelector('.box')) { return };
 
     box_width = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('width'));
     box_height = parseFloat(window.getComputedStyle(document.querySelector('.box')).getPropertyValue('height'));
@@ -399,7 +391,7 @@ const observer = new MutationObserver(() => {
 });
 
 // 어떤 대상의 상태 변화를 감지하는 observer 의 설정값 (대상 : grid-container, childList - true : 대상 내용물의 갯수만 감지)
-observer.observe(document.getElementById('grid-container'), {childList: true });
+observer.observe(document.getElementById('grid-container'), { childList: true });
 
 // 시작시간, 종료시간 숫자입력 고정 및 최대값 고정
 function number_max(inputdata) {
@@ -408,7 +400,7 @@ function number_max(inputdata) {
 
     time_data = time_data.replace(/[^0-9]/g, '');
     inputdata.value = time_data;
-    if (parseInt(time_data) > parseInt(time_max)) {time_data = time_max};
+    if (parseInt(time_data) > parseInt(time_max)) { time_data = time_max };
 
     inputdata.value = time_data;
 };
@@ -419,10 +411,9 @@ const formInputs = document.getElementById('submission-form').querySelectorAll('
 formInputs.forEach((input, index) => {
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-            if (index === formInputs.length - 1) {formInputs[2].focus()}
-            else {formInputs[index + 1].focus()};
+            if (index === formInputs.length - 1) { formInputs[2].focus() } else { formInputs[index + 1].focus() };
         };
-        if (e.key === 'Tab' && index === formInputs.length - 1) {formInputs[1].focus()};
+        if (e.key === 'Tab' && index === formInputs.length - 1) { formInputs[1].focus() };
     });
 });
 

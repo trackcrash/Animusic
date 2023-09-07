@@ -38,7 +38,7 @@
             </div>
             <div class="mt-1 py-1">
                 <a href="{{ url_for('static', filename='file_form/MakingMap_form.xlsx') }}" class="inline-block w-1/3 px-2 py-1 mt-1 text-center bg-blue-500 text-white rounded hover:bg-blue-600" download>양식 다운로드</a>
-                <button id="file_save_btn" class="w-1/3 px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600 {% if request.args.get('id') %}hidden{% endif %}" >맵 추가하기</button>
+                <button id="file_save_btn" class="w-1/3 px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600 {% if request.args.get('id') %}hidden{% endif %}">맵 추가하기</button>
                 <button id="file_insert_btn" class="w-1/3 px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600 {% if not request.args.get('id') %}hidden{% endif %}">맵 수정하기</button>
                 <div id="loading-spinner" class="spinner"></div>
                 <div class="mb-5 progress-bar">
@@ -110,23 +110,23 @@
                     <input id="song-link-input" class="w-full p-2 border border-gray-300 rounded" style="margin-top: 5px" type="url">
 
                     <label>시작 시간 및 종료 시간</label>
-                        <div id="Time" class="flex space-x-0.5 time-style">
-                            <input id="startTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
-                            <span>:</span>
-                            <input id="startTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
-                            <span>:</span>
-                            <input id="startTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
-                            <span>.</span>
-                            <input id="startTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
-                            <span>~</span>
-                            <input id="endTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
-                            <span>:</span>
-                            <input id="endTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
-                            <span>:</span>
-                            <input id="endTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
-                            <span>.</span>
-                            <input id="endTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)"  placeholder="소숫점">
-                        </div>
+                    <div id="Time" class="flex space-x-0.5 time-style">
+                        <input id="startTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
+                        <span>:</span>
+                        <input id="startTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+                        <span>:</span>
+                        <input id="startTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
+                        <span>.</span>
+                        <input id="startTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
+                        <span>~</span>
+                        <input id="endTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
+                        <span>:</span>
+                        <input id="endTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+                        <span>:</span>
+                        <input id="endTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
+                        <span>.</span>
+                        <input id="endTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
+                    </div>
                     <div class="flex space-x-2">
                         <button id="register-btn" type="button" class="w-1/2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">등록하기</button>
                         <button id="update-btn" type="button" class="w-1/2 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">정보 수정하기</button>
@@ -141,10 +141,10 @@
         {% else %}
         <div class="right-side w-1/2">
             <!-- 상단 정보 영역 -->
-            <div class="info-section bg-gray-200 rounded p-2 shadow-md mb-4">
-                <div id="grid-container" class="grid grid-cols-3 gap-4 w-full h-full">
-                    <!-- 여기에 .box 아이템들이 추가됩니다 -->
-                    <div class="add_box grid-item">
+            <div class="info-section igeo-section">
+                <div id="grid-container" class="igeo-grid">
+                    <!-- .box items will be appended here -->
+                    <div class="add_box grid-item igeo-add-box">
                         +
                     </div>
                 </div>
@@ -176,23 +176,23 @@
                     <input id="song-link-input" class="w-full p-2 border border-gray-300 rounded" style="margin-top: 5px" type="url">
 
                     <label>시작 시간 및 종료 시간</label>
-                        <div id="Time" class="flex space-x-0.5 time-style">
-                            <input id="startTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
-                            <span>:</span>
-                            <input id="startTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
-                            <span>:</span>
-                            <input id="startTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
-                            <span>.</span>
-                            <input id="startTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
-                            <span>~</span>
-                            <input id="endTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
-                            <span>:</span>
-                            <input id="endTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
-                            <span>:</span>
-                            <input id="endTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
-                            <span>.</span>
-                            <input id="endTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
-                        </div>
+                    <div id="Time" class="flex space-x-0.5 time-style">
+                        <input id="startTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
+                        <span>:</span>
+                        <input id="startTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+                        <span>:</span>
+                        <input id="startTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
+                        <span>.</span>
+                        <input id="startTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
+                        <span>~</span>
+                        <input id="endTime-input-h" class="w-full border border-gray-300 rounded" type="number" max="99" oninput="number_max(this)" placeholder="시간">
+                        <span>:</span>
+                        <input id="endTime-input-m" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="분">
+                        <span>:</span>
+                        <input id="endTime-input-s" class="w-full border border-gray-300 rounded" type="number" max="59" oninput="number_max(this)" placeholder="초">
+                        <span>.</span>
+                        <input id="endTime-input-ms" class="w-full border border-gray-300 rounded" type="number" max="999" oninput="number_max(this)" placeholder="소숫점">
+                    </div>
                     <div class="flex space-x-2">
                         <button id="register-btn" type="button" class="w-1/2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">등록하기</button>
                         <button id="save-btn" type="button" class="w-1/2 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">맵 저장하기</button>
