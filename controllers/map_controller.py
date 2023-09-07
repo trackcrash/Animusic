@@ -2,7 +2,7 @@ import random, requests
 from decouple import config
 from flask import jsonify, request, render_template
 from flask_login import current_user
-from sqlalchemy import func, inspect
+from sqlalchemy import func, inspect ,desc
 from models import data_model
 from db.database import create_session,close_session
 from models.data_model import Mission, Music
@@ -132,6 +132,19 @@ def show_table_bymissionid(missionid):
         close_session(engine, session)
     return entries
     
+def show_table_mission_top_five():
+    engine,session = create_session()
+    try:
+        queries = session.query(Mission).order_by(desc(Mission.PlayNum),desc(Mission.id)).limit(5)
+        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]        
+    except Exception as e:
+        # Handle exceptions or errors as needed
+        print(f"An error occurred while retrieving music records: {str(e)}")
+        return []
+    finally:
+        close_session(engine, session)
+    return entries
+    
 
 def get_music_data(data):
     mission_id = data
@@ -144,7 +157,8 @@ def show_mission():
     try:
         queries = session.query(Mission)
         # 노래 갯수 추가
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
+        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]        
+        
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while retrieving music records: {str(e)}")
@@ -160,7 +174,7 @@ def show_mission_active():
     try:
         queries = session.query(Mission).filter(Mission.active == True)
         # 노래 갯수 추가
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
+        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while retrieving music records: {str(e)}")
@@ -175,7 +189,7 @@ def show_mission_byProducer():
     engine,session = create_session()
     try:
         queries = session.query(Mission).filter(Mission.MapProducer_id == current_user.id)
-        entries = [dict(id=q.id, MapName=q.MapName, MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id,MusicNum=session.query(Music).filter(Music.mission_id == q.id).count()) for q in queries]
+        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while retrieving music records: {str(e)}")
@@ -189,7 +203,7 @@ def show_mission_byid(id):
     engine,session = create_session()
     try:
         queries = session.query(Mission).filter(Mission.id == id)
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail, MapProducer_id=q.MapProducer_id) for q in queries]
+        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while retrieving music records: {str(e)}")

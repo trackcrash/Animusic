@@ -9,108 +9,143 @@
 
 <url>
   <loc>https://igeo.site/</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
   <loc>https://igeo.site/single_list</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://igeo.site/room_list</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <loc>https://igeo.site/login?next=%2Froom_list</loc>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=3</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=26</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=32</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=40</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://igeo.site/single-play?id=41</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=42</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=47</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=66</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=71</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=83</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=96</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=102</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=108</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=117</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=118</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=119</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=121</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://igeo.site/single-play?id=122</loc>
-  <lastmod>2023-08-29T16:10:17+00:00</lastmod>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
   <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://igeo.site/single-play?id=127</loc>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://igeo.site/single-play?id=137</loc>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://igeo.site/single-play?id=142</loc>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://igeo.site/single-play?id=147</loc>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://igeo.site/single-play?id=152</loc>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://igeo.site/single-play?id=153</loc>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://igeo.site/register</loc>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://igeo.site/login</loc>
+  <lastmod>2023-09-05T20:24:13+00:00</lastmod>
+  <priority>0.51</priority>
 </url>
 
 

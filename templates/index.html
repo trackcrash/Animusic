@@ -4,25 +4,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MainPage</title>
+    <title>아이거 뭐더라... - 각종 맞추기는 아이거에서</title>
+    <meta name="description" content="애니메이션 영화 드라마 각종매체에 대한 맞추기를 만들고 공유해보세요">
+    <meta name="naver-site-verification" content="27f9b46ffbf61a43c28049b8510474c94f923312" />
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <!-- Poppins Font -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #2f2f2f;
+        }
+        
+        h1,
+        h2 {
+            color: #1a1a1a;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        a {
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        a:hover {
+            color: #0077cc;
+        }
+        
+        .ranking-first {
+            background-color: #FFD700;
+        }
+        
+        .ranking-second {
+            background-color: #C0C0C0;
+        }
+        
+        .ranking-third {
+            background-color: #CD7F32;
+        }
+        
+        .ranking-other {
+            background-color: #E5E5E5;
+        }
+        
+        .text-xl,
+        .text-2xl {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        a.text-white:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
 </head>
 
 <body class="bg-gray-200 h-screen flex flex-col">
 
     {% include "header.html" %}
 
-    <div class="flex-grow flex items-center justify-center">
-        <div class="space-x-4">
-            <a href="/single_list" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-20 px-10 rounded transition duration-300">
-                싱글플레이
+    <div class="flex-grow flex flex-col items-center justify-center p-5 space-y-6">
+
+        <!-- Intro Section -->
+        <div class="text-center p-5">
+            <h1 class="text-4xl font-bold">아이거에서 맞추기를 즐겨보세요!</h1>
+            <p class="text-xl mt-3">다양한 매체의 맞추기를 만들고 공유하며, 타 사용자와 함께 즐길 수 있습니다.</p>
+        </div>
+
+        <!-- Game Modes Section -->
+        <div class="flex space-x-6 w-4/5 mx-auto">
+
+            <!-- Single Play Button -->
+            <a href="/single_list" class="flex-1 p-6 rounded-xl shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition duration-300 space-y-4">
+                <h2 class="text-2xl font-bold text-center text-white">싱글 플레이</h2>
+                <p class="text-xl text-center text-white">저는 혼자서 놀고싶어요.</p>
             </a>
-            <a href="/room_list" class="bg-green-500 hover:bg-green-700 text-white font-bold py-20 px-10 rounded transition duration-300">
-                멀티플레이
+
+            <!-- Multi Play Button -->
+            <a href="/room_list" class="flex-1 p-6 rounded-xl shadow-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 transition duration-300 space-y-4">
+                <h2 class="text-2xl font-bold text-center text-white">멀티플레이</h2>
+                <p class="text-xl text-center text-white">나는 친구가 많다.</p>
             </a>
+
+        </div>
+
+        <!-- Popular Quizzes Section -->
+        <div class="p-10 text-center w-4/5 mx-auto">
+            <h2 class="text-2xl font-bold">인기 있는 맞추기</h2>
+            <div id="play_ranking" class="grid grid-cols-3 gap-4 mt-4">
+            </div>
         </div>
     </div>
+
 </body>
 
 </html>
