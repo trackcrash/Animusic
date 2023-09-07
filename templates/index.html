@@ -7,6 +7,7 @@
     <title>각종 맞추기는 아이거에서 - 아이거 뭐더라... igeo.site</title>
     <meta name="description" content="애니메이션 영화 드라마 각종매체에 대한 맞추기를 만들고 공유해보세요">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 </head>
 
@@ -14,15 +15,18 @@
 
     {% include "header.html" %}
 
-    <div class="flex-grow flex items-center justify-center">
-        <div class="space-x-4">
-            <a href="/single_list" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-20 px-10 rounded transition duration-300">
-                싱글플레이
-            </a>
-            <a href="/room_list" class="bg-green-500 hover:bg-green-700 text-white font-bold py-20 px-10 rounded transition duration-300">
-                멀티플레이
-            </a>
+    <div class="flex-grow justify-center flex items-center flex-col">
+        <div>
+            <div class="space-x-4">
+                <a href="/single_list" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-20 px-10 rounded transition duration-300">
+                    싱글플레이
+                </a>
+                <a href="/room_list" class="bg-green-500 hover:bg-green-700 text-white font-bold py-20 px-10 rounded transition duration-300">
+                    멀티플레이
+                </a>
+            </div>
         </div>
+        <div id = play_ranking class="flex justify-between"></div>
     </div>
 </body>
 

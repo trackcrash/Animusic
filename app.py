@@ -9,6 +9,8 @@ from view.play import play_bp
 from view.map import map_bp
 from view.user import user_bp
 from view.room import room_bp
+from view.index import index_bp
+
 from view.character import char_bp
 #socket
 from Socket.socket import socketio
@@ -19,6 +21,7 @@ from Socket.room_socket import room_Socket
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 
+app.register_blueprint(index_bp)
 app.register_blueprint(play_bp)
 app.register_blueprint(map_bp)
 app.register_blueprint(user_bp)

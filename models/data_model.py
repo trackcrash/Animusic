@@ -49,15 +49,13 @@ class Mission(Base):
     Thumbnail = Column(String(255), nullable=True)
     active = Column(Boolean, default=False)
     musics = relationship("Music", back_populates="mission")
+    PlayNum = Column(Integer, default = 0, nullable= False)
     MapProducer_id = Column(Integer, ForeignKey('UserTable.id', ondelete='CASCADE'), nullable=False)
-
     def __init__(self, MapName, MapProducer, Thumbnail, MapProducer_id):
         self.MapName = MapName
         self.MapProducer = MapProducer
         self.Thumbnail = Thumbnail
         self.MapProducer_id = MapProducer_id
-        
-
 # 코드 구조개선 --kyaru 16/08/23 12:00
 def save_to_db(data):
     engine,session = create_session()
@@ -80,6 +78,20 @@ def save_to_db(data):
                 )
                 session.add(new_music)
 
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f'Error saving data: {str(e)}')
+        return f'Error saving data: {str(e)}'
+    # 세션닫기 추가
+    finally:
+       close_session(engine,session)
+
+def playNumUp(id):
+    engine,session = create_session()
+    try:
+        mission = session.query(Mission).filter_by(id = id).first()
+        mission.PlayNum = mission.PlayNum+1
         session.commit()
     except SQLAlchemyError as e:
         session.rollback()
