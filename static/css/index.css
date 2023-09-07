@@ -1,0 +1,44 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    color: #2f2f2f;
+}
+
+h2 {
+    color: #1a1a1a;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+a {
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #0077cc;
+}
+
+.ranking-first {
+    background-color: #FFD700;
+}
+
+.ranking-second {
+    background-color: #C0C0C0;
+}
+
+.ranking-third {
+    background-color: #CD7F32;
+}
+
+.ranking-other {
+    background-color: #E5E5E5;
+}
+
+.text-xl,
+.text-2xl {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+a.text-white:hover {
+    color: rgba(255, 255, 255, 0.8);
+}

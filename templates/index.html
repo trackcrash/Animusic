@@ -9,67 +9,22 @@
     <meta name="naver-site-verification" content="27f9b46ffbf61a43c28049b8510474c94f923312" />
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
     <!-- Poppins Font -->
+    <link href="{{ url_for('static', filename='css/index.css') }}" rel="stylesheet">
+
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            color: #2f2f2f;
-        }
-        
-        h1,
-        h2 {
-            color: #1a1a1a;
-            font-weight: 600;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-        }
-        
-        a {
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        a:hover {
-            color: #0077cc;
-        }
-        
-        .ranking-first {
-            background-color: #FFD700;
-        }
-        
-        .ranking-second {
-            background-color: #C0C0C0;
-        }
-        
-        .ranking-third {
-            background-color: #CD7F32;
-        }
-        
-        .ranking-other {
-            background-color: #E5E5E5;
-        }
-        
-        .text-xl,
-        .text-2xl {
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-        }
-        
-        a.text-white:hover {
-            color: rgba(255, 255, 255, 0.8);
-        }
-    </style>
 </head>
 
-<body class="bg-gray-200 h-screen flex flex-col">
+<body class="flex flex-col">
 
     {% include "header.html" %}
 
     <div class="flex-grow flex flex-col items-center justify-center p-5 space-y-6">
 
         <!-- Intro Section -->
-        <div class="text-center p-5">
-            <h1 class="text-4xl font-bold">아이거에서 맞추기를 즐겨보세요!</h1>
+        <div class="text-center p-5 text-white">
+            <p class="text-4xl font-bold">아이거에서 맞추기를 즐겨보세요!</p>
             <p class="text-xl mt-3">다양한 매체의 맞추기를 만들고 공유하며, 타 사용자와 함께 즐길 수 있습니다.</p>
         </div>
 
@@ -91,7 +46,7 @@
         </div>
 
         <!-- Popular Quizzes Section -->
-        <div class="p-10 text-center w-4/5 mx-auto">
+        <div class="p-10 text-center w-4/5 mx-auto bg-gray-200 rounded">
             <h2 class="text-2xl font-bold">인기 있는 맞추기</h2>
             <div id="play_ranking" class="grid grid-cols-3 gap-4 mt-4">
             </div>
@@ -99,5 +54,23 @@
     </div>
 
 </body>
+<!-- <body>에 그라데이션 bg 효과 적용 스크립트 -->
+<script id="custom-gradient-in-body">
+    let center_count = 255, right_count = 128;
+    let switch_center, switch_right;
 
+    setInterval(() => {
+        if (center_count <= 0) { switch_center = 2 }
+        else if (center_count >= 255) { switch_center = -2 };
+        if (right_count <= 128) { switch_right = 1 }
+        else if (right_count >= 255) { switch_right = -1 };
+
+        center_count += switch_center;
+        right_count += switch_right;
+
+        document.body.style.backgroundImage = `
+            linear-gradient(45deg, rgb(0, ${center_count}, 255) 10%, rgb(128, 0, ${right_count}) 90%)
+        `;
+    }, 15);
+</script>
 </html>
