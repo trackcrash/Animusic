@@ -130,13 +130,6 @@ button:hover {
 }
 
 
-/* 기본 스타일 */
-
-.text-white-50 {
-    opacity: 0.5;
-}
-
-
 /* 음량조절 스타일 */
 
 #VolumeBar {
