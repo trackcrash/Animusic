@@ -84,20 +84,9 @@ button:hover {
 .left-side,
 .right-side {
     background-color: #181818;
+    color: #FFFFFF;
     height: 100vh;
     padding: 2rem;
-}
-
-.info-section {
-    background-color: #282828;
-    color: #FFFFFF;
-    height: 50%;
-}
-
-.input-form-section {
-    background-color: #181818;
-    color: #FFFFFF;
-    height: 50%;
 }
 
 .video-container {
