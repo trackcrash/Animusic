@@ -8,8 +8,9 @@
     transition: transform 0.3s;
     position: relative;
 }
-.box:hover, .add_box:hover
-{
+
+.box:hover,
+.add_box:hover {
     cursor: pointer;
 }
 
@@ -17,7 +18,7 @@ input,
 select,
 button,
 textarea {
-    font-family: 'Circular Std', Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
     background-color: #282828;
     color: #FFFFFF;
     border: 1px solid #333333;

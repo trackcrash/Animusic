@@ -1,0 +1,96 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #181818;
+    color: #FFFFFF;
+}
+
+h2 {
+    color: #1ED760;
+}
+
+label {
+    color: #B3B3B3;
+}
+
+input[type="text"],
+input[type="password"] {
+    background-color: #333;
+    color: #FFFFFF;
+    border: 1px solid #333;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #1ED760;
+    outline: none;
+}
+
+input[type="text"],
+input[type="email"] {
+    background-color: #333;
+    color: #FFFFFF;
+    border: 1px solid #333;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus {
+    border-color: #1ED760;
+    outline: none;
+}
+
+button[type="submit"],
+button[type="button"] {
+    font-weight: 600;
+}
+
+#delete-account-button {
+    background-color: #E8254D;
+}
+
+#delete-account-button:hover {
+    background-color: #C21D3B;
+}
+
+.bg-blue-500 {
+    background-color: #1ED760;
+}
+
+.hover\:bg-blue-600:hover {
+    background-color: #18A74D;
+}
+
+.button-igeo {
+    background-color: #1ED760;
+    color: #FFFFFF;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.button-igeo:hover {
+    background-color: #18A74D;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.button-igeo-red {
+    background-color: #E8254D;
+    color: #FFFFFF;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.button-igeo-red:hover {
+    background-color: #C21D3B;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}

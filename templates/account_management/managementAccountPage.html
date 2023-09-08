@@ -5,35 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원정보 수정</title>
+    <link href="{{ url_for('static', filename='css/account.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-black">
     {% include "header.html" %}
-    <div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+    <div class="max-w-md mx-auto mt-10 p-6 bg-gray-500 rounded-lg shadow-md">
         <h2 class="text-2xl font-semibold mb-4">회원정보 수정</h2>
         <form action="/update_profile" method="POST">
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-600">기존 닉네임 : {{ current_user.name }}</label>
-                <input type="text" name="nickname" class="mt-1 p-2 border rounded w-full">
+                <label class="block text-sm font-medium text-white">기존 닉네임 : {{ current_user.name }}</label>
+                <input type="text" name="nickname" class="mt-1 text-white p-2 border rounded w-full">
             </div>
             {% if not current_user.is_google_authenticated %}
             <div class="mb-4" id="passwordSection">
-                <label class="block text-sm font-medium text-gray-600">기존 비밀번호 입력</label>
-                <input type="password" name="password" class="mt-1 p-2 border rounded w-full">
+                <label class="block text-sm font-medium text-white">기존 비밀번호 입력</label>
+                <input type="password" name="password" class="mt-1 p-2 text-white border rounded w-full">
             </div>
             <div class="mb-4" id="newpasswordSection">
-                <label class="block text-sm font-medium text-gray-600">새 비밀번호</label>
-                <input type="password" name="newpassword" class="mt-1 p-2 border rounded w-full">
+                <label class="block text-sm font-medium text-white">새 비밀번호</label>
+                <input type="password" name="newpassword" class="mt-1 p-2 text-white border rounded w-full">
             </div>
             <div class="mb-4" id="confirmPasswordSection">
-                <label class="block text-sm font-medium text-gray-600">비밀번호 확인</label>
-                <input type="password" name="confirmPassword" class="mt-1 p-2 border rounded w-full">
+                <label class="block text-sm font-medium text-white">비밀번호 확인</label>
+                <input type="password" name="confirmPassword" class="mt-1 p-2 text-white border rounded w-full">
             </div>{% endif %}
             <div class="flex justify-between items-center mt-4">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">수정 완료</button>
-                <button type="button" onclick="window.location.href='/'" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">메인으로</button>
-                <button type="button" id="delete-account-button" onclick="window.location.href='/delete_account_confirm'" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition duration-300">회원탈퇴</button>
+                <button type="submit" class="button-igeo">수정 완료</button>
+                <button type="button" onclick="window.location.href='/'" class="button-igeo">메인으로</button>
+                <button type="button" id="delete-account-button" onclick="window.location.href='/delete_account_confirm'" class="button-igeo-red">회원탈퇴</button>
             </div>
         </form>
     </div>
