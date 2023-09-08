@@ -9,14 +9,20 @@ from oauthlib.oauth2 import WebApplicationClient
 
 from models import user_model
 
+import smtplib
+import random
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID')
+GOOGLE_ID = config('GOOGLE_ID')
+GOOGLE_PW = config('GOOGLE_PW')
 GOOGLE_CLIENT_SECRET = config('GOOGLE_CLIENT_SECRET')
 GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
+emailDict = {}
 
-
-def register():
+def register(request):
     if request.method == 'GET':
         return render_template('register.html')
 
@@ -24,12 +30,6 @@ def register():
         email = request.form.get('email')
         name = request.form.get('name')
         password = request.form.get('password')
-
-        # 사용자 이메일 중복 검사
-        existing_user = user_model.get_user_by_email(email)
-        if existing_user:
-            flash('Email already exists.')
-            return redirect(url_for('user.register'))
 
         # 사용자 정보 저장
         user = user_model.save_user(email, name, password)
@@ -103,3 +103,51 @@ def google_callback():
     login_user(user)
     session.close()
     return redirect(url_for('index'))
+
+
+
+# 이메일 보내는 함수
+def send_verification_email(email, verification_code):
+    # SMTP 서버 설정 (Gmail 사용 예제)
+    smtp_server = 'smtp.gmail.com'
+    smtp_port = 587
+    smtp_username = GOOGLE_ID  # 보내는 이메일 주소
+    smtp_password = GOOGLE_PW  # 이메일 비밀번호
+
+    # 이메일 내용 설정
+    subject = '이메일 인증 코드'
+    message = f'인증 코드: {verification_code}'
+
+    # 이메일 보내기 
+    try:
+        smtp = smtplib.SMTP(smtp_server, smtp_port)
+        smtp.starttls()
+        smtp.login(smtp_username, smtp_password)
+
+        msg = MIMEMultipart()
+        msg['From'] = smtp_username
+        msg['To'] = email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(message, 'plain'))
+
+
+        smtp.sendmail(smtp_username, email, msg.as_string())
+        emailDict[email] = verification_code
+        smtp.quit()
+        print("이메일 전송 성공")
+        return True
+    except Exception as e:
+        print(f"이메일 전송 실패: {str(e)}")
+        return False
+
+# 무작위 인증 번호 생성 함수
+def generate_verification_code():
+    return str(random.randint(1000, 9999))
+
+# 인증 번호 생성 및 이메일 보내기
+verification_code = generate_verification_code()
+email = 'recipient_email@example.com'  # 수신자의 이메일 주소
+if send_verification_email(email, verification_code):
+    print(f'인증 코드 ({verification_code})를 이메일로 보냈습니다.')
+else:
+    print('이메일 보내기 실패')

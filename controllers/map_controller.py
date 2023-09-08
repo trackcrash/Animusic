@@ -241,7 +241,22 @@ def delete_Mission(id):
             </body>
         </html>
     '''
-
+#missionid로 맵 삭제 use on map.py deleteMission()
+def delete_User(id):
+    engine, session = create_session()
+    try:
+        # Mission 테이블에서 MapProducer_id가 주어진 id와 일치하는 모든 레코드 찾기
+        data_to_delete = session.query(Mission).filter_by(MapProducer_id=id).all()
+        
+        # 각 Mission 레코드에 대해 관련 Music 레코드를 삭제하고 Mission 레코드 삭제
+        for mission in data_to_delete:
+            # 해당 Mission과 관련된 Music 레코드 삭제
+            session.query(Music).filter_by(mission_id=mission.id).delete()
+            # Mission 레코드 삭제
+            session.delete(mission)
+        commit_or_rollback(session)
+    finally:
+        close_session(engine, session)
 #videoid가 사용가능한지 체크 use on map.py check_videoid()
 def videoid_check(videoid_list):
     result = videoid_list.copy()

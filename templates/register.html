@@ -6,58 +6,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 </head>
 
 <body>
     {% include "header.html" %}
-    <section class="bg-gray-50 dark:bg-gray-900">
+    <section class="bg-black">
         <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-            <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+            <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-white dark:text-white">
                 <img class="w-8 h-8 mr-2" src="/static/img/icon.png" alt="logo"> 아이거...
             </a>
-            <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div class="w-full bg-gray-400 rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                 <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                    <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                    <h1 class="text-xl font-bold leading-tight tracking-tight text-white md:text-2xl dark:text-white">
                         회원가입
                     </h1>
-                    <form class="space-y-4 md:space-y-6" action="/register" method="POST">
+                    <form class="space-y-4 md:space-y-6" action="/register" method="POST" onsubmit="return validateForm()">
                         <div>
-                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">이메일 주소</label>
+                            <label for="email" class="block mb-2 text-sm font-medium text-white dark:text-white flex justify-between"><p>이메일 주소</p><p id = "email_check_text" class="text-red-400">이메일을 입력해주세요.</p></label>
                             <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="name@company.com" required="">
-                            <button onclick="sendVerificationEmail()" class="mt-2 w-full text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center">인증코드 보내기</button>
+                            <button id ="sendverificationcodeBtn" class="mt-2 w-full text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center">인증코드 보내기</button>
+                            <div id="verificationCodeInputSection"  style="display:none;">
+                                <div class="flex justify-between mt-2">
+                                    <input type="text" id="verificationCode" placeholder="인증 코드 입력" class="w-1/2 px-4 py-2.5 rounded-lg text-sm focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                    <button id="confirmBtn" class="w-1/2 text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm text-center">확인</button>
+                                </div>
+                                <p class="text-white" id=timer></p>
+                                <button id="reSendEmail" class="text-white">코드 다시받기</button>
+                            </div>
                         </div>
                         <div>
-                            <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">닉네임</label>
+                            <label for="name" class="block mb-2 text-sm font-medium text-white dark:text-white">닉네임</label>
                             <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="닉네임을 입력하세요" required="">
+                            <button id ="nicknameCheck" class="mt-2 w-full text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center">체크</button>
                         </div>
                         <div>
-                            <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호</label>
+                            <label for="password" class="block mb-2 text-sm font-medium text-white dark:text-white">비밀번호</label>
                             <input type="password" name="password" id="password" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 required="">
                         </div>
                         <div>
-                            <label for="confirm-password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호 확인</label>
+                            <label for="confirm-password" class="block mb-2 text-sm font-medium text-white dark:text-white">비밀번호 확인</label>
                             <input type="password" name="confirm-password" id="confirm-password" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 required="">
+                            <p class="white" id="passwordCheck"></p>
                         </div>
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
                                 <input id="terms" aria-describedby="terms" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="">
                             </div>
                             <div class="ml-3 text-sm">
-                                <label for="terms" class="font-light text-gray-500 dark:text-gray-300">나는 <a class="font-medium text-primary-600 hover:underline dark:text-primary-500" href="#">약관에 동의합니다</a></label>
+                                <label for="terms" class="font-light text-white dark:text-gray-300">나는 <a class="font-medium text-primary-600 hover:underline dark:text-primary-500" href="#">약관에 동의합니다</a></label>
                             </div>
                         </div>
-                        <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                        <button id="registerBtn" type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                             style="background-color: black;">Create an account</button>
-                        <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                            이미 계정이 있으신가요? <a onclick="window.location.href='/login'" class="font-medium text-primary-600 hover:underline dark:text-primary-500">로그인 하러가기</a>
-                        </p>
+                        <p class="text-sm font-light text-white dark:text-gray-400">
+                            이미 계정이 있으신가요? <a onclick="window.location.href='/login'" class="font-medium hover:underline dark:text-primary-500">로그인 하러가기</a>                        </p>
                     </form>
                 </div>
             </div>
         </div>
     </section>
 </body>
+<script src="{{ url_for('static', filename='js/register.js') }}"></script>

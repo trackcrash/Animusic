@@ -4,8 +4,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 
 from flask_login import logout_user, login_required, current_user
 from controllers.user_controller import user_controller, google_login, google_callback
-from controllers.user_controller import register as user_register
-from models.user_model import delete_account, account_insert, account_insert_in_googleuser, insert_character_number
+from controllers.user_controller import register as user_register,send_verification_email,generate_verification_code,emailDict
+from models.user_model import delete_account, account_insert, account_insert_in_googleuser, insert_character_number,email_check_model,name_check_model
 
 
 user_bp = Blueprint('user', __name__, url_prefix='')
@@ -86,9 +86,7 @@ def logout():
 
 @user_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        return user_register()
-    return render_template('register.html')
+    return user_register(request)
 
 @user_bp.route('/select_character')
 @login_required
@@ -101,7 +99,37 @@ def insert_character():
     character_number = request.get_json().get('character_number')
     return insert_character_number(character_number)
 
-@user_bp.route('/send_verification_email', methods=['POST'])
-def send_verification_email():
+@user_bp.route('/api/send_verification_email', methods=['POST'])
+def send_verification():
     email = request.get_json().get('email')
-    return user_register(email)
+    verification_email =  generate_verification_code()
+    send_verification_email(email, verification_email)
+    return "이메일 전송완료"
+
+@user_bp.route('/api/verify_verification_code', methods=['POST'])
+def verify_verification_code():
+    client_code = request.form.get('code')  # 클라이언트에서 전송한 인증 코드
+    email = request.form.get('email')  # 클라이언트에서 전송한 인증 코드
+    if emailDict[email]:
+        server_code = emailDict[email]  # 예제에서는 고정값으로 설정하였지만, 실제로는 동적으로 생성되거나 데이터베이스에서 가져와야 합니다.
+
+    # 서버에서 생성한 인증 코드 또는 데이터베이스에 저장된 인증 코드를 가져와서 비교
+    if client_code == server_code:
+        return "success"  # 인증 코드가 일치할 때 성공 응답 반환
+    else:
+        return "error"  # 인증 코드가 일치하지 않을 때 오류 응답 반환
+
+
+@user_bp.route('/api/email_check', methods=['GET'])
+def email_check():
+    email = request.args.get('email')
+    if email_check_model(email):
+        return "Success"
+    return "Fail"
+
+@user_bp.route('/api/name_check', methods=['GET'])
+def name_check():
+    name = request.args.get('name')
+    if name_check_model(name):
+        return "Success"
+    return "Fail"

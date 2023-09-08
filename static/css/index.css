@@ -16,6 +16,7 @@ a {
 
 a:hover {
     color: #0077cc;
+    cursor: pointer;
 }
 
 .ranking-first {

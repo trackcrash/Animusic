@@ -237,3 +237,29 @@ def insert_character_number(character_number):
         finally:
             close_session(engine, session)
     return {'message': '인증되지 않은 사용자입니다.'}
+
+def email_check_model(email):
+    engine, session = create_session()
+    try:
+        check_sameemail = session.query(User).filter(User.email == email).first()
+        if check_sameemail:
+            return False
+        return True
+    except Exception as e:
+        # Handle exceptions or errors as needed
+        print(f"An error occurred while inserting account information: {str(e)}")
+    finally:
+        close_session(engine, session)
+
+def name_check_model(name):
+    engine, session = create_session()
+    try:
+        check_samename = session.query(User).filter(User.name == name).first()
+        if check_samename:
+            return False
+        return True
+    except Exception as e:
+        # Handle exceptions or errors as needed
+        print(f"An error occurred while inserting account information: {str(e)}")
+    finally:
+        close_session(engine, session)
