@@ -143,11 +143,3 @@ def send_verification_email(email, verification_code):
 # 무작위 인증 번호 생성 함수
 def generate_verification_code():
     return str(random.randint(1000, 9999))
-
-# 인증 번호 생성 및 이메일 보내기
-verification_code = generate_verification_code()
-email = 'recipient_email@example.com'  # 수신자의 이메일 주소
-if send_verification_email(email, verification_code):
-    print(f'인증 코드 ({verification_code})를 이메일로 보냈습니다.')
-else:
-    print('이메일 보내기 실패')

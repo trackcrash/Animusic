@@ -8,6 +8,10 @@
     transition: transform 0.3s;
     position: relative;
 }
+.box:hover, .add_box:hover
+{
+    cursor: pointer;
+}
 
 input,
 select,
@@ -91,7 +95,7 @@ button:hover {
 }
 
 .input-form-section {
-    background-color: #282828;
+    background-color: #181818;
     color: #FFFFFF;
     height: 50%;
 }

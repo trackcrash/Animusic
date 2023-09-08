@@ -5,22 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Map</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="bg-black font-sans">
     {% include "header.html" %}
     <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
-        <h1 class="text-center text-3xl font-bold mb-8 text-gray-700">내 맵</h1>
+        <h1 class="text-center text-3xl font-bold mb-8 text-white">내 맵</h1>
         <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
             {% if data_list is defined and data_list %} {% for data in data_list %}
-            <a href="/make_map?id={{data['id']}}" class="block bg-white p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300">
-                <p class="text-xl mb-4 truncate">{{ data['MapName'] }}</p>
+            <a href="/make_map?id={{data['id']}}" class="block bg-gray-400 p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300">
+                <p class="text-xl mb-4 truncate text-white">{{ data['MapName'] }}</p>
                 <div class="mb-4">
                     <img src="{{ data['Thumbnail'] }}" alt="{{ data['MapName'] }}" class="mx-auto w-full h-56 object-cover rounded-lg" />
                 </div>
-                <p class="text-gray-500 mb-2">제작자: {{ data['MapProducer'] }}</p>
-                <p class="text-indigo-600">곡수: {{ data['MusicNum'] }}곡</p>
+                <p class="text-white mb-2 ">제작자: {{ data['MapProducer'] }}</p>
+                <p class="text-white">곡수: {{ data['MusicNum'] }}곡</p>
             </a>
             {% endfor %} {% endif %}
         </div>

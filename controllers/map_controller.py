@@ -135,7 +135,7 @@ def show_table_bymissionid(missionid):
 def show_table_mission_top_five():
     engine,session = create_session()
     try:
-        queries = session.query(Mission).order_by(desc(Mission.PlayNum),desc(Mission.id)).limit(5)
+        queries = session.query(Mission).order_by(desc(Mission.PlayNum),desc(Mission.id)).limit(6)
         entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]        
     except Exception as e:
         # Handle exceptions or errors as needed

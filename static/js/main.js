@@ -57,14 +57,14 @@ function modifyFunction() {
     const addBox = document.querySelector('.add_box.grid-item');
     boxes.forEach((box, i) => {
         box.addEventListener('click', () => {
-            const title = box.querySelector('h3') ? .innerText;
-            const song = box.querySelector('p') ? .innerText;
-            const songURL = box.querySelector('input') ? .value;
-            const answer = box.querySelector('h1') ? .innerText;
-            const hint = box.querySelector('h2') ? .innerText;
-            const id = box.querySelector('h4') ? .innerText;
-            const startTime = box.querySelector('h5') ? .innerText;
-            const endTime = box.querySelector('h6') ? .innerText;
+            const title = box.querySelector('h3') ?.innerText;
+            const song = box.querySelector('p') ?.innerText;
+            const songURL = box.querySelector('input') ?.value;
+            const answer = box.querySelector('h1') ?.innerText;
+            const hint = box.querySelector('h2') ?.innerText;
+            const id = box.querySelector('h4') ?.innerText;
+            const startTime = box.querySelector('h5') ?.innerText;
+            const endTime = box.querySelector('h6') ?.innerText;
 
             // 정보를 설정하면서 선택적 체이닝 사용
             document.getElementById('title-input').value = title || ''; // 속성이 없을 때는 빈 문자열
@@ -134,7 +134,7 @@ function createInfoItem(title, song, songURL, thumbnail, answer, hint, startTime
     thumbnailElem.src = thumbnail;
     thumbnailElem.classList.add('w-24', 'h-24', 'mx-auto');
     box.appendChild(thumbnailElem);
-
+    
     const songURLElem = document.createElement('input');
     songURLElem.type = 'hidden'; // 사용자에게는 보이지 않도록 hidden 유형으로 설정
     songURLElem.value = songURL;
@@ -192,7 +192,7 @@ document.getElementById("register-btn").addEventListener("click", (e) => {
     const endMS = parseFloat("0." + document.getElementById('endTime-input-ms').value) || 0;
 
     const end_seconds = (endH * 3600) + (endM * 60) + endS + endMS;
-    const endTime = String(end_seconds);
+    let endTime = String(end_seconds);
 
     if (start_seconds >= end_seconds) { endTime = '0' };
 
@@ -237,7 +237,7 @@ function changeBox(box, title, song, songURL, thumbnail, answer, hint, startTime
 }
 
 document.body.addEventListener('click', (event) => {
-    if (event.target && event.target.classList.contains('close-btn')) {
+    if (event.target && (event.target.classList.contains('close-btn') || event.target.classList.contains('igeo-close-btn'))) {
         event.target.parentElement.remove();
     }
 });
