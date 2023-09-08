@@ -67,9 +67,9 @@ function closePasswordModal() {
     document.getElementById('newPasswordModal').style.display = 'none';
 }
 
-document.getElementById("forgotPasswordButton").addEventListener("click", () => {
-    document.getElementById("passwordResetModal").style.display = "block";
-});
+function openforgotPasswordModal() {
+    document.getElementById("passwordResetModal").style.display = "flex";
+}
 
 function closeforgotPasswordModal() {
     document.getElementById("passwordResetModal").style.display = "none";
