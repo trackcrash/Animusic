@@ -263,3 +263,12 @@ def name_check_model(name):
         print(f"An error occurred while inserting account information: {str(e)}")
     finally:
         close_session(engine, session)
+
+def password_update(email,password):
+    engine, session = create_session()
+    try:
+        user = session.query(User).filter_by(email=email).first()
+        user.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        commit_or_rollback(session)
+    finally:
+        close_session(engine, session)

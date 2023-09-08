@@ -14,7 +14,7 @@
     {% include "header.html" %}
     <section class="bg-black">
         <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-            <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-white dark:text-white">
+            <a href="/" class="flex items-center mb-6 text-2xl font-semibold text-white dark:text-white">
                 <img class="w-8 h-8 mr-2" src="/static/img/icon.png" alt="logo"> 아이거...
             </a>
             <div class="w-full bg-gray-800 rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
@@ -61,7 +61,18 @@
                                 <input id="terms" aria-describedby="terms" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="">
                             </div>
                             <div class="ml-3 text-sm">
-                                <label for="terms" class="font-light text-white dark:text-gray-300">나는 <a class="font-medium text-primary-600 hover:underline dark:text-primary-500" href="#">약관에 동의합니다</a></label>
+                                <label for="terms" class="font-light text-white dark:text-gray-300">나는 <a class="font-medium text-primary-600 hover:underline dark:text-primary-500" onclick="showTermsModal(); return false;">약관에 동의합니다</a></label>
+                            </div>
+                            <div class="fixed top-0 left-0 w-full h-full flex items-center justify-center" id="termsModal" style="background-color: rgba(0, 0, 0, 0.8); display: none;">
+                                <div class="bg-gray-800 rounded-lg overflow-auto p-5">
+                                    <h2 class="text-xl text-center font-bold mb-4 text-green-500">서비스 약관</h2>
+                                    <div class="bg-gray-600 p-4 rounded-lg overflow-auto mb-4" style="max-height: 60%;">
+                                        <p class="text-white mb-2">본 약관은 아이거 서비스의 이용 조건 및 절차에 관한 기본적인 사항을 정하고 있습니다.</p>
+                                        <p class="text-white mb-2">수집하는 정보: 이메일 주소</p>
+                                        <p class="text-white mb-2">해당 정보는 회원 탈퇴 시 바로 파기됩니다.</p>
+                                    </div>
+                                    <button class="button-igeo" onclick="closeTermsModal()">닫기</button>
+                                </div>
                             </div>
                         </div>
                         <button id="registerBtn" type="submit" class="w-full text-white button-igeo" style="background-color: black;">계정 생성</button>

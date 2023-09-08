@@ -4,6 +4,7 @@ let totalSeconds = 300;
 let emailOk = false;
 let nameOk = false;
 let passwordOk = false;
+
 function email_send(email) {
     // 입력된 이메일 주소 가져오기
     // Ajax 요청 설정
@@ -34,17 +35,15 @@ function email_send(email) {
         }
     });
 }
-document.getElementById("reSendEmail").addEventListener("click",(e)=>
-{   
+document.getElementById("reSendEmail").addEventListener("click", (e) => {
     e.preventDefault();
     const emailInput = document.getElementById("email");
     const email = emailInput.value;
-    
+
     email_send(email);
-    
+
 })
-document.getElementById("confirmBtn").addEventListener("click",(e)=>
-{
+document.getElementById("confirmBtn").addEventListener("click", (e) => {
     e.preventDefault();
     const emailInput = document.getElementById("email");
     const email = emailInput.value;
@@ -52,14 +51,16 @@ document.getElementById("confirmBtn").addEventListener("click",(e)=>
     $.ajax({
         url: "/api/verify_verification_code", // 인증 코드 검증을 위한 서버 엔드포인트
         type: "POST",
-        data: { code: code,
-                email: email }, // 클라이언트에서 입력한 코드를 서버에 전송
+        data: {
+            code: code,
+            email: email
+        }, // 클라이언트에서 입력한 코드를 서버에 전송
         success: function(response) {
             if (response === "success") {
                 // 인증 코드가 일치할 때 처리
                 alert("인증이 완료되었습니다.");
                 clearInterval(verificationInterval);
-                emailOk =true;
+                emailOk = true;
                 document.getElementById("verificationCodeInputSection").innerHTML = "";
             } else {
                 // 인증 코드가 일치하지 않을 때 처리
@@ -71,10 +72,11 @@ document.getElementById("confirmBtn").addEventListener("click",(e)=>
             console.error(error);
         }
     });
-    
+
 })
+
 function updateTimer() {
-    
+
     const timerElement = document.getElementById("timer");
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
@@ -85,7 +87,7 @@ function updateTimer() {
     } else {
         clearInterval(verificationInterval); // 타이머가 종료되면 clearInterval로 중지
         timerElement.textContent = "시간이 종료되었습니다. 메일을 다시 받아주세요"; // 원하는 메시지로 변경 가능 
-        document.getElementById("confirmBtn").disabled= true;
+        document.getElementById("confirmBtn").disabled = true;
     }
 }
 
@@ -95,11 +97,11 @@ function padZero(num) {
 
 // 페이지가 로드될 때 타이머 시작
 
-document.getElementById("sendverificationcodeBtn").addEventListener("click", async (e) => {
+document.getElementById("sendverificationcodeBtn").addEventListener("click", async(e) => {
     e.preventDefault();
     const emailInput = document.getElementById("email");
     const email = emailInput.value;
-    
+
     const emailAvailability = await checkEmailAvailability(email);
 
     if (emailAvailability !== 3) {
@@ -114,35 +116,34 @@ document.getElementById("sendverificationcodeBtn").addEventListener("click", asy
 });
 
 
-document.getElementById("email").addEventListener("input",function()
-{
+document.getElementById("email").addEventListener("input", function() {
     const emailInput = document.getElementById("email");
     const email = emailInput.value;
     checkEmailAvailability(email)
-    .then(result => {
-        const email_check_text = document.getElementById("email_check_text");
-        if (result === 1) {
-            email_check_text.classList.remove("text-green-400")
-            email_check_text.classList.add("text-red-400")
-            email_check_text.textContent = "이메일을 입력하세요.";
-        } else if (result === 2) {
-            email_check_text.classList.remove("text-green-400")
-            email_check_text.classList.add("text-red-400")
-            email_check_text.textContent = "유효한 이메일 주소를 입력하세요.";
-        } else if (result === 3) {
-            email_check_text.classList.remove("text-red-400")
-            email_check_text.classList.add("text-green-400")
-            
-            email_check_text.textContent = "사용 가능한 이메일입니다.";
-        } else {
-            email_check_text.classList.remove("text-green-400")
-            email_check_text.classList.add("text-red-400")
-            email_check_text.textContent = "이미 가입된 이메일입니다.";
-        }
-    })
-    .catch(error => {
-        console.error('Error checking email availability:', error);
-    });
+        .then(result => {
+            const email_check_text = document.getElementById("email_check_text");
+            if (result === 1) {
+                email_check_text.classList.remove("text-green-400")
+                email_check_text.classList.add("text-red-400")
+                email_check_text.textContent = "이메일을 입력하세요.";
+            } else if (result === 2) {
+                email_check_text.classList.remove("text-green-400")
+                email_check_text.classList.add("text-red-400")
+                email_check_text.textContent = "유효한 이메일 주소를 입력하세요.";
+            } else if (result === 3) {
+                email_check_text.classList.remove("text-red-400")
+                email_check_text.classList.add("text-green-400")
+
+                email_check_text.textContent = "사용 가능한 이메일입니다.";
+            } else {
+                email_check_text.classList.remove("text-green-400")
+                email_check_text.classList.add("text-red-400")
+                email_check_text.textContent = "이미 가입된 이메일입니다.";
+            }
+        })
+        .catch(error => {
+            console.error('Error checking email availability:', error);
+        });
 });
 
 async function checkEmailAvailability(email) {
@@ -168,77 +169,75 @@ function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 }
-function UsedEmailcheck(email)
-{
+
+function UsedEmailcheck(email) {
     return $.get(`/api/email_check?email=${email}`)
-    .then(data => {
-        return data === "Success";
-    })
-    .catch(error => {
-        console.error('Error fetching email check data:', error);
-        return false; // 에러가 발생한 경우, 가입된 이메일이 아닌 것으로 처리
-    });
+        .then(data => {
+            return data === "Success";
+        })
+        .catch(error => {
+            console.error('Error fetching email check data:', error);
+            return false; // 에러가 발생한 경우, 가입된 이메일이 아닌 것으로 처리
+        });
 }
-document.getElementById("nicknameCheck").addEventListener("click",()=>
-{
-    const name=document.getElementById("name").value;
-    if(nicknameCheck(name))
-    {
+document.getElementById("nicknameCheck").addEventListener("click", () => {
+    const name = document.getElementById("name").value;
+    if (nicknameCheck(name)) {
         alert("사용가능한 닉네임입니다.");
-        nameOk= true;
-    }
-    else
-    {
+        nameOk = true;
+    } else {
         alert("사용불가능한 닉네임입니다.");
     }
 })
-document.getElementById("name").addEventListener("input",()=>
-{
+document.getElementById("name").addEventListener("input", () => {
     nameOk = false;
 })
-document.getElementById("confirm-password").addEventListener("input",()=>
-{   
+document.getElementById("confirm-password").addEventListener("input", () => {
     const password = document.getElementById("password").value;
     const confirm_password = document.getElementById("confirm-password").value;
     const passwordCheck = document.getElementById("passwordCheck");
-    if(password == confirm_password)
-    {
+    if (password == confirm_password) {
         passwordCheck.classList.remove("text-red-400");
         passwordCheck.classList.add("text-green-400");
         passwordCheck.textContent = "비밀번호가 동일합니다";
-        passwordOk =true;
-    }
-    else
-    {
+        passwordOk = true;
+    } else {
         passwordCheck.classList.remove("text-green-400");
         passwordCheck.classList.add("text-red-400");
-        passwordCheck.textContent = "비밀번호를 다시 확인해주세요"  
+        passwordCheck.textContent = "비밀번호를 다시 확인해주세요"
         passwordOk = false;
     }
 })
+
 function validateForm(name) {
     agree = document.getElementById("terms").checked
-    // 이메일 유효성 검사 로직 예시 (추가 검증 로직 필요)
-    if(emailOk && passwordOk && nameOk && agree)
-    {
+        // 이메일 유효성 검사 로직 예시 (추가 검증 로직 필요)
+    if (emailOk && passwordOk && nameOk && agree) {
         const emailInput = document.getElementById("email");
         emailInput.disabled = false;
         return true;
-    }
-    else
-    {
+    } else {
         alert("입력내용을 다시확인 해주시기 바랍니다.");
         return false;
     }
 }
-function nicknameCheck(name)
-{
+
+function nicknameCheck(name) {
     return $.get(`/api/name_check?name=${name}`)
-    .then(data => {
-        return data === "Success";
-    })
-    .catch(error => {
-        console.error('Error fetching email check data:', error);
-        return false; // 에러가 발생한 경우, 가입된 이메일이 아닌 것으로 처리
-    });
+        .then(data => {
+            return data === "Success";
+        })
+        .catch(error => {
+            console.error('Error fetching email check data:', error);
+            return false; // 에러가 발생한 경우, 가입된 이메일이 아닌 것으로 처리
+        });
+}
+// 약관 모달 보이기 함수
+function showTermsModal() {
+    document.getElementById('termsModal').style.display = 'flex';
+}
+
+// 약관 모달 숨기기 함수
+function closeTermsModal() {
+    document.getElementById('termsModal').style.display = 'none';
 }

@@ -1,13 +1,16 @@
 #user_main --author: NewKyaru 30/08/2023
+import jwt, datetime
 from decouple import config
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, Flask
 
 from flask_login import logout_user, login_required, current_user
 from controllers.user_controller import user_controller, google_login, google_callback
 from controllers.user_controller import register as user_register,send_verification_email,generate_verification_code,emailDict
-from models.user_model import delete_account, account_insert, account_insert_in_googleuser, insert_character_number,email_check_model,name_check_model
+from models.user_model import delete_account, account_insert, account_insert_in_googleuser, insert_character_number,email_check_model,name_check_model,password_update
 
-
+SECRET_KEY = config('SECRET_KEY')
+EXPIRATION_TIME = datetime.timedelta(minutes=10)
+tokenDict = {}
 user_bp = Blueprint('user', __name__, url_prefix='')
 
 @user_bp.get('/delete_account_confirm')
@@ -111,15 +114,46 @@ def verify_verification_code():
     client_code = request.form.get('code')  # 클라이언트에서 전송한 인증 코드
     email = request.form.get('email')  # 클라이언트에서 전송한 인증 코드
     if emailDict[email]:
-        server_code = emailDict[email]  # 예제에서는 고정값으로 설정하였지만, 실제로는 동적으로 생성되거나 데이터베이스에서 가져와야 합니다.
-
-    # 서버에서 생성한 인증 코드 또는 데이터베이스에 저장된 인증 코드를 가져와서 비교
+        server_code = emailDict[email]
     if client_code == server_code:
         return "success"  # 인증 코드가 일치할 때 성공 응답 반환
     else:
         return "error"  # 인증 코드가 일치하지 않을 때 오류 응답 반환
 
-
+@user_bp.route('/api/verify_forgot_password', methods=['POST'])
+def verify_forgot_password():
+    client_code = request.form.get('code')  
+    email = request.form.get('email')  
+    if emailDict[email]:
+        server_code = emailDict[email]
+    if client_code == server_code:
+        payload = {
+            'email': email,
+            'exp': datetime.datetime.utcnow() + EXPIRATION_TIME
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        tokenDict[email] = token
+        return jsonify({'token': token, 'message': 'success'})
+    else:
+        return "error"
+    
+@user_bp.route('/api/password_reset', methods=['POST'])
+def password_reset():
+    token = request.form.get('token')
+    password = request.form.get('password')
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        email = payload['email']
+        if tokenDict[email] == token:
+            tokenDict.pop(email)
+            #DB에 비밀번호 변경
+            password_update(email,password)
+            return "success"
+        else:
+            return "error"
+    except jwt.ExpiredSignatureError:
+        return "error"
+    
 @user_bp.route('/api/email_check', methods=['GET'])
 def email_check():
     email = request.args.get('email')

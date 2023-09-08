@@ -55,6 +55,10 @@ def robots():
 def sitemap():
     return send_file('sitemap.xml')
 
+@app.route('/ads.txt')
+def ads():
+    return send_file('ads.txt')
+
 if __name__ == '__main__':
     ensure_tables_exist()
     socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
