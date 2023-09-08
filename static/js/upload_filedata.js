@@ -1,6 +1,15 @@
 document.getElementById('file_save_btn').addEventListener('click', () => data_convert_upload('save'));
 document.getElementById('file_insert_btn').addEventListener('click', () => data_convert_upload('insert'));
 
+document.getElementById('excelUpload').addEventListener('change', (e) => {
+    const fileList = e.target.files;
+    const excelUpload_label = document.querySelector('label[for="excelUpload"]');
+
+    if (fileList.length > 0) {excelUpload_label.textContent = "맵 양식 제출: " + fileList[0].name}
+    else {excelUpload_label.textContent = "맵 양식 제출"};
+});
+
+
 let progressBar = document.querySelector('.progress-bar');
 let progressFill = progressBar.querySelector('.progress-fill');
 let spinnerText = progressBar.querySelector('.spinner-text');
@@ -335,7 +344,6 @@ function trans_data(check_array) {
             });
         };
     };
-    console.log(data);
     return data;
 }
 
@@ -360,7 +368,6 @@ function response_data (data, response_url) {
 
             progress_step.step_end();
 
-            console.log("통신데이터 값 : ", data);
             alert("등록 완료되었습니다.");
             window.location.href = '/Map';
         }
