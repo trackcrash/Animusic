@@ -258,7 +258,7 @@ function push_exceldata(excelFile_data) {
 };
 
 // videoid의 유효성을 검사하는 함수
-async function checking_videoid(check_videoid_list) {
+async function checking_videoid(check_videoid_list, check_array) {
     const videoid_checking = await fetch('/check_videoid', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -390,7 +390,7 @@ async function data_convert_upload(button) {
 
     progress_step.step_4();
 
-    let check_videoid_list_count = await checking_videoid(check_videoid_list);
+    let check_videoid_list_count = await checking_videoid(check_videoid_list, check_array);
     if (check_videoid_list_count.length > 0) {
         location.reload();
         return;
