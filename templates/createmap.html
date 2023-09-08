@@ -40,10 +40,12 @@
                 <a href="{{ url_for('static', filename='file_form/MakingMap_form.xlsx') }}" class="inline-block w-1/3 px-2 py-1 mt-1 text-center bg-blue-500 text-white rounded hover:bg-blue-600" download>양식 다운로드</a>
                 <button id="file_save_btn" class="w-1/3 px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600 {% if request.args.get('id') %}hidden{% endif %}">맵 추가하기</button>
                 <button id="file_insert_btn" class="w-1/3 px-2 py-1 mt-1 bg-blue-500 text-white rounded hover:bg-blue-600 {% if not request.args.get('id') %}hidden{% endif %}">맵 수정하기</button>
-                <div id="loading-spinner" class="spinner"></div>
-                <div class="mb-5 progress-bar">
+                <div class="w-2/3 mt-1.5 mb-5 progress-bar">
                     <div class="progress-fill"></div>
-                    <a class="spinner-text">요청 처리중...</a>
+                    <div class="flex mt-1">
+                        <div id="loading-spinner" class="spinner"></div>
+                        <a class="spinner-text">요청 처리중...</a>
+                    </div>
                 </div>
             </div>
             <button id="tutorial" onclick="open_tutorial()" class="w-1/3 px-2 py-1 mt-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">튜토리얼</button>
@@ -59,25 +61,23 @@
         <!-- 오른쪽 영역 -->
         <div class="right-side w-1/2">
             <!-- 상단 정보 영역 -->
-            <div class="bg-gray-200 rounded p-2 shadow-md mb-4">
-                <div id="grid-container" class="grid gap-4 w-full h-full">
-                    <!-- 여기에 .box 아이템들이 추가됩니다 -->
+            <div id="grid-container" class="igeo-grid">
+                <!-- 여기에 .box 아이템들이 추가됩니다 -->
 
-                    {% for d in data[1] %}
-                    <div class="box grid-item"><button class="igeo-close-btn bg-red-500 text-white rounded-full absolute top-2 right-2">X</button>
-                        <h4 hidden>{{d['id']}}</h4>
-                        <h3 class="font-bold mb-2 scrolling-text">{{ d['title'] }}</h3>
-                        <p class="mb-2 scrolling-text">{{ d['song'] }}</p><img src="{{ d['thumnail_url'] }}" class="w-24 h-24 mx-auto">
-                        <input type="hidden" value="{{ d['youtube_url'] }}">
-                        <h1 style="display: none;">{{d['answer']}}</h1>
-                        <h2 style="display: none;">{{d['hint']}}</h2>
-                        <h5 style="display: none;">{{d['startTime']}}</h5>
-                        <h6 style="display: none;">{{d['endTime']}}</h6>
-                    </div>
-                    {% endfor %}
-                    <div class="add_box grid-item">
-                        +
-                    </div>
+                {% for d in data[1] %}
+                <div class="box grid-item"><button class="igeo-close-btn bg-red-500 text-white rounded-full absolute top-2 right-2">X</button>
+                    <h4 hidden>{{d['id']}}</h4>
+                    <h3 class="font-bold mb-2 scrolling-text">{{ d['title'] }}</h3>
+                    <p class="mb-2 scrolling-text">{{ d['song'] }}</p><img src="{{ d['thumnail_url'] }}" class="w-24 h-24 mx-auto">
+                    <input type="hidden" value="{{ d['youtube_url'] }}">
+                    <h1 style="display: none;">{{d['answer']}}</h1>
+                    <h2 style="display: none;">{{d['hint']}}</h2>
+                    <h5 style="display: none;">{{d['startTime']}}</h5>
+                    <h6 style="display: none;">{{d['endTime']}}</h6>
+                </div>
+                {% endfor %}
+                <div class="add_box grid-item">
+                    +
                 </div>
             </div>
 
@@ -139,12 +139,10 @@
         {% else %}
         <div class="right-side w-1/2">
             <!-- 상단 정보 영역 -->
-            <div class="igeo-section">
-                <div id="grid-container" class="igeo-grid">
-                    <!-- .box items will be appended here -->
-                    <div class="add_box grid-item igeo-add-box">
-                        +
-                    </div>
+            <div id="grid-container" class="igeo-grid">
+                <!-- .box items will be appended here -->
+                <div class="add_box grid-item igeo-add-box">
+                    +
                 </div>
             </div>
 

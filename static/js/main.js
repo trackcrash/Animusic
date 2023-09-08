@@ -373,6 +373,8 @@ function resize_variable_declaration() {
 
 // 윈도우창 크기가 변경될 때 마다 실행됨
 window.addEventListener('resize', resize_variable_declaration);
+// 페이지 로드가 완료되었을 때 실행됨
+document.addEventListener('DOMContentLoaded', resize_variable_declaration);
 
 // grid-container 안의 아이템의 갯수를 정의함 ( + 1 은 추가버튼 아이템)
 let container_item = document.getElementById('grid-container').querySelectorAll('.box').length + 1;
