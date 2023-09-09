@@ -13,26 +13,8 @@ label {
 }
 
 input[type="text"],
-input[type="password"] {
-    background-color: #333;
-    color: #FFFFFF;
-    border: 1px solid #333;
-}
-
-input[type="text"]:focus,
-input[type="password"]:focus {
-    border-color: #1ED760;
-    outline: none;
-}
-
-input[type="text"],
-input[type="email"] {
-    background-color: #333;
-    color: #FFFFFF;
-    border: 1px solid #333;
-}
-
-input[type="text"],
+input[type="password"],
+input[type="email"],
 input[type="passemail"] {
     background-color: #333;
     color: #FFFFFF;
@@ -40,12 +22,8 @@ input[type="passemail"] {
 }
 
 input[type="text"]:focus,
-input[type="email"]:focus {
-    border-color: #1ED760;
-    outline: none;
-}
-
-input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
 input[type="passemail"]:focus {
     border-color: #1ED760;
     outline: none;
@@ -72,8 +50,8 @@ button[type="button"] {
     background-color: #18A74D;
 }
 
-.button-igeo {
-    background-color: #1ED760;
+.button-igeo,
+.button-igeo-red {
     color: #FFFFFF;
     padding: 12px 24px;
     border: none;
@@ -82,6 +60,10 @@ button[type="button"] {
     cursor: pointer;
     transition: all 0.3s;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.button-igeo {
+    background-color: #1ED760;
 }
 
 .button-igeo:hover {
@@ -92,14 +74,6 @@ button[type="button"] {
 
 .button-igeo-red {
     background-color: #E8254D;
-    color: #FFFFFF;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 50px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .button-igeo-red:hover {

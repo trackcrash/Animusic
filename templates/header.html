@@ -23,7 +23,7 @@
     <a href="/" class="flex items-center mb-4 md:mb-0">
         <div id="logo" class="text-3xl font-bold text-green-500">아이거...</div>
     </a>
-
+    <script src="{{ url_for('static', filename='js/scroll.js') }}"></script>
     <!-- For Larger Screens -->
     <div class="hidden md:flex items-center space-x-4 text-white">
         {% if current_user.is_authenticated %}
