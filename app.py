@@ -17,7 +17,7 @@ from Socket.socket import socketio
 from Socket.connect_socket import connect_MySocket
 from Socket.play_socket import play_Socket
 from Socket.room_socket import room_Socket
-
+from models.notification_model import notification
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 
@@ -45,7 +45,7 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('index.html', current_user=current_user)
+    return render_template('index.html', current_user=current_user,notification=notification.get_notification())
 
 @app.route('/robots.txt')
 def robots():

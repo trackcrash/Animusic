@@ -2,11 +2,12 @@ from models.play_model import make_answer ,get_room_dict, get_user,get_thisroom_
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import current_user, login_required
 from models.play_model import room_data_manager
+from models.notification_model import notification
 play_bp = Blueprint('play', __name__, url_prefix='')
 
 @play_bp.route('/single-play', methods=['GET', 'POST'])
 def single_play():
-    return render_template('single_game.html',current_user=current_user)
+    return render_template('single_game.html',current_user=current_user, notification = notification.get_notification())
 
 @play_bp.get("/get-room-dict")
 @login_required
@@ -34,11 +35,11 @@ def chat():
     if room_data_manager.is_user_in_room(user_name, room_key):
          flash("이미 방에 입장해 있습니다.", "warning")
          return redirect(url_for('index'))
-    return render_template('multi_game/multi_game.html',current_user=current_user)
+    return render_template('multi_game/multi_game.html',current_user=current_user, notification= notification.get_notification())
 
 @play_bp.post('/multi_game')
 @login_required
 def chat_post():
     mission_id = request.args.get('id')
     make_answer(mission_id, request.args.get('room_key'))
-    return render_template('multi_game/multi_game.html',current_user=current_user)
+    return render_template('multi_game/multi_game.html',current_user=current_user, notification= notification.get_notification())

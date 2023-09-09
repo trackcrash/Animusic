@@ -4,8 +4,13 @@ from flask_login import current_user
 from models.play_model import room_data_manager
 from Socket.socket import socket_class
 from models.room_model import update_room_player_count
-
+from models.notification_model import notification
 def connect_MySocket(socketio):
+    @socketio.on("notification")
+    def notification_all(data):
+        contents = data["contents"]
+        notification.notification_change(contents)
+        emit("all_notification", {"contents":contents}, broadcast = True)
     @socketio.on('connect')
     def handle_connect():
         print("SocketConnect")

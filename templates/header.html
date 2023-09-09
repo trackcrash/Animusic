@@ -1,3 +1,7 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+<script src="{{ url_for('static', filename='js/socket_function.js') }}"></script>
+<script src="{{ url_for('static', filename='js/all_socket.js') }}"></script>
+
 <header class="bg-gradient-to-b from-gray-800 to-black shadow-sm p-5 md:flex-row flex flex-col justify-between items-center">
     <!--google ad-->
     <style>
@@ -25,7 +29,16 @@
     </a>
     <script src="{{ url_for('static', filename='js/scroll.js') }}"></script>
     <!-- For Larger Screens -->
+        
+    <div id="all_user_notification" class="text-white">{{ notification }}</div>
     <div class="hidden md:flex items-center space-x-4 text-white">
+        {% if current_user.level == -1 %}
+        <div id="sendnotification" class="">
+            <input id="notificationCt" type="text" class="text-black">
+            <button type="submit">send</button>
+        </div>
+        <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+        {% endif %}
         {% if current_user.is_authenticated %}
         <span class="text-green-500">
             <strong id="User_Name">{{ current_user.name }}</strong>님, 환영합니다!
