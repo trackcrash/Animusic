@@ -3,7 +3,7 @@ if (downloadBtn) {downloadBtn.addEventListener('click', data_convert_download)};
 
 async function data_convert_download() {
 
-    const items = document.querySelectorAll('.grid-item.box');
+    const items = document.querySelectorAll('.box');
     let exceldata = [];
     for (let item of items) {
         // 웹페이지에 있는 곡 정보를 각각 변수선언 하는 곳
