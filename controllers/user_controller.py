@@ -108,7 +108,6 @@ def google_callback():
 
 # 이메일 보내는 함수
 def send_verification_email(email, verification_code):
-    # SMTP 서버 설정 (Gmail 사용 예제)
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
     smtp_username = GOOGLE_ID  # 보내는 이메일 주소
@@ -116,7 +115,15 @@ def send_verification_email(email, verification_code):
 
     # 이메일 내용 설정
     subject = '이메일 인증 코드'
-    message = f'인증 코드: {verification_code}'
+    message = f'''
+    아이거에서 보낸 이메일 인증 코드입니다,
+
+    인증코드: {verification_code}
+
+    이 인증 코드를 웹사이트에 입력하여 이메일 인증을 완료해주세요.
+
+    감사합니다.
+    '''
 
     # 이메일 보내기 
     try:
@@ -125,7 +132,7 @@ def send_verification_email(email, verification_code):
         smtp.login(smtp_username, smtp_password)
 
         msg = MIMEMultipart()
-        msg['From'] = smtp_username
+        msg['From'] = f"아이거 Igeo <{smtp_username}>"
         msg['To'] = email
         msg['Subject'] = subject
         msg.attach(MIMEText(message, 'plain'))
