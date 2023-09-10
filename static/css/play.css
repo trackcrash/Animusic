@@ -1,5 +1,6 @@
+a,
 button {
-    border-radius: 0.25rem;
+    border-radius: 25px;
 }
 
 .custom-body {
@@ -58,7 +59,7 @@ button {
     grid-gap: 1.25rem;
     width: 100%;
     height: 22.5%;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     overflow-x: hidden;
     overflow-y: auto;
 }
@@ -71,6 +72,8 @@ button {
     transition: transform 0.3s;
     position: relative;
     z-index: 9;
+    /* height 사이즈 변경 값은 main.js 의
+     resize_variable_declaration() 참고 */
 }
 
 .box:hover {
@@ -136,31 +139,26 @@ button {
     }
 }
 
-
-/* .box가 3~4줄 이상일 경우 box의 크기를 변경함 (JS 사용) */
-
-.three-or-more-row {
-    height: 60px;
-}
-
-
 /* 우측 곡 정보 입력부분 스타일 */
 
 #submission-form {
     height: 50%;
 }
 
+.same-submission-form >*,
 #submission-form>* {
     margin: 0.3rem 0;
 }
 
+.same-submission-form input,
 #submission-form input {
     padding: 0.5rem;
     background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid white;
+    border: none;
     border-radius: 8px;
 }
 
+.same-submission-form input:focus,
 #submission-form input:focus {
     border-color: #1ed760;
     outline: none;
@@ -204,8 +202,10 @@ button {
 /*----------------------------------------*/
 
 label[for="excelUpload"] {
+    justify-content: center;
     width: 67.6%;
     border: 1px solid #1ed760;
+    display: flex;
     padding: 0.5rem;
     border-radius: 0.25rem;
     background-color: rgba(255, 255, 255, 0.1);
