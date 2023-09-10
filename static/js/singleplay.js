@@ -44,7 +44,8 @@ function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
             onNextReady(startTime, endTime, callback)
         }, 1000)
     }
-    videoOverlay.style.display = 'block';
+    //videooverlay style block 추가
+    videoOverlay.style.display = '';
 }
 
 function onPlayerReady(event, startTime, endTime, callback) {
@@ -196,6 +197,7 @@ function checkAnswer(answer) {
     if (trimmedAnswerList.includes(answer)) {
         isPlayingVideo = false;
         playvideo(currentIndex, musicData[currentIndex].startTime, "stop", null);
+        //videooverlay style 삭제
         videoOverlay.style.display = 'none';
         showSongInfo(currentIndex);
         if (document.querySelector("#NextVideo").checked) {

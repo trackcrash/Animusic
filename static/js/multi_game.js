@@ -84,15 +84,16 @@ function voteSkip() {
 
 
 function dummyplay() {
-    let embedLink = "http://www.youtube.com/embed/LN1ASBClb0Q?autoplay=1&loop=1";
+    console.log("호출됨");
+    let embedLink = "https://www.youtube.com/embed/LN1ASBClb0Q?autoplay=1";
     const iframe = document.createElement("iframe");
     iframe.src = embedLink;
     iframe.allow = "autoplay";
     iframe.width = "100%";
     iframe.height = "100%";
     const dummy = document.getElementById('dummy');
+    dummy.classList.add("absolute", "top-0", "left-0", "w-0", "h-0");
     dummy.innerHTML = "";
-    dummy.style.display = 'none';
     dummy.appendChild(iframe);
 }
 
@@ -106,7 +107,7 @@ function playvideo(videolink, endTime = null) {
 
     if (player) {
         player.destroy();
-        if (document.querySelector("div #videoFrame").length > 0) {
+        if (document.querySelector("div #videoFrame")) {
             document.querySelector("div #videoFrame").remove();
         }
         isVideoPlaying = false;
@@ -197,6 +198,9 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
     document.getElementById("videoFrame").removeAttribute("title");
     elements.nextButton.disabled = false;
     isAnswer = true;
+    setTimeout(() => {
+        dummyplay();
+    }, 700);
 }
 
 function getYoutubeVideoId(url) {
@@ -298,7 +302,6 @@ function initializeSocketEvents() {
         nextButton.disabled = false;
         updateVoteCountUI(0);
         showHostContent(true);
-        dummyplay();
     });
     //게임 끝났을 때 init
     socket.on('EndOfData', function(data) {
