@@ -177,6 +177,7 @@ function getidtourl() {
         let url = window.location.href;
         let id = url.split("&id=")[1];
         selectedId = id;
+        socket.emit('MissionSelect', { "room_key": room_key, "selected_id": selectedId });
         onetime = true;
     }
 }
