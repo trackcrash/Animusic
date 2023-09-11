@@ -50,6 +50,7 @@ class Mission(Base):
     active = Column(Boolean, default=False)
     musics = relationship("Music", back_populates="mission")
     PlayNum = Column(Integer, default = 0, nullable= False)
+    Description = Column(String(500), nullable=True)
     MapProducer_id = Column(Integer, ForeignKey('UserTable.id', ondelete='CASCADE'), nullable=False)
     def __init__(self, MapName, MapProducer, Thumbnail, MapProducer_id):
         self.MapName = MapName
@@ -63,7 +64,8 @@ def save_to_db(data):
         MissionMapName = data[-1]['MapName']
         MissionMapProducer = data[-1]['MapProducer']
         MissionThumbnail = data[-1]['Thumbnail']
-        new_mission = Mission(MissionMapName, MissionMapProducer, MissionThumbnail, current_user.id)
+        MissionDescription = data[-1]['Description']
+        new_mission = Mission(MissionMapName, MissionMapProducer, MissionThumbnail, MissionDescription, current_user.id)
         new_mission.active = True
         session.add(new_mission)
         session.flush()

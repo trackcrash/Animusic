@@ -408,6 +408,7 @@ function UploadBtn(event) {
     let map_entry = {
         MapName: document.querySelector("#MapName-input").value,
         MapProducer: document.querySelector("#User_Name").innerHTML,
+	MapDescription: document.querySelector("#MapDescription-input").value,
         Thumbnail: data[0].thumbnail || 'basic'
     };
 

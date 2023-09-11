@@ -5,8 +5,7 @@ document.getElementById('excelUpload').addEventListener('change', (e) => {
     const fileList = e.target.files;
     const excelUpload_label = document.querySelector('label[for="excelUpload"]');
 
-    if (fileList.length > 0) {excelUpload_label.textContent = "맵 양식 제출: " + fileList[0].name}
-    else {excelUpload_label.textContent = "맵 양식 제출"};
+    if (fileList.length > 0) { excelUpload_label.textContent = "맵 양식 제출: " + fileList[0].name } else { excelUpload_label.textContent = "맵 양식 제출" };
 });
 
 
@@ -25,11 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
 const switch_progress_display = {
     show: function() {
         progressBar.style.display = 'block';
-        spinner.style.display =  'block';
+        spinner.style.display = 'block';
     },
     hide: function() {
         progressBar.style.display = 'none';
-        spinner.style.display =  'none';
+        spinner.style.display = 'none';
     }
 };
 
@@ -106,7 +105,7 @@ async function file_load() {
 
             let cellList = [];
 
-            for (let i in firstSheet) {cellList.push(i)};
+            for (let i in firstSheet) { cellList.push(i) };
 
             cellList.sort((i, j) => {
                 let cellNumber_i = parseInt(i.match(/\d+/g));
@@ -125,8 +124,8 @@ async function file_load() {
                 for (let j = 9; j <= maxCell; j++) {
                     const cellName = cellCol + String(j);
                     if (!(cellName in firstSheet)) {
-                                              // 아래 값은 json으로 변환 시 undefined 값이 됨
-                        firstSheet[cellName] = {t: 's', v: '', r: '<t></t>', h: '', w: ''};
+                        // 아래 값은 json으로 변환 시 undefined 값이 됨
+                        firstSheet[cellName] = { t: 's', v: '', r: '<t></t>', h: '', w: '' };
                     }
                 }
             }
@@ -165,7 +164,7 @@ function push_exceldata(excelFile_data) {
                 song_info.push("");
             } else {
                 let answerList = new Set(answer.split(',').map(item => item.trim()).filter(Boolean));
-                for (let i of answerList) {answerList.add(i.replace(/\s+/g, ""))};
+                for (let i of answerList) { answerList.add(i.replace(/\s+/g, "")) };
                 song_info.push(Array.from(answerList).join(","));
             };
 
@@ -179,13 +178,13 @@ function push_exceldata(excelFile_data) {
                 song_info.push(excelFile_data[i]['__EMPTY_3'].split('v=')[1].substring(0, 11));
             } else if (excelFile_data[i]['__EMPTY_3'].split('/')[3]) {
                 song_info.push(excelFile_data[i]['__EMPTY_3'].split('/')[3].substring(0, 11));
-            } else {song_info.push("")};
+            } else { song_info.push("") };
 
             /* 재생 시간 부분 */
 
             let play_time = excelFile_data[i]['__EMPTY_4'];
 
-            if (play_time) {play_time = play_time.replace(/[^0-9:.~]/g, "")};
+            if (play_time) { play_time = play_time.replace(/[^0-9:.~]/g, "") };
             if (play_time.split("~").length === 2) {
 
                 let start_time = play_time.split("~")[0];
@@ -216,7 +215,7 @@ function push_exceldata(excelFile_data) {
                         multiples *= 60;
                     }
                     start_time = start_number;
-                } else {start_time = 0};
+                } else { start_time = 0 };
 
                 if (end_time.split(".").length === 2 && end_time.split(":").length < 4) {
                     end_point_number = parseFloat("0." + end_time.split(".")[1]);
@@ -237,9 +236,9 @@ function push_exceldata(excelFile_data) {
                         multiples *= 60;
                     }
                     end_time = end_number;
-                } else {start_time = 0};
+                } else { start_time = 0 };
 
-                if (start_time >= end_time) {end_time = 0};
+                if (start_time >= end_time) { end_time = 0 };
 
                 song_info.push(start_time);
                 song_info.push(end_time);
@@ -251,7 +250,7 @@ function push_exceldata(excelFile_data) {
 
             if (document.querySelectorAll('h4')[j - 7]) {
                 song_info.push(document.querySelectorAll('h4')[j - 7].innerHTML);
-            } else {song_info.push("")};
+            } else { song_info.push("") };
 
             /* 올바른 곡 양식인지 체크 */
 
@@ -270,7 +269,7 @@ function push_exceldata(excelFile_data) {
 async function checking_videoid(check_videoid_list, check_array) {
     const videoid_checking = await fetch('/check_videoid', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(check_videoid_list)
     });
 
@@ -288,9 +287,9 @@ async function checking_videoid(check_videoid_list, check_array) {
         alert('해당링크의 곡정보가 담긴 파일을 다운로드합니다.');
 
         for (let videoid of videoid_check_result) {
-                textdata += String(check_videoid_list.indexOf(videoid) + 9) + ". ";
-                textdata += check_array[check_videoid_list.indexOf(videoid)].slice(0, 2).join(', ');
-                textdata += "\n";
+            textdata += String(check_videoid_list.indexOf(videoid) + 9) + ". ";
+            textdata += check_array[check_videoid_list.indexOf(videoid)].slice(0, 2).join(', ');
+            textdata += "\n";
         }
 
         const blob = new Blob([textdata], { type: 'text/plain' });
@@ -321,7 +320,7 @@ function trans_data(check_array) {
 
         if (id) {
             data.push({
-                Music_id : id,
+                Music_id: id,
                 title: title,
                 song: song,
                 thumbnail: thumbnail,
@@ -347,7 +346,7 @@ function trans_data(check_array) {
     return data;
 }
 
-function response_data (data, response_url) {
+function response_data(data, response_url) {
     data = JSON.stringify(data);
     $.ajax({
         type: "POST",
@@ -377,7 +376,7 @@ function response_data (data, response_url) {
 async function data_convert_upload(button) {
 
     let [excelFile, excelFile_data, workbook] = await file_load();
-    if (!excelFile) {return};
+    if (!excelFile) { return };
 
     // 양식 파일이 맞는지 확인하는 부분
 
@@ -407,7 +406,7 @@ async function data_convert_upload(button) {
 
     let data = trans_data(check_array);
 
-    if (button === 'save'){
+    if (button === 'save') {
         let split_file_name = excelFile.name.split('.')
         split_file_name.pop()
 
@@ -422,7 +421,8 @@ async function data_convert_upload(button) {
         data.push({
             MapName: document.querySelector("#MapName-input").value,
             MapProducer: document.querySelector("#User_Name").innerHTML,
-            mission_Id : document.querySelector("#Mission_id").innerHTML,
+            mission_Id: document.querySelector("#Mission_id").innerHTML,
+            mission_description: document.querySelector("#Mission_description").innerHTML,
             Thumbnail: data[0].thumbnail || 'basic'
         });
 

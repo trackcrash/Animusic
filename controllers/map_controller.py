@@ -136,7 +136,7 @@ def show_table_mission_top_five():
     engine,session = create_session()
     try:
         queries = session.query(Mission).order_by(desc(Mission.PlayNum),desc(Mission.id)).limit(6)
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]        
+        entries = [dict(id=q.id, Description=q.Description,MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]        
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while retrieving music records: {str(e)}")
@@ -157,7 +157,7 @@ def show_mission():
     try:
         queries = session.query(Mission)
         # 노래 갯수 추가
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]        
+        entries = [dict(id=q.id, Description=q.Description,MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]        
         
     except Exception as e:
         # Handle exceptions or errors as needed
@@ -174,7 +174,7 @@ def show_mission_active():
     try:
         queries = session.query(Mission).filter(Mission.active == True)
         # 노래 갯수 추가
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
+        entries = [dict(id=q.id, Description=q.Description,MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while retrieving music records: {str(e)}")
@@ -189,7 +189,7 @@ def show_mission_byProducer():
     engine,session = create_session()
     try:
         queries = session.query(Mission).filter(Mission.MapProducer_id == current_user.id)
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
+        entries = [dict(id=q.id, Description=q.Description,MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while retrieving music records: {str(e)}")
@@ -203,7 +203,7 @@ def show_mission_byid(id):
     engine,session = create_session()
     try:
         queries = session.query(Mission).filter(Mission.id == id)
-        entries = [dict(id=q.id, MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
+        entries = [dict(id=q.id, Description=q.Description,MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while retrieving music records: {str(e)}")

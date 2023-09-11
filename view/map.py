@@ -22,6 +22,11 @@ def make_map():
     data = map_controller()
     return render_template('createmap.html', data=data)
 
+@map_bp.route('/view_maps', methods=['GET', 'POST'])
+def view_map():
+    missions = show_mission()
+    return render_template('view_maps.html', current_user=current_user,missions=missions)
+
 @map_bp.route('/Show')
 def show():
     return show_table()
