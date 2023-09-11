@@ -5,7 +5,18 @@ document.getElementById('excelUpload').addEventListener('change', (e) => {
     const fileList = e.target.files;
     const excelUpload_label = document.querySelector('label[for="excelUpload"]');
 
+<<<<<<< Updated upstream
     if (fileList.length > 0) { excelUpload_label.textContent = "맵 양식 제출: " + fileList[0].name } else { excelUpload_label.textContent = "맵 양식 제출" };
+=======
+    if (fileList.length > 0) {
+        excelUpload_label.textContent = "맵 양식 제출: " + fileList[0].name;
+        excelUpload_label.style.justifyContent = 'left';
+    }
+    else {
+        excelUpload_label.textContent = "맵 양식 제출";
+        excelUpload_label.style.justifyContent = '';
+    };
+>>>>>>> Stashed changes
 });
 
 
