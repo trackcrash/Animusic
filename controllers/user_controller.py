@@ -1,6 +1,5 @@
 #user login & api register -- Newkyaru 13/08/2023
 import json,requests
-from datetime import datetime
 from decouple import config
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import login_user
@@ -57,9 +56,7 @@ def user_controller():
         user = user_model.validate_user(email, password)
         if user:
             login_user(user)
-            user.last_login = datetime.utcnow()
             return True
-
         flash('Invalid email or password')
         return False
 
@@ -74,7 +71,6 @@ def google_login():
         redirect_uri=request.base_url + "/callback",
         scope=["openid", "email", "profile"],
     )
-
     return redirect(request_uri)
 
 
@@ -109,7 +105,6 @@ def google_callback():
 
     # Use Flask-Login to login user
     login_user(user)
-    user.last_login = datetime.utcnow()
     session.close()
     return redirect(url_for('index'))
 

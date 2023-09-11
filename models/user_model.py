@@ -1,4 +1,5 @@
 # user login & api register model crud -- Newkyaru 13/08/2023
+from datetime import datetime
 from flask_login import current_user
 from flask_bcrypt import Bcrypt
 from sqlalchemy import Boolean, Column, Integer, String, DateTime
@@ -53,6 +54,8 @@ class User(Base):
     def get_id(self):
         return str(self.id)
     
+    def update_login_time(self):
+        self.last_login = datetime.now()
 
 def commit_or_rollback(session):
     try:
@@ -116,6 +119,8 @@ def save_google_user(user_info):
             commit_or_rollback(session)
         else:
             user = save_user(email=user_info['email'], name=user_info.get('name'), is_google_authenticated=True)
+        user.update_login_time()
+        commit_or_rollback(session)
         session.add(user)
         return user, session
     except Exception as e:
@@ -127,6 +132,8 @@ def validate_user(email, password):
     engine, session = create_session()
     try:
         user = session.query(User).filter_by(email=email).first()
+        user.update_login_time()
+        commit_or_rollback(session)
         if user and bcrypt.check_password_hash(user.password, password):
             return user
         return None
