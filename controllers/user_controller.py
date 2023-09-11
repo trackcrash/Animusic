@@ -1,7 +1,6 @@
 #user login & api register -- Newkyaru 13/08/2023
-import json
+import json,requests,datetime
 
-import requests
 from decouple import config
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import login_user
@@ -22,6 +21,9 @@ GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configura
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
 emailDict = {}
 
+with open('banned_words.txt', 'r', encoding='utf-8') as f:
+    BANNED_WORDS = f.read().split('\n')
+
 def register(request):
     if request.method == 'GET':
         return render_template('register.html')
@@ -30,6 +32,11 @@ def register(request):
         email = request.form.get('email')
         name = request.form.get('name')
         password = request.form.get('password')
+
+        for word in BANNED_WORDS:
+            if word in name:
+                flash('Invalid name')
+                return redirect(url_for('user.register'))
 
         # 사용자 정보 저장
         user = user_model.save_user(email, name, password)
@@ -50,6 +57,7 @@ def user_controller():
         user = user_model.validate_user(email, password)
         if user:
             login_user(user)
+            user.last_login = datetime.utcnow()
             return True
 
         flash('Invalid email or password')
@@ -101,6 +109,7 @@ def google_callback():
 
     # Use Flask-Login to login user
     login_user(user)
+    user.last_login = datetime.utcnow()
     session.close()
     return redirect(url_for('index'))
 
