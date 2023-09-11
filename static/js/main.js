@@ -408,7 +408,11 @@ function UploadBtn(event) {
     let map_entry = {
         MapName: document.querySelector("#MapName-input").value,
         MapProducer: document.querySelector("#User_Name").innerHTML,
+        /* 임시조치
         MapDescription: document.querySelector("#MapDescription-input").value,
+        */
+        MapDescription: null,
+
         ActiveSetting: document.querySelector('.active-check i').classList,
         Thumbnail: data[0].thumbnail || 'basic',
     };
