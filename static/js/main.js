@@ -408,11 +408,7 @@ function UploadBtn(event) {
     let map_entry = {
         MapName: document.querySelector("#MapName-input").value,
         MapProducer: document.querySelector("#User_Name").innerHTML,
-        /* 임시조치
-        MapDescription: document.querySelector("#MapDescription-input").value,
-        */
-        MapDescription: null,
-
+        Description: descript_textfield.value,
         ActiveSetting: document.querySelector('.active-check i').classList,
         Thumbnail: data[0].thumbnail || 'basic',
     };
@@ -570,6 +566,7 @@ window.onload = ()=>
         }
     })
 }
+
 document.getElementById("add_answerlist").addEventListener("click", () => {
     const answer_listAll = document.getElementById("answer_listAll");
     const answer_input = document.querySelectorAll(".answer_input");
@@ -599,3 +596,16 @@ document.getElementById("add_answerlist").addEventListener("click", () => {
     answer_listAll.insertBefore(button,addanswerList);
     answer_input[answer_input.length-1].after(new_answer_input);
   });
+
+/*------------- 맵 설명 입력 부분-------------*/
+const map_descript_popup = document.getElementById('map-descript-popup');
+const map_descript_popup_content = document.getElementById('map-descript-popup-content');
+const descript_textfield = document.getElementById('descript-textfield');
+
+function open_descript() {
+    map_descript_popup.style.display = 'block';
+}
+
+function close_descript() {
+    map_descript_popup.style.display = '';
+}

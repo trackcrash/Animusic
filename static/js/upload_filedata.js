@@ -15,6 +15,16 @@ document.getElementById('excelUpload').addEventListener('change', (e) => {
     };
 });
 
+// 파일 전용 active check
+const file_active_check = document.querySelector('.file-active-check');
+const file_active_check_icon = file_active_check.querySelector('i');
+
+file_active_check.addEventListener('click', ()=> {
+    file_active_check_icon.classList.toggle('fa-lock-open');
+    file_active_check_icon.classList.toggle('fa-lock');
+    file_active_check_icon.classList.remove('1');
+});
+
 
 let progressBar = document.querySelector('.progress-bar');
 let progressFill = progressBar.querySelector('.progress-fill');
@@ -420,6 +430,11 @@ async function data_convert_upload(button) {
         data.push({
             MapName: split_file_name.join('.'),
             MapProducer: document.querySelector("#User_Name").innerHTML,
+            ActiveSetting: document.querySelector('.file-active-check i').classList,
+            /* 임시조치
+            Description: 맵파일에 맵설명 넣어야됨,
+            */
+            Description: null,
             Thumbnail: data[0].thumbnail || 'basic'
         });
 
@@ -429,7 +444,8 @@ async function data_convert_upload(button) {
             MapName: document.querySelector("#MapName-input").value,
             MapProducer: document.querySelector("#User_Name").innerHTML,
             mission_Id: document.querySelector("#Mission_id").innerHTML,
-            mission_description: document.querySelector("#Mission_description").innerHTML,
+            Description: document.querySelector("#Mission_description").innerHTML,
+            ActiveSetting: document.querySelector('.file-active-check i').classList,
             Thumbnail: data[0].thumbnail || 'basic'
         });
 

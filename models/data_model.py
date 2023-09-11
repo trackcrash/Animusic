@@ -52,11 +52,13 @@ class Mission(Base):
     PlayNum = Column(Integer, default = 0, nullable= False)
     Description = Column(String(500), nullable=True)
     MapProducer_id = Column(Integer, ForeignKey('UserTable.id', ondelete='CASCADE'), nullable=False)
-    def __init__(self, MapName, MapProducer, Thumbnail, MapProducer_id):
+    def __init__(self, MapName, MapProducer, Thumbnail, MapProducer_id, Description, active):
         self.MapName = MapName
         self.MapProducer = MapProducer
         self.Thumbnail = Thumbnail
         self.MapProducer_id = MapProducer_id
+        self.Description = Description
+        self.active = active
 # 코드 구조개선 --kyaru 16/08/23 12:00
 def save_to_db(data):
     engine,session = create_session()
@@ -66,11 +68,7 @@ def save_to_db(data):
         MissionThumbnail = data[-1]['Thumbnail']
         MissionDescription = data[-1]['Description']
         new_mission = Mission(MissionMapName, MissionMapProducer, MissionThumbnail, MissionDescription, current_user.id)
-        ''' 임시조치
-        new_mission.active = True if data[-1]['ActiveSetting']['1'] == 'fa-lock-open' else False
-        '''
-        new_mission.active = True if data[-1].get('ActiveSetting', {'1': 'fa-lock-open'})['1'] == 'fa-lock-open' else False
-
+        new_mission.active = True if data[-1]['ActiveSetting']['3'] == 'fa-lock-open' else False
         session.add(new_mission)
         session.flush()
         mission_id = new_mission.id
@@ -116,12 +114,8 @@ def update_to_db(data):
         now_mission_info = session.query(Mission).filter_by(id=mission_id).first()
         now_mission_info.MapName = mission_data['MapName']
         now_mission_info.Thumbnail = mission_data['Thumbnail']
-
-        ''' 임시조치
-        now_mission_info.active = True if data[-1]['ActiveSetting']['1'] == 'fa-lock-open' else False
-        '''
-        now_mission_info.active = True if data[-1].get('ActiveSetting', {'1': 'fa-lock-open'})['1'] == 'fa-lock-open' else False
-
+        now_mission_info.Description = mission_data['Description']
+        now_mission_info.active = True if mission_data['ActiveSetting']['3'] == 'fa-lock-open' else False
         now_music_info = session.query(Music).filter_by(mission_id=mission_id).all() #현재 맵 미션id를 가진 모든 곡 불러오기
         now_music_idset = set(music.id for music in now_music_info) # id값만 추출한 set() 생성
         data_idset = set() # 비어있는 set() 생성

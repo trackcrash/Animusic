@@ -181,7 +181,7 @@ def show_mission_byid(id):
     engine,session = create_session()
     try:
         queries = session.query(Mission).filter(Mission.id == id)
-        entries = [dict(id=q.id, Description=q.Description,MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
+        entries = [dict(id=q.id, active=q.active, Description=q.Description,MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while retrieving music records: {str(e)}")

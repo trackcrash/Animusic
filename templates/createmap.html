@@ -54,9 +54,15 @@
                     <span class="text-gray-400">영상이 표시됩니다</span>
                 </div>
             </div>
-            <div class="mb-1 py-1 flex">
-                <label for="autoplay-check">영상 자동재생</label>
-                <input id="autoplay-check" type="checkbox" class="ml-1" checked>
+            <div class="flex w-2/3 space-x-2">
+                <div class="w-1/2 mb-1 py-1 flex">
+                    <label for="autoplay-check">영상 자동재생</label>
+                    <input id="autoplay-check" type="checkbox" class="ml-1" checked>
+                </div>
+                <div class="w-1/2 flex mb-1 py-1 justify-end file-active-check">
+                    <label class="mr-1">파일 공개 여부</label>
+                    <i class="mt-1 fa-solid fa-lock-open"></i>
+                </div>
             </div>
             <!-- 양식 파일 다운로드/업로드 form -->
             <div class="mb-1 py-1">
@@ -64,7 +70,7 @@
                 <input type="file" id="excelUpload" style="display: none;">
             </div>
             <div class="mt-1 py-1">
-
+                <div class="flex space-x-1">
                 <a href="{{ url_for('static', filename='file_form/MakingMap_form.xlsx') }}"
                    class="inline-block w-1/3 px-2 py-1 mt-1 text-center blue-button" download>양식 다운로드</a>
 
@@ -75,7 +81,7 @@
                 <button id="file_insert_btn"
                         class="w-1/3 px-2 py-1 mt-1 blue-button \
                         {% if not request.args.get('id') %}hidden{% endif %}">맵 수정</button>
-
+                </div>
                 <div id="loading-spinner" class="spinner"></div>
                 <div class="mb-5 progress-bar">
                     <div class="progress-fill"></div>
@@ -102,6 +108,23 @@
         <!-- 오른쪽 영역 -->
         <div class="right-side">
             <!-- 상단 정보 영역 -->
+            <button onclick="open_descript()"
+                    class="py-2 mb-2 w-full blue-button">맵 설명</button>
+
+            <!--맵 설명을 적기위한 팝업 창-->
+            <div id="map-descript-popup" class="mapDescriptPopup">
+                <div id="map-descript-popup-content" class="mapDescriptPopupContent">
+                    <div class="flex flex-col">
+                        <textarea rows='17' cols='25' id="descript-textfield" class="mb-1">{{ data[0][0]['Description'] }}</textarea>
+                        <div class="flex mt-1">
+                            <div class="w-1/3"></div>
+                            <div class="w-1/3"></div>
+                            <button onclick="close_descript()" class="w-1/3 py-1 orange-button">닫기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="grid-container" class="grid w-full h-full">
                 <!-- 여기에 .box 아이템들이 추가됩니다 -->
 
@@ -123,24 +146,32 @@
             </div>
             <!-- 하단 입력 양식 영역 -->
             <form id="submission-form">
-                <div class="flex">
-                    <div class="w-1/2 mt-2 active-check">
-                        <label>공개 / 비공개 설정</label>
-                        <i class="fa-solid fa-lock-open"></i>
+                <div class="flex space-x-2">
+                    <div class="flex w-1/2 mt-2 active-check">
+                        <label class="mr-1">공개 여부</label>
+                        <!-- 여기 i에 클래스 추가할때 조건문 앞에추가하면
+                             서버에서 클래스 배열의 인덱스번호 고정값으로 체크해서 전송오류남
+                             그러니 뒤에다가 해야 됨-->
+                        <i class="mt-1 fa-solid \
+                        {% if data[0][0]['active'] %} fa-lock-open {% else %} fa-lock {% endif %}"></i>
                     </div>
                     <button id="register-btn" type="button"
                                 class="w-1/2 mt-1 py-1 blue-button">곡 등록</button>
                 </div>
 
                 <input type="text" id="id-input" hidden>
-
-                <label for="title-input">매체 이름</label>
-                <input id="title-input" class="w-full" type="text">
-
                 <div hidden id="Mission_id">{{data[0][0]['id']}}</div>
 
-                <label for="song-name-input">곡 이름</label>
-                <input id="song-name-input" class="w-full" type="text">
+                <div class="flex space-x-2">
+                    <div class="w-1/2">
+                        <label for="title-input">매체 이름</label>
+                        <input id="title-input" class="w-full" type="text">
+                    </div>
+                    <div class="w-1/2">
+                        <label for="song-name-input">곡 이름</label>
+                        <input id="song-name-input" class="w-full" type="text">
+                    </div>
+                </div>
 
                 <div class="flex justify-between">
                     <label for="answer-input">정답</label>
@@ -196,6 +227,22 @@
         {% else %}
         <div class="right-side">
             <!-- 상단 정보 영역 -->
+            <button onclick="open_descript()"
+                    class="py-2 mb-2 w-full blue-button">맵 설명</button>
+
+            <!--맵 설명을 적기위한 팝업 창-->
+            <div id="map-descript-popup" class="mapDescriptPopup">
+                <div id="map-descript-popup-content" class="mapDescriptPopupContent">
+                    <div class="flex flex-col">
+                        <textarea rows='17' cols='25' id="descript-textfield" class="mb-1"></textarea>
+                        <div class="flex mt-1">
+                            <div class="w-1/3"></div>
+                            <div class="w-1/3"></div>
+                            <button onclick="close_descript()" class="w-1/3 py-1 orange-button">닫기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div id="grid-container" class="grid w-full h-full">
                 <!-- 여기에 .box 아이템들이 추가됩니다 -->
@@ -205,10 +252,10 @@
             <!-- 하단 입력 양식 영역 -->
             <form id="submission-form">
 
-                <div class="flex">
+                <div class="flex space-x-2">
 
                     <div class="w-1/2 mt-2 active-check">
-                        <label>공개 / 비공개 설정</label>
+                        <label>공개 여부</label>
                         <i class="fa-solid fa-lock-open"></i>
                     </div>
 
@@ -218,11 +265,16 @@
 
                 <input type="text" id="id-input" hidden>
 
-                <label for="title-input">매체 이름</label>
-                <input id="title-input" class="w-full" type="text">
-
-                <label for="song-name-input">곡 이름</label>
-                <input id="song-name-input" class="w-full" type="text">
+                <div class="flex space-x-2">
+                    <div class="w-1/2">
+                        <label for="title-input">매체 이름</label>
+                        <input id="title-input" class="w-full" type="text">
+                    </div>
+                    <div class="w-1/2">
+                        <label for="song-name-input">곡 이름</label>
+                        <input id="song-name-input" class="w-full" type="text">
+                    </div>
+                </div>
 
                 <div class="flex justify-between">
                     <label for="answer-input">정답:</label>
