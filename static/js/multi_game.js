@@ -62,20 +62,17 @@ function sendMessage() {
 
 }
 //정답 출력용
-function showSongInfo(title, song, correctusername,all) {
+function showSongInfo(title, song, correctusername, all) {
     const songTitle = document.getElementById('songTitle');
     const songArtist = document.getElementById('songArtist');
     const correctUser = document.getElementById('correctUser');
     const all_play = document.getElementById("all_play");
     songTitle.innerText = "정답: " + title;
     correctUser.innerText = "정답자: " + correctusername;
-    if(all == true)
-    {
+    if (all == true) {
         songArtist.innerText = song;
         all_play.innerText = "모든 정답을 맞추셨습니다.";
-    }
-    else
-    {
+    } else {
         all_play.innerText = `${song}개의 정답이 남았습니다.`;
     }
 }
@@ -173,6 +170,16 @@ socket.on("reCheck", function(data) {
         socket.emit("WaitPlay", { "room_key": room_key, "endTime": endTime });
     }
 });
+let onetime = false;
+
+function getidtourl() {
+    if (!onetime) {
+        let url = window.location.href;
+        let id = url.split("&id=")[1];
+        selectedId = id;
+        onetime = true;
+    }
+}
 
 function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
     clearInterval(gameTimerInterval);
@@ -431,14 +438,13 @@ function initializeSocketEvents() {
         const videolink = data["data"]["youtube_embed_url"];
         clearInterval(gameTimerInterval);
         playvideo(videolink, data.data.endTime);
-        showSongInfo(data.data.title, data.data.song, data.name,true);
+        showSongInfo(data.data.title, data.data.song, data.name, true);
         if (document.querySelector("#NextVideo").checked) {
             voteSkip();
         }
     });
 
-    socket.on('showAnswer', data =>
-    {
+    socket.on('showAnswer', data => {
         showSongInfo(data.msg, data.leftAnswer, data.name, false);
     })
     socket.on('hint', data => {
@@ -485,7 +491,7 @@ window.onload = () => {
             });
         })
     });
-
+    getidtourl();
 };
 window.addEventListener('scroll', function() {
     let scrollYvalue = window.scrollY;

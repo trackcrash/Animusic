@@ -276,6 +276,7 @@ $('#CreateRoomBtn').click(function() {
             }
         } else { // 사용자가 로그인되지 않은 경우
             alert("로그인 후 이용해주세요");
+            location.href = "/login";
         }
     });
 });
