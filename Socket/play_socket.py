@@ -91,15 +91,19 @@ def play_Socket(socketio):
         room = data.get('room')
         name = current_user.name
         if music_data_manager.check_answer(room, msg) and data['isAnswer'] and socket_class.isDuplication[room]:
-            current_data = music_data_manager.retrieve_data(room)
-            current_data['endTime'] = "stop"
-            emit('correctAnswer', {'name':name,'data':current_data}, room=room)
-            if room not in socket_class.isDuplication :
+            leftAnswer = music_data_manager.is_group_answered(room)
+            if leftAnswer == 0:
+                current_data = music_data_manager.retrieve_data(room)
+                current_data['endTime'] = "stop"
+                emit('correctAnswer', {'name':name,'data':current_data,"leftAnswer":leftAnswer}, room=room)
+                if room not in socket_class.isDuplication :
+                    socket_class.isDuplication[room] = False
                 socket_class.isDuplication[room] = False
-            socket_class.isDuplication[room] = False
-            if room not in socket_class.play_vote :
+                if room not in socket_class.play_vote :
+                    socket_class.play_vote[room] = []
                 socket_class.play_vote[room] = []
-            socket_class.play_vote[room] = []
+            else : 
+                emit('showAnswer', {'name': name, 'leftAnswer':leftAnswer,'msg':msg}, room=room)
             room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
             emit('message', {'name': name, 'msg': msg}, room=room)
             update_room_player_count(room, "님이 정답을 맞췄습니다.", name)

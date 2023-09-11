@@ -61,17 +61,79 @@ function modifyFunction() {
             const title = box.querySelector('h3')?.innerText;
             const song = box.querySelector('p')?.innerText;
             const songURL = box.querySelector('input')?.value;
-            const answer = box.querySelector('h1')?.innerText;
+            const h1Text = box.querySelector('h1')?.innerText;
+            const regex = /\[(.*?)\]/g; // 대괄호 내용을 추출하기 위한 정규 표현식
+            const matches = h1Text.match(regex); // 대괄호 내용을 추출하여 배열로 얻음
+            let answer;
+            if (matches) {
+                answer = matches.map(match => {
+                    const innerMatches = match.match(/\w+/g); // 각 대괄호 내부의 값 추출
+                    return innerMatches || []; // 대괄호 내부 값이 없으면 빈 배열 반환
+                });
+
+            }
+            console.log(answer);
             const hint = box.querySelector('h2')?.innerText;
             const id = box.querySelector('h4')?.innerText;
             const startTime = box.querySelector('h5')?.innerText;
             const endTime = box.querySelector('h6')?.innerText;
+            let answer_input=document.querySelectorAll(".answer_input");
 
             // 정보를 설정하면서 선택적 체이닝 사용
             document.getElementById('title-input').value = title || ''; // 속성이 없을 때는 빈 문자열
             document.getElementById('song-name-input').value = song || '';
             document.getElementById('song-link-input').value = songURL || '';
-            document.getElementById('answer-input').value = answer || '';
+            const answer_list = document.querySelectorAll(".answer_list")
+            for(let i = 0; i < answer_input.length; i++)
+            {
+                if(!answer_input[i].id)
+                {
+                    answer_list[i].remove();
+                    answer_input[i].remove();
+                }
+                else
+                {
+                    answer_input[i].style.display = "block";
+                }
+            }
+            for(let i = 0; i <answer.length;i++)
+            {
+                if(i != 0)
+                {
+                    const answer_listAll = document.getElementById("answer_listAll");
+                    const addanswerList =document.getElementById("add_answerlist");
+                    answer_input=document.querySelectorAll(".answer_input");
+                    // 새 버튼 생성 및 설정
+                    const button = document.createElement("button");
+                    button.classList.add("answer_list");
+                    console.log(answer_input);
+                    button.textContent = answer_input.length + 1;
+                  
+                    // 새로운 입력 필드 생성 및 설정
+                    const new_answer_input = document.createElement("input");
+                    new_answer_input.classList.add("w-full", "answer_input");
+                    new_answer_input.style.display = "none";
+                    new_answer_input.value = answer[i];
+                    // 버튼 클릭 이벤트 리스너 설정
+                    button.addEventListener("click", () => {
+                      // 모든 기존 입력 필드를 숨김
+                      let answer_input_inner = document.querySelectorAll(".answer_input");
+                      for (const element of answer_input_inner) {
+                        element.style.display = "none";
+                      }
+                      // 새 입력 필드만 보이도록 설정
+                      new_answer_input.style.display = "block";
+                    });
+                  
+                    // 버튼과 입력 필드를 문서에 추가
+                    answer_listAll.insertBefore(button,addanswerList);
+                    answer_input[answer_input.length-1].after(new_answer_input);
+                }
+                else
+                {
+                    answer_input[i].value = answer[i];
+                }
+            }
             document.getElementById('hint-input').value = hint || '';
             document.getElementById('startTime-input-h').value = Math.floor(parseInt(startTime) / 3600) || "";
             document.getElementById('startTime-input-m').value = Math.floor((parseInt(startTime) % 3600) / 60) || "";
@@ -89,6 +151,21 @@ function modifyFunction() {
         });
     });
     addBox.addEventListener('click', () => {
+        let answer_input=document.querySelectorAll(".answer_input");
+        const answer_list = document.querySelectorAll(".answer_list")
+
+        for(let i = 0; i < answer_input.length; i++)
+        {
+            if(!answer_input[i].id)
+            {
+                answer_list[i].remove();
+                answer_input[i].remove();
+            }
+            else
+            {
+                answer_input[i].style.display = "block";
+            }
+        }
         const fields = [
             'title-input', 'song-name-input', 'song-link-input', 'answer-input', 'hint-input',
             'startTime-input-h', 'startTime-input-m', 'startTime-input-s', 'startTime-input-ms',
@@ -143,7 +220,9 @@ function createInfoItem(title, song, songURL, thumbnail, answer, hint, startTime
 
     const AnswerElem = document.createElement('h1');
     // 사용자에게는 보이지 않도록 hidden 유형으로 설정
-    AnswerElem.innerText = answer;
+    const answerString = answer.map(val => '[' + val + ']').join(', ');
+    AnswerElem.innerText = answerString.replace(/,\s*$/, '');
+    
     box.appendChild(AnswerElem);
     AnswerElem.style.display = "None";
 
@@ -175,7 +254,12 @@ document.getElementById("register-btn").addEventListener("click", (e) => {
     const song = document.getElementById('song-name-input').value;
     const songURL = document.getElementById('song-link-input').value;
     const thumbnailLink = "https://img.youtube.com/vi/" + videoId + "/sddefault.jpg";
-    const answer = document.getElementById('answer-input').value;
+    const answer = [];
+    const answer_input = document.querySelectorAll(".answer_input");
+    for (const element of answer_input) {
+        const value = element.value;
+        answer.push(value);
+    }
     const hint = document.getElementById('hint-input').value;
     const id = document.getElementById('id-input').value;
 
@@ -236,15 +320,21 @@ document.getElementById("register-btn").addEventListener("click", (e) => {
     }
 });
 
+
 function changeBox(box,title, song, songURL, thumbnail, answer, hint, startTime, endTime) {
     box.querySelector('h3').innerText = title;
     box.querySelector('p').innerText = song;
     box.querySelector('img').src = thumbnail;
     box.querySelector('input').value = songURL;
-    box.querySelector('h1').innerText = answer;
     box.querySelector('h2').innerText = hint;
     box.querySelector('h5').innerText = startTime;
     box.querySelector('h6').innerText = endTime;
+    // answer 배열의 각 요소를 []로 묶어서 표시
+    const answerString = answer.map(val => '[' + val + ']').join(', ');
+
+    // 마지막 요소 뒤에 쉼표 제거
+    box.querySelector('h1').innerText = answerString.replace(/,\s*$/, '');
+    
 }
 
 document.body.addEventListener('click', (event) => {
@@ -426,3 +516,69 @@ document.getElementById('MapName-insert').addEventListener('click', () => {
         MapName_label.textContent = "맵 이름: " + document.getElementById('MapName-input').value;
     };
 });
+window.onload = ()=>
+{
+    const answer_list = document.querySelectorAll(".answer_list");
+    for(let i = 0; i < answer_list.length; i++)
+    {
+        answer_list[i].addEventListener("click",()=>
+        {
+            const answer_input = document.querySelectorAll(".answer_input");
+            for(let j = 0 ; j < answer_input.length; j++)
+            {
+                if(j == i)
+                {
+                    answer_input[j].style.display = "block";
+                }
+                else
+                {
+                    answer_input[j].style.display = "none";
+                }
+            }
+        })
+    }
+    document.getElementById("delete_answerlist").addEventListener("click",()=>
+    {
+        const answer_input = document.querySelectorAll(".answer_input");
+        if(answer_input.length > 1)
+        {
+            const answer_list_inner = document.querySelectorAll(".answer_list");
+            answer_list_inner[answer_list_inner.length-1].remove();
+            answer_input[answer_input.length-1].remove();
+        }
+        else
+        {
+            alert("첫번째 항목은 삭제할 수 없습니다.")
+        }
+    })
+}
+document.getElementById("add_answerlist").addEventListener("click", () => {
+    const answer_listAll = document.getElementById("answer_listAll");
+    const answer_input = document.querySelectorAll(".answer_input");
+    const addanswerList =document.getElementById("add_answerlist");
+    // 새 버튼 생성 및 설정
+    const button = document.createElement("button");
+    button.classList.add("answer_list");
+    button.textContent = answer_input.length + 1;
+  
+    // 새로운 입력 필드 생성 및 설정
+    const new_answer_input = document.createElement("input");
+    new_answer_input.classList.add("w-full", "answer_input");
+    new_answer_input.style.display = "none";
+  
+    // 버튼 클릭 이벤트 리스너 설정
+    button.addEventListener("click", () => {
+      // 모든 기존 입력 필드를 숨김
+      let answer_input_inner = document.querySelectorAll(".answer_input");
+      for (const element of answer_input_inner) {
+        element.style.display = "none";
+      }
+      // 새 입력 필드만 보이도록 설정
+      new_answer_input.style.display = "block";
+    });
+  
+    // 버튼과 입력 필드를 문서에 추가
+    answer_listAll.insertBefore(button,addanswerList);
+    answer_input[answer_input.length-1].after(new_answer_input);
+  });
+  
