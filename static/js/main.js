@@ -408,13 +408,9 @@ function UploadBtn(event) {
     let map_entry = {
         MapName: document.querySelector("#MapName-input").value,
         MapProducer: document.querySelector("#User_Name").innerHTML,
-<<<<<<< Updated upstream
-	MapDescription: document.querySelector("#MapDescription-input").value,
-        Thumbnail: data[0].thumbnail || 'basic'
-=======
+        MapDescription: document.querySelector("#MapDescription-input").value,
+        ActiveSetting: document.querySelector('.active-check i').classList,
         Thumbnail: data[0].thumbnail || 'basic',
-        ActiveSetting: document.querySelector('.active-check i').classList
->>>>>>> Stashed changes
     };
 
     if (event.target.id === "save-btn") {
@@ -519,8 +515,21 @@ MapName_insert.addEventListener('click', () => {
         MapName_label.style.display = '';
         MapName_label.textContent = MapName_input.value;
     };
-<<<<<<< Updated upstream
+    MapName_insert.classList.toggle('w-full');
+    MapName_insert.classList.toggle('w-1/2');
+    MapName_input.classList.toggle('hidden');
 });
+
+// 맵 공개/비공개 유무 설정
+const active_check = document.querySelector('.active-check');
+const active_check_icon = active_check.querySelector('i');
+
+active_check.addEventListener('click', ()=> {
+    active_check_icon.classList.toggle('fa-lock-open');
+    active_check_icon.classList.toggle('fa-lock');
+    active_check_icon.classList.remove('1');
+});
+
 window.onload = ()=>
 {
     const answer_list = document.querySelectorAll(".answer_list");
@@ -586,20 +595,3 @@ document.getElementById("add_answerlist").addEventListener("click", () => {
     answer_listAll.insertBefore(button,addanswerList);
     answer_input[answer_input.length-1].after(new_answer_input);
   });
-  
-=======
-    MapName_insert.classList.toggle('w-full');
-    MapName_insert.classList.toggle('w-1/2');
-    MapName_input.classList.toggle('hidden');
-});
-
-// 맵 공개/비공개 유무 설정
-const active_check = document.querySelector('.active-check');
-const active_check_icon = active_check.querySelector('i');
-
-active_check.addEventListener('click', ()=> {
-    active_check_icon.classList.toggle('fa-lock-open');
-    active_check_icon.classList.toggle('fa-lock');
-    active_check_icon.classList.remove('1');
-});
->>>>>>> Stashed changes

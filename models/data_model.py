@@ -64,14 +64,9 @@ def save_to_db(data):
         MissionMapName = data[-1]['MapName']
         MissionMapProducer = data[-1]['MapProducer']
         MissionThumbnail = data[-1]['Thumbnail']
-<<<<<<< Updated upstream
         MissionDescription = data[-1]['Description']
         new_mission = Mission(MissionMapName, MissionMapProducer, MissionThumbnail, MissionDescription, current_user.id)
-        new_mission.active = True
-=======
-        new_mission = Mission(MissionMapName, MissionMapProducer, MissionThumbnail, current_user.id)
         new_mission.active = True if data[-1]['ActiveSetting']['1'] == 'fa-lock-open' else False
->>>>>>> Stashed changes
         session.add(new_mission)
         session.flush()
         mission_id = new_mission.id
