@@ -1,7 +1,7 @@
 # user login & api register model crud -- Newkyaru 13/08/2023
 from flask_login import current_user
 from flask_bcrypt import Bcrypt
-from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String, DateTime
 from db.database import Base, create_tables,create_session,close_session
 from controllers import map_controller
 from flask import jsonify
@@ -20,6 +20,7 @@ class User(Base):
     exp = Column(Integer, nullable=False)
     nextexp = Column(Integer, nullable=False)
     character = Column(Integer, nullable=False)
+    last_login = Column(DateTime, nullable=True)
     is_google_authenticated = Column(Boolean, default=False)
 
     def __init__(self, email, name, password, level, exp, nextexp, character, is_google_authenticated):
@@ -51,7 +52,6 @@ class User(Base):
 
     def get_id(self):
         return str(self.id)
-    
     
 
 def commit_or_rollback(session):

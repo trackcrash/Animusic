@@ -2,6 +2,7 @@
 .env
 db.zip
 .idea
+banned_words.txt
 /venv
 test.py
 /hi
