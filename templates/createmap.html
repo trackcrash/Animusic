@@ -122,9 +122,15 @@
                     </div>
                 </div>
 
-                <label for="answer-input">정답:</label>
-                <input id="answer-input" class="w-full" type="text">
-
+                <div class="flex justify-between">
+                    <label for="answer-input">정답:</label>
+                    <div id = "answer_listAll">
+                        <button class="answer_list">1</button>
+                        <button id="add_answerlist"><p class="inline">다중 정답</p></button>
+                        <button id="delete_answerlist"><p class="inline">제거</p></button>
+                    </div>                        
+                </div>
+                <input id="answer-input" class="w-full answer_input" type="text"> 
                 <label for="hint-input">힌트:</label>
                 <input id="hint-input" class="w-full" type="text">
 
@@ -174,10 +180,10 @@
             <!-- 상단 정보 영역 -->
 
             <div class="mb-3 same-submission-form">
-                <label for="MapName-input" id="MapName-label">맵 이름: {{data[0][0]['MapName']}}</label>
+                <label for="MapName-input" id="MapName-label">맵 이름: </label>
                     <div class="w-full flex">
                         <input id="MapName-input" class="w-1/2 mx-1 hidden"
-                               type="text" value="{{data[0][0]['MapName']}}">
+                               type="text" value="">
                         <button id="MapName-insert" type="button"
                                 class="w-full py-2 mx-1 blue-button">제목 변경하기</button>
                     </div>
@@ -203,8 +209,16 @@
                     </div>
                 </div>
 
-                <label for="answer-input">정답:</label>
-                <input id="answer-input" class="w-full" type="text">
+                <div class="flex justify-between">
+                    <label for="answer-input">정답:</label>
+                    <div id = "answer_listAll">
+                        <button class="answer_list">1</button>
+                        <button id="add_answerlist"><p class="inline">다중 정답</p></button>
+                        <button id="delete_answerlist"><p class="inline">제거</p></button>
+                    
+                    </div>                        
+                </div>
+                <input id="answer-input" class="w-full answer_input" type="text">
 
                 <label for="hint-input">힌트:</label>
                 <input id="hint-input" class="w-full" type="text">

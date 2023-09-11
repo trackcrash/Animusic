@@ -62,13 +62,22 @@ function sendMessage() {
 
 }
 //정답 출력용
-function showSongInfo(title, song, correctusername) {
+function showSongInfo(title, song, correctusername,all) {
     const songTitle = document.getElementById('songTitle');
     const songArtist = document.getElementById('songArtist');
     const correctUser = document.getElementById('correctUser');
+    const all_play = document.getElementById("all_play");
     songTitle.innerText = "정답: " + title;
-    songArtist.innerText = song;
     correctUser.innerText = "정답자: " + correctusername;
+    if(all == true)
+    {
+        songArtist.innerText = song;
+        all_play.innerText = "모든 정답을 맞추셨습니다.";
+    }
+    else
+    {
+        all_play.innerText = `${song}개의 정답이 남았습니다.`;
+    }
 }
 
 function showHint(hint) {
@@ -274,7 +283,10 @@ function initializeSocketEvents() {
         elements.nextButton.style.display = "block";
         elements.hintButton.style.display = "block";
         elements.StartButton.style.display = "none";
+        const all_play = document.getElementById("all_play");
+
         songTitle.innerHTML = "";
+        all_play.innerHTML = "";
         nextButton.disabled = false;
         updateVoteCountUI(0);
         showHostContent(true);
@@ -293,7 +305,10 @@ function initializeSocketEvents() {
         totalPlayers = data['totalPlayers'];
         clearInterval(gameTimerInterval);
         playvideo(currentvideolink);
-        songTitle.innerText = "";
+        const all_play = document.getElementById("all_play");
+
+        songTitle.innerHTML = "";
+        all_play.innerHTML = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
         songHint.style.display = "none";
@@ -308,7 +323,10 @@ function initializeSocketEvents() {
         // 기존의 게임 상태 및 UI 초기화 코드        
         clearInterval(gameTimerInterval);
         document.querySelector("div #videoFrame").remove();
-        songTitle.innerText = "";
+        const all_play = document.getElementById("all_play");
+
+        songTitle.innerHTML = "";
+        all_play.innerHTML = "";
         songArtist.innerText = "";
         correctUser.innerText = "";
         songHint.innerText = "";
@@ -413,12 +431,16 @@ function initializeSocketEvents() {
         const videolink = data["data"]["youtube_embed_url"];
         clearInterval(gameTimerInterval);
         playvideo(videolink, data.data.endTime);
-        showSongInfo(data.data.title, data.data.song, data.name);
+        showSongInfo(data.data.title, data.data.song, data.name,true);
         if (document.querySelector("#NextVideo").checked) {
             voteSkip();
         }
     });
 
+    socket.on('showAnswer', data =>
+    {
+        showSongInfo(data.msg, data.leftAnswer, data.name, false);
+    })
     socket.on('hint', data => {
         showHint(data.hint);
     });

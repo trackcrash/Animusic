@@ -6,6 +6,7 @@ from flask_login import current_user
 from models.user_model import get_userinfo_by_name
 from controllers.map_controller import show_mission_byid
 from Socket.socket import socket_class
+import re
 import copy
 class RoomDataManger:
     def __init__(self):
@@ -169,14 +170,41 @@ class MusicDataManager:
         room_data = self._data_store.get(room_key, {})
         data = room_data.get('data', [])
         idx = room_data.get('current_index', 0)
+
         # Data is available
         if idx < len(data):
             next_item = data[idx]
-            if answer in next_item['answer_list']:
-                return True
+            # Check if the answer is in any group's answer list
+            for group_answers in next_item['answer_list']:
+                print("group_answer",group_answers)
+                if answer in group_answers:
+                    next_item['answer_list'].remove(group_answers)    
+                    return True
         return False
+    
+    def is_group_answered(self, room):
+        room_data = self._data_store.get(room, {})
+        data = room_data.get('data', [])
+        idx = room_data.get('current_index', 0)
+        print("next_item",room_data)
 
+        # Data is available
+        if idx < len(data):
+            next_item = data[idx]
+            # Count the number of remaining non-empty answer_list groups
+            remaining_groups_count = sum(1 for group_answers in next_item['answer_list'] if group_answers)
+            # Return the remaining groups count
+            return remaining_groups_count
+        # If no data or no more groups, return 0
+        return 0
 music_data_manager = MusicDataManager()
+
+
+def parse_answers(answer_str):
+    # 각 하위 그룹을 쉼표로 분할하고 좌우 공백 제거하여 리스트로 저장
+    group_strings = answer_str.strip('[]').split('],[')
+    answer_list = [group.split(',') for group in group_strings]
+    return answer_list
 
 def make_answer(mission_id, room_key):
     data = show_table_bymissionid(mission_id)
@@ -184,7 +212,7 @@ def make_answer(mission_id, room_key):
 
     for item in data:
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
-        answer_list = [answer.strip() for answer in item['answer'].split(',')]
+        answer_list =  parse_answers(item['answer'])
         starttime = float(item['startTime'])
         endTime = float(item['endTime'])
         music_data = {
@@ -211,7 +239,7 @@ def single_make_answer(mission_id):
 
     for item in data:
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
-        answer_list = [answer.strip() for answer in item['answer'].split(',')]
+        answer_list = parse_answers(item['answer'])
         music_data = {
             'hint': item['hint'],
             'is_answered': 'false',
