@@ -17,6 +17,8 @@ function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
         return;
     }
     let videolink = musicData[currentIndex]['youtube_embed_url'];
+    console.log(musicData[currentIndex]);
+    // musicData[currentIndex].answer_list = JSON.parse("["+musicData[currentIndex].answer_list+"]");
     isPlayingVideo = true;
     const videoFrame = document.getElementById("videoFrame");
     const videoId = getYoutubeVideoId(videolink);
@@ -193,30 +195,49 @@ socket.on('single_message', (data) => {
 
 // 사용자의 답안 확인
 function checkAnswer(answer) {
-    const trimmedAnswerList = musicData[currentIndex].answer_list.map(answer => answer.trim());
-    if (trimmedAnswerList.includes(answer)) {
-        isPlayingVideo = false;
-        playvideo(currentIndex, musicData[currentIndex].startTime, "stop", null);
-        //videooverlay style 삭제
-        videoOverlay.style.display = 'none';
-        showSongInfo(currentIndex);
-        if (document.querySelector("#NextVideo").checked) {
-            setTimeout(
-                () => {
+   const answerToFind = answer.trim();
+    const answerList = musicData[currentIndex].answer_list;
+
+    // 정답 확인
+    const isCorrectAnswer = answerList.some(group => group.map(item => item.trim()).includes(answerToFind));
+
+    if (isCorrectAnswer) {
+        // 정답인 경우 추가 동작 수행
+        musicData[currentIndex].answer_list = answerList.filter(group => !group.map(item => item.trim()).includes(answerToFind));
+        if (musicData[currentIndex].answer_list == 0) {
+            isPlayingVideo = false;
+            playvideo(currentIndex, musicData[currentIndex].startTime, "stop", null);
+            videoOverlay.style.display = 'none';
+            showSongInfo(currentIndex,true);
+            if (document.querySelector("#NextVideo").checked) {
+                setTimeout(() => {
                     if (!skipWait) {
                         nextVideo();
                     }
-                }, 1000
-            )
+                }, 1000);
+            }
+        }else
+        {
+            showSongInfo(currentIndex, false, answer);
         }
     }
 }
 
-function showSongInfo(index) {
+function showSongInfo(index, all, myanswer = null) {
     const songTitle = document.getElementById('songTitle');
     const songArtist = document.getElementById('songArtist');
-    songTitle.innerText = "정답: " + musicData[index].title;
-    songArtist.innerText = "곡 제목: " + musicData[index].song;
+    const all_play = document.getElementById('all_play');
+    if(all == true)
+    {
+        songTitle.innerText = "정답: " + musicData[index].title;
+        songArtist.innerText = "곡 제목: " + musicData[index].song;    
+        all_play.innerText = "모든 문제를 다 맞췄습니다.";
+    }
+    else
+    {
+        songTitle.innerText = "정답: " + myanswer;
+        all_play.innerText = `${musicData[index].answer_list.length}문제 남았습니다.`;
+    }
 }
 // 다음 영상 재생
 function nextVideo() {
