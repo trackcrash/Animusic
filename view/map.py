@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, jsonify, send_file
 from flask_login import current_user, login_required
 from controllers.map_controller import show_mission, show_table, show_mission_byProducer, show_mission_active
-from controllers.map_controller import submit_to_db, update_to_db, delete_Mission, single_make_answer
+from controllers.map_controller import submit_to_db, update_to_db, delete_Mission
+from models.play_model import single_make_answer
 from controllers.map_controller import map_controller, videoid_check
 from models.notification_model import notification
 map_bp = Blueprint('map', __name__, url_prefix='')
