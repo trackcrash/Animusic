@@ -1,6 +1,6 @@
 #user login & api register -- Newkyaru 13/08/2023
-import json,requests,datetime
-
+import json,requests
+from datetime import datetime
 from decouple import config
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import login_user
