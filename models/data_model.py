@@ -66,7 +66,11 @@ def save_to_db(data):
         MissionThumbnail = data[-1]['Thumbnail']
         MissionDescription = data[-1]['Description']
         new_mission = Mission(MissionMapName, MissionMapProducer, MissionThumbnail, MissionDescription, current_user.id)
-        new_mission.active = True
+        ''' 임시조치
+        new_mission.active = True if data[-1]['ActiveSetting']['1'] == 'fa-lock-open' else False
+        '''
+        new_mission.active = True if data[-1].get('ActiveSetting', {'1': 'fa-lock-open'})['1'] == 'fa-lock-open' else False
+
         session.add(new_mission)
         session.flush()
         mission_id = new_mission.id
@@ -93,7 +97,7 @@ def playNumUp(id):
     engine,session = create_session()
     try:
         mission = session.query(Mission).filter_by(id = id).first()
-        mission.PlayNum = mission.PlayNum+1
+        mission.PlayNum = mission.PlayNum + 1
         session.commit()
     except SQLAlchemyError as e:
         session.rollback()
@@ -112,6 +116,12 @@ def update_to_db(data):
         now_mission_info = session.query(Mission).filter_by(id=mission_id).first()
         now_mission_info.MapName = mission_data['MapName']
         now_mission_info.Thumbnail = mission_data['Thumbnail']
+
+        ''' 임시조치
+        now_mission_info.active = True if data[-1]['ActiveSetting']['1'] == 'fa-lock-open' else False
+        '''
+        now_mission_info.active = True if data[-1].get('ActiveSetting', {'1': 'fa-lock-open'})['1'] == 'fa-lock-open' else False
+
         now_music_info = session.query(Music).filter_by(mission_id=mission_id).all() #현재 맵 미션id를 가진 모든 곡 불러오기
         now_music_idset = set(music.id for music in now_music_info) # id값만 추출한 set() 생성
         data_idset = set() # 비어있는 set() 생성
@@ -141,7 +151,7 @@ def update_to_db(data):
                 )
                 session.add(new_music_info)
 
-        idset_for_delete = now_music_idset -  data_idset # DB에 있는 곡 중에 전송받은 곡을 제외한 나머지
+        idset_for_delete = now_music_idset - data_idset # DB에 있는 곡 중에 전송받은 곡을 제외한 나머지
         for delete_id in idset_for_delete: # 해당 id를 가진 모든 곡을 삭제
             delete_music_info = session.query(Music).filter_by(id=delete_id).first()
             session.delete(delete_music_info)

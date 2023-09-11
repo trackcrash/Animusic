@@ -408,8 +408,13 @@ function UploadBtn(event) {
     let map_entry = {
         MapName: document.querySelector("#MapName-input").value,
         MapProducer: document.querySelector("#User_Name").innerHTML,
-	MapDescription: document.querySelector("#MapDescription-input").value,
-        Thumbnail: data[0].thumbnail || 'basic'
+        /* 임시조치
+        MapDescription: document.querySelector("#MapDescription-input").value,
+        */
+        MapDescription: null,
+
+        ActiveSetting: document.querySelector('.active-check i').classList,
+        Thumbnail: data[0].thumbnail || 'basic',
     };
 
     if (event.target.id === "save-btn") {
@@ -501,22 +506,34 @@ formInputs.forEach((input, index) => {
 });
 
 // 제목 입력 란 고정
-const MapName_label = document.getElementById('MapName-label');
 const MapName_insert = document.getElementById('MapName-insert');
-document.getElementById('MapName-insert').addEventListener('click', () => {
-    if (document.getElementById('MapName-input').classList.contains('hidden')) {
-        document.getElementById('MapName-input').classList.remove('hidden');
-        MapName_insert.classList.remove('w-full');
-        MapName_insert.classList.add('w-1/2');
-        MapName_insert.innerText = '제목 저장하기';
+
+MapName_insert.addEventListener('click', () => {
+    const MapName_label = document.getElementById('MapName-label');
+    const MapName_input = document.getElementById('MapName-input')
+    if (MapName_input.classList.contains('hidden')) {
+        MapName_insert.innerText = '제목 저장';
+        MapName_label.style.display = 'none';
     } else {
-        document.getElementById('MapName-input').classList.add('hidden');
-        MapName_insert.classList.remove('w-1/2');
-        MapName_insert.classList.add('w-full');
-        MapName_insert.innerText = '제목 변경하기';
-        MapName_label.textContent = "맵 이름: " + document.getElementById('MapName-input').value;
+        MapName_insert.innerText = '제목 변경';
+        MapName_label.style.display = '';
+        MapName_label.textContent = MapName_input.value;
     };
+    MapName_insert.classList.toggle('w-full');
+    MapName_insert.classList.toggle('w-1/2');
+    MapName_input.classList.toggle('hidden');
 });
+
+// 맵 공개/비공개 유무 설정
+const active_check = document.querySelector('.active-check');
+const active_check_icon = active_check.querySelector('i');
+
+active_check.addEventListener('click', ()=> {
+    active_check_icon.classList.toggle('fa-lock-open');
+    active_check_icon.classList.toggle('fa-lock');
+    active_check_icon.classList.remove('1');
+});
+
 window.onload = ()=>
 {
     const answer_list = document.querySelectorAll(".answer_list");
@@ -582,4 +599,3 @@ document.getElementById("add_answerlist").addEventListener("click", () => {
     answer_listAll.insertBefore(button,addanswerList);
     answer_input[answer_input.length-1].after(new_answer_input);
   });
-  
