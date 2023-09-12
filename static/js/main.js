@@ -606,7 +606,7 @@ document.getElementById("add_answerlist").addEventListener("click", () => {
     new_answer_input.dataset.index = answer_input.length;
     new_answer_input.className = "w-full answer_input";
     new_answer_input.style.display = "none";
-  
+
     // 버튼과 입력 필드를 문서에 추가
     answer_listAll.insertBefore(button,addanswerList);
     answer_input[answer_input.length - 1].after(new_answer_input);
