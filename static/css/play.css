@@ -164,6 +164,11 @@ button {
     }
 }
 
+/* 누락된 정보가 있는 .box 스타일 (.box 스타일보다 위로가면 안됨) */
+.info-omission {
+    background-color: #952215;
+}
+
 /* 우측 곡 정보 입력부분 스타일 */
 
 #submission-form {
