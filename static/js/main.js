@@ -67,10 +67,9 @@ function modifyFunction() {
             let answer;
             if (matches) {
                 answer = matches.map(match => {
-                    const innerMatches = match.match(/\w+/g); // 각 대괄호 내부의 값 추출
-                    return innerMatches || []; // 대괄호 내부 값이 없으면 빈 배열 반환
+                    const innerValue = match.match(/\[([^\]]+)\]/);
+                    return innerValue ? innerValue[1] : ''; // 대괄호 내부 값 추출
                 });
-
             }
             console.log(answer);
             const hint = box.querySelector('h2')?.innerText;
