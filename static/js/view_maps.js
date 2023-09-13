@@ -111,10 +111,62 @@ $(document).ready(function() {
     });
 });
 
+$("#reportIcon").click(function() {
+
+});
+
 $(document).click(function(event) {
     // 모달을 클릭했는지, 아니면 모달 밖을 클릭했는지 확인
     if ($(event.target).closest("#myModal").length && !$(event.target).closest(".igeo-modal").length) {
         $('#myModal').addClass('hidden'); // 모달 닫기
         flag = false;
     }
+});
+
+// 모달을 열 때 발생하는 이벤트
+document.getElementById('reportIcon').addEventListener('click', function() {
+    document.getElementById('reportModal').classList.remove('hidden');
+});
+
+// 모달을 닫을 때 발생하는 이벤트
+document.getElementById('reportModalCloseBtn').addEventListener('click', function() {
+    document.getElementById('reportModal').classList.add('hidden');
+});
+
+// 신고를 제출할 때 발생하는 이벤트
+document.getElementById('sendReportBtn').addEventListener('click', function() {
+    const reportReason = document.getElementById('reportReason').value.trim();
+    const reportDescription = document.getElementById('reportDescription').value.trim();
+    const missionId = id;
+
+    if (!reportReason || !reportDescription) {
+        alert('신고사유와 신고내용을 모두 작성해주세요.');
+        return;
+    }
+
+    // 신고 데이터를 서버로 전송
+    fetch('/create-report', {
+            method: 'POST',
+            body: JSON.stringify({
+                mission_id: missionId,
+                reason: reportReason,
+                description: reportDescription
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('신고가 성공적으로 전송되었습니다.');
+                document.getElementById('reportModal').classList.add('hidden');
+            } else {
+                alert('신고 전송에 실패했습니다.');
+            }
+        });
+
+    // 입력값 초기화
+    document.getElementById('reportReason').value = '';
+    document.getElementById('reportDescription').value = '';
 });

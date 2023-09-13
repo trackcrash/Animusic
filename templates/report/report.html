@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-900 text-white font-sans">
+    {% include "header.html" %}
+    <div class="container mx-auto p-5">
+        <h1 class="text-3xl font-bold mb-5">신고 내용</h1>
+        <div class="space-y-4">
+            {% for report in reports %}
+            <div class="p-5 bg-gray-800 rounded shadow-lg">
+                <div class="text-green-400 mb-2">{{ report.notification_content }}</div>
+                <div>
+                    <strong class="text-gray-400">Reason:</strong> {{ report.report_reason }}
+                </div>
+                <div>
+                    <strong class="text-gray-400">Description:</strong> {{ report.report_description }}
+                </div>
+                <div class="mt-3">
+                    <strong class="text-gray-400">Read:</strong>
+                    <span class="{{ 'text-green-500' if report.is_read else 'text-red-500' }}">
+                        {{ "Yes" if report.is_read else "No" }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+
+</html>

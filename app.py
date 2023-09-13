@@ -1,5 +1,5 @@
 #flask main --author: NewKyaru 11/08/2023
-from decouple import config 
+from decouple import config
 from flask import Flask,render_template, send_file
 from flask_login import LoginManager, current_user
 #controller&model&view(blueprint)
@@ -10,7 +10,7 @@ from view.map import map_bp
 from view.user import user_bp
 from view.room import room_bp
 from view.index import index_bp
-
+from view.report import report_bp
 from view.character import char_bp
 #socket
 from Socket.socket import socketio
@@ -18,6 +18,7 @@ from Socket.connect_socket import connect_MySocket
 from Socket.play_socket import play_Socket
 from Socket.room_socket import room_Socket
 from models.notification_model import notification
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 
@@ -27,6 +28,7 @@ app.register_blueprint(map_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(room_bp)
 app.register_blueprint(char_bp)
+app.register_blueprint(report_bp)
 socketio.init_app(app, cors_allowed_origins="*")
 
 
