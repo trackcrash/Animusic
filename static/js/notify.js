@@ -1,31 +1,35 @@
-document.querySelector(".fa-bell").addEventListener("click", function() {
-    fetch('/api/notification')
-        .then(response => response.json())
-        .then(notifications => {
-            const dropdown = document.getElementById("notification-dropdown");
-            dropdown.innerHTML = ""; // Clear existing notifications
+const notificationIcon = document.getElementById("notificationIcon");
+const dropdown = document.getElementById("notificationList");
 
-            notifications.forEach(notification => {
-                const div = document.createElement("div");
-                div.className = "notification-item";
-                div.textContent = notification.content;
-
-                div.addEventListener('click', function() {
-                    fetch(`/api/notification/mark-read/${notification.id}`, {
-                            method: 'POST'
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.status === "success") {
-                                div.remove();
-                                data.length === 0 ? document.querySelector(".fa-bell").classList.add("hidden") : null;
-                            } else {
-                                console.error(data.message);
-                            }
-                        });
-                });
-
-                dropdown.appendChild(div);
-            });
-        });
+notificationIcon.addEventListener("click", function() {
+    dropdown.parentElement.classList.toggle("hidden");
 });
+
+fetch('/api/notification')
+    .then(response => response.json())
+    .then(notifications => {
+        notifications.forEach(notification => {
+            const li = document.createElement("li");
+            li.className = "p-3 hover:bg-gray-100 cursor-pointer";
+            li.textContent = notification.content;
+
+            li.addEventListener('click', function() {
+                fetch(`/api/notification/mark-read/${notification.id}`, {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            li.remove();
+                            if (!dropdown.children.length) {
+                                document.querySelector(".fa-bell").classList.add("hidden");
+                            }
+                        } else {
+                            console.error(data.message);
+                        }
+                    });
+            });
+
+            dropdown.appendChild(li);
+        });
+    });

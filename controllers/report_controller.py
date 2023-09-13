@@ -30,7 +30,7 @@ def get_report_dtos_by_user_id(user_id):
         notifications = session.query(Notifications).filter(Notifications.user_id == user_id).all()      
         for notification in notifications:
             # 각 알림과 연관된 신고 정보 불러옴
-            report = session.query(Report).filter(Report.mission_id == notification.mission_id).first()
+            report = session.query(Report).filter(Report.id == notification.report_id).first()
             if report:
                 report_dto = ReportDTO(
                     notification_content=notification.content,
@@ -66,6 +66,9 @@ class ReportDTO:
         self.report_reason = report_reason
         self.report_description = report_description
         self.is_read = is_read
+    
+    def __repr__(self):
+        return f"<ReportDTO(notification_content={self.notification_content}, report_reason={self.report_reason}, report_description={self.report_description}, is_read={self.is_read})>"
 
     def to_dict(self):
         return {

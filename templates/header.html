@@ -1,7 +1,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
 <script src="{{ url_for('static', filename='js/socket_function.js') }}"></script>
 <script src="{{ url_for('static', filename='js/all_socket.js') }}"></script>
-<script src="{{ url_for('static', filename='js/notify.js') }}"></script>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 <header class="bg-gradient-to-b from-gray-800 to-black shadow-sm p-5 md:flex-row flex flex-col justify-between items-center">
     <!--google ad-->
@@ -46,11 +46,10 @@
         <div id="notificationDropdown" class="relative inline-block text-left">
             <div class="cursor-pointer" id="notificationIcon">
                 <i class="fas fa-bell"></i>
-                <span id="notificationCount" class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                <span id="notificationCount" class="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2">0</span>
             </div>
-            <div id="notificationListDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute right-0 mt-2">
-                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" id="notificationList">
-                    <!-- JS will dynamically add notifications here -->
+            <div id="notificationListDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-64 dark:bg-gray-700 absolute right-0 mt-2">
+                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200 overflow-y-auto max-h-80" id="notificationList">
                 </ul>
             </div>
         </div>
@@ -59,13 +58,6 @@
         <button onclick="window.location.href='/Map'" class="text-white py-1 px-3 rounded transition duration-300">맵 관리</button>
         <button onclick="window.location.href='/logout'" class="text-white py-1 px-3 rounded transition duration-300">로그아웃</button> {% else %}
         <button onclick="window.location.href='/login'" class="text-white py-1 px-3 rounded transition duration-300">로그인</button> {% endif %}
-    </div>
-    <div id="notificationDropdown" class="md:hidden relative inline-block text-left ml-auto hidden">
-        <div class="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute right-0 mt-2">
-            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" id="notificationList">
-                <!-- JS에서 동적으로 알림 내용 추가 -->
-            </ul>
-        </div>
     </div>
     <!-- Dropdown For Small Screens -->
     <div class="md:hidden relative inline-block text-left ml-auto">
@@ -101,7 +93,7 @@
         </div>
     </div>
 </header>
-
+<script src="{{ url_for('static', filename='js/notify.js') }}"></script>
 <script>
     const dropdownButton = document.getElementById('dropdownDefaultButton');
     const dropdownMenu = document.getElementById('dropdown');

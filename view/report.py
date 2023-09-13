@@ -30,7 +30,7 @@ def create_report():
 def fetch_notifications():
     user_id = current_user.id
     reports = get_report_dtos_by_user_id(user_id)
-    unread_reports = [report for report in reports if not report.is_read]
-    notifications = [{"id": report.id, "content": report.notification_content} for report in unread_reports]
+    unread_reports = [report for report in reports if report.is_read == False]
+    notifications = [{"content": report.notification_content} for report in unread_reports]
     return jsonify(notifications)
         
