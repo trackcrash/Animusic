@@ -1,35 +1,51 @@
-const notificationIcon = document.getElementById("notificationIcon");
-const dropdown = document.getElementById("notificationList");
+$(document).ready(function() {
+    const notificationIcon = $("#notificationIcon");
+    const dropdown = $("#notificationList");
+    const notificationCountElem = $("#notificationCount");
 
-notificationIcon.addEventListener("click", function() {
-    dropdown.parentElement.classList.toggle("hidden");
-});
-
-fetch('/api/notification')
-    .then(response => response.json())
-    .then(notifications => {
-        notifications.forEach(notification => {
-            const li = document.createElement("li");
-            li.className = "p-3 hover:bg-green-300 cursor-pointer";
-            li.textContent = notification.content;
-
-            li.addEventListener('click', function() {
-                fetch(`/api/notification/mark-read/${notification.id}`, {
-                        method: 'POST'
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === "success") {
-                            li.remove();
-                            if (!dropdown.children.length) {
-                                document.querySelector(".fa-bell").classList.add("hidden");
-                            }
-                        } else {
-                            console.error(data.message);
-                        }
-                    });
-            });
-
-            dropdown.appendChild(li);
-        });
+    notificationIcon.click(function() {
+        dropdown.parent().toggleClass("hidden");
     });
+
+    $.ajax({
+        url: '/api/notification',
+        method: 'GET',
+        success: function(notifications) {
+            // 알림 갯수 설정
+            notificationCountElem.text(notifications.length);
+            if (notifications.length === 0) {
+                notificationCountElem.addClass("hidden");
+            } else {
+                notificationCountElem.removeClass("hidden");
+            }
+
+            notifications.forEach(notification => {
+                const li = $('<li></li>')
+                    .addClass("p-3 hover:bg-green-300 cursor-pointer")
+                    .text(notification.content)
+                    .click(function() {
+                        $.ajax({
+                            url: `/api/notification/mark-read/${notification.id}`,
+                            method: 'POST',
+                            success: function(data) {
+                                if (data.status === "success") {
+                                    li.remove();
+                                    let remainingCount = parseInt(notificationCountElem.text()) - 1;
+                                    notificationCountElem.text(remainingCount);
+
+                                    if (remainingCount === 0) {
+                                        notificationCountElem.addClass("hidden");
+                                        $(".fa-bell").addClass("hidden");
+                                    }
+                                } else {
+                                    console.error(data.message);
+                                }
+                            }
+                        });
+                    });
+
+                dropdown.append(li);
+            });
+        }
+    });
+});
