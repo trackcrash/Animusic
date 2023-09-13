@@ -10,7 +10,7 @@ fetch('/api/notification')
     .then(notifications => {
         notifications.forEach(notification => {
             const li = document.createElement("li");
-            li.className = "p-3 hover:bg-gray-100 cursor-pointer";
+            li.className = "p-3 hover:bg-green-300 cursor-pointer";
             li.textContent = notification.content;
 
             li.addEventListener('click', function() {
