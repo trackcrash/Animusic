@@ -84,12 +84,12 @@ async function data_convert_download() {
     const excelFile = new Uint8Array(await blob.arrayBuffer()); // 받아온 파일을 Uint8Array로 변환
 
     let workbook = XLSX.read(excelFile, { type: 'array'}); // 기존 서식을 살릴 수가 없음 !
-    let worksheet = workbook.Sheets['시트1']; // 기존 워크시트 선택
+    let worksheet = workbook.Sheets['곡 정보']; // 기존 워크시트 선택
 
     // 웹페이지에서 가져온 데이터를 새로운 열에 추가
 
     const col_list = ['A', 'B', 'C', 'D', 'E', 'F'];    // 양식 내용이 바뀌면 수정해야 됨
-    const start_row = 9;                                // 양식 내용이 바뀌면 수정해야 됨
+    const start_row = 10;                                // 양식 내용이 바뀌면 수정해야 됨
     for (let i = 0; i < exceldata.length; i++) {
         for (let j = 0; j < col_list.length; j++) {
             const cell_name = col_list[j] + String(start_row + i);

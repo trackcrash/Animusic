@@ -242,6 +242,7 @@ button {
 
 /*----------------------------------------*/
 
+/* 파일 제출 버튼 스타일 */
 label[for="excelUpload"] {
     justify-content: center;
     width: 67.6%;
@@ -261,44 +262,6 @@ label[for="excelUpload"]:hover {
     background-color: #1ed760;
     color: black;
     transition: 0.3s;
-}
-
-.spinner {
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-left-color: #3498db;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    animation: spin 1s linear infinite;
-    display: none;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-
-/* 프로그레스 바 컨테이너 스타일 */
-
-.progress-bar {
-    width: 100%;
-    height: 30px;
-    background-color: #ddd;
-    position: relative;
-}
-
-/* 프로그레스 바 채우기 스타일 */
-
-.progress-fill {
-    height: 100%;
-    background-color: #4caf50;
-    width: 0;
-    transition: width 0.3s;
 }
 
 /* 튜토리얼 창 스타일 */

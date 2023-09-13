@@ -19,13 +19,30 @@ const delete_btn = document.getElementById('delete-btn');
 if (delete_btn) {delete_btn.addEventListener("click", ()=> {delete_mission()})}
 
 function zero_space_text(answer) {
-    const answerList = answer.split(',').map(str => str.trim()).filter(Boolean);
-    const zeroSpaceList = answerList.map(str => str.replace(/\s+/g, ''));
+    const text_list = [];
+    let answertext_list = '', element_str = '', element_switch = 0;
+    Array.from(answer).forEach(element => {
+        if (element === "[") {
+            element_switch = 1;
+            return
+        } else if (element === "]") {
+            element_switch = 0
+            text_list.push(element_str);
+            element_str = '';
+            return
+        }
+        if (element_switch > 0) {element_str += element};
+    });
+    text_list.forEach(text => {
+        const answerList = text.split(',').map(str => str.trim()).filter(Boolean);
+        const zeroSpaceList = answerList.map(str => str.replace(/\s+/g, ''));
 
-    const combinedList = answerList.concat(zeroSpaceList);
-    const combinedSet = new Set(combinedList);
+        const combinedList = answerList.concat(zeroSpaceList);
+        const combinedSet = new Set(combinedList);
 
-    return Array.from(combinedSet).join(',');
+        answertext_list += "[" + Array.from(combinedSet).join(',') + "],"
+    })
+    return answertext_list.slice(0, -1);
 }
  // 유튜브 영상링크 videoId분리 함수(일반링크, 공유링크)
 function split_ytLink(ytLink) {
@@ -90,6 +107,7 @@ function modifyFunction() {
 
             // answer의 0번째 인덱스를 제거하고 그 값을 answer-input 에 할당
             document.querySelector('.answer_input').value = answer.shift() || '';
+            document.querySelector('.answer_input').style.display = 'block';
 
             // 이전의 데이터로 인해 생겼던 중복정답 요소를 모두 제거 (input, button)
             document.querySelectorAll('.answer_input[data-index]:not([data-index="0"])').forEach(input_element => {
@@ -118,6 +136,8 @@ function modifyFunction() {
                     newInput.dataset.index = document.querySelectorAll('.answer_input').length;
                     newInput.className = 'w-full answer_input';
                     newInput.value = answer_element;
+                    newInput.style.display = 'none';
+
                     // 문서에 추가
                     document.getElementById('answer_listAll').insertBefore(newButton, document.getElementById("add_answerlist"));
                     document.getElementById('submission-form').insertBefore(newInput, document.querySelector('[for="hint-input"]'));
