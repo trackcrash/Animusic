@@ -10,7 +10,7 @@ from view.map import map_bp
 from view.user import user_bp
 from view.room import room_bp
 from view.index import index_bp
-
+from view.report import report_bp
 from view.character import char_bp
 #socket
 from Socket.socket import socketio
@@ -27,6 +27,7 @@ app.register_blueprint(map_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(room_bp)
 app.register_blueprint(char_bp)
+app.register_blueprint(report_bp)
 socketio.init_app(app, cors_allowed_origins="*")
 
 

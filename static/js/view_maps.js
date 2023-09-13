@@ -111,6 +111,10 @@ $(document).ready(function() {
     });
 });
 
+$("#reportIcon").click(function() {
+
+});
+
 $(document).click(function(event) {
     // 모달을 클릭했는지, 아니면 모달 밖을 클릭했는지 확인
     if ($(event.target).closest("#myModal").length && !$(event.target).closest(".igeo-modal").length) {

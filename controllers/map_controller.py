@@ -6,7 +6,8 @@ from sqlalchemy import func, inspect ,desc
 from models import data_model
 from db.database import create_session,close_session
 from models.data_model import Mission, Music
-
+from models.user_model import User
+from models.notification_model import Report, Notifications
 def commit_or_rollback(session):
     try:
         session.commit()
@@ -34,9 +35,8 @@ def SuchTable(table_Name):
 def ensure_tables_exist():
     engine, session = create_session()
     try:
-        for table in [Music, Mission]:
-            if not SuchTable(table.__tablename__):
-                table.__table__.create(bind=engine, checkfirst=True)
+        for table in [Music, Mission, Report, User, Notifications]:
+            table.__table__.create(bind=engine, checkfirst=True)
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while ensuring table existence: {str(e)}")
@@ -190,6 +190,17 @@ def show_mission_byid(id):
         close_session(engine, session)
     return entries
 
+def get_mission_by_id(id):
+    engine,session = create_session()
+    try:
+        queries = session.query(Mission).filter(Mission.id == id).first()
+    except Exception as e:
+        # Handle exceptions or errors as needed
+        print(f"An error occurred while retrieving music records: {str(e)}")
+        return []
+    finally:
+        close_session(engine, session)
+    return queries
      
 #missionid로 맵 삭제 use on map.py deleteMission()
 def delete_Mission(id):

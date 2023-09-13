@@ -1,7 +1,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
 <script src="{{ url_for('static', filename='js/socket_function.js') }}"></script>
 <script src="{{ url_for('static', filename='js/all_socket.js') }}"></script>
-
+<script src="{{ url_for('static', filename='js/notify.js') }}"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 <header class="bg-gradient-to-b from-gray-800 to-black shadow-sm p-5 md:flex-row flex flex-col justify-between items-center">
     <!--google ad-->
     <style>
@@ -29,7 +30,7 @@
     </a>
     <script src="{{ url_for('static', filename='js/scroll.js') }}"></script>
     <!-- For Larger Screens -->
-        
+
     <div id="all_user_notification" class="text-white">{{ notification }}</div>
     <div class="hidden md:flex items-center space-x-4 text-white">
         {% if current_user.level == -1 %}
@@ -38,18 +39,34 @@
             <button type="submit">send</button>
         </div>
         <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
-        {% endif %}
-        {% if current_user.is_authenticated %}
+        {% endif %} {% if current_user.is_authenticated %}
         <span class="text-green-500">
             <strong id="User_Name">{{ current_user.name }}</strong>님, 환영합니다!
         </span>
+        <div id="notificationDropdown" class="relative inline-block text-left">
+            <div class="cursor-pointer" id="notificationIcon">
+                <i class="fas fa-bell"></i>
+                <span id="notificationCount" class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+            </div>
+            <div id="notificationListDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute right-0 mt-2">
+                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" id="notificationList">
+                    <!-- JS will dynamically add notifications here -->
+                </ul>
+            </div>
+        </div>
         <button onclick="window.location.href='/select_character'" class="text-white py-1 px-3 rounded transition duration-300">캐릭터 변경</button>
         <button onclick="window.location.href='/account_confirm'" class="text-white py-1 px-3 rounded transition duration-300">회원정보 관리</button>
         <button onclick="window.location.href='/Map'" class="text-white py-1 px-3 rounded transition duration-300">맵 관리</button>
         <button onclick="window.location.href='/logout'" class="text-white py-1 px-3 rounded transition duration-300">로그아웃</button> {% else %}
         <button onclick="window.location.href='/login'" class="text-white py-1 px-3 rounded transition duration-300">로그인</button> {% endif %}
     </div>
-
+    <div id="notificationDropdown" class="md:hidden relative inline-block text-left ml-auto hidden">
+        <div class="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute right-0 mt-2">
+            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" id="notificationList">
+                <!-- JS에서 동적으로 알림 내용 추가 -->
+            </ul>
+        </div>
+    </div>
     <!-- Dropdown For Small Screens -->
     <div class="md:hidden relative inline-block text-left ml-auto">
         <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
