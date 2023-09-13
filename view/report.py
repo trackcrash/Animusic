@@ -8,6 +8,7 @@ report_bp = Blueprint('report', __name__, url_prefix='')
 def view_reports():
     user_id = current_user.id
     reports = get_report_dtos_by_user_id(user_id)
+    print(reports)
     return render_template('report/report.html', reports=reports)
 
 @report_bp.route('/create-report', methods=['POST'])

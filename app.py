@@ -1,5 +1,5 @@
 #flask main --author: NewKyaru 11/08/2023
-from decouple import config 
+from decouple import config
 from flask import Flask,render_template, send_file
 from flask_login import LoginManager, current_user
 #controller&model&view(blueprint)
@@ -18,6 +18,7 @@ from Socket.connect_socket import connect_MySocket
 from Socket.play_socket import play_Socket
 from Socket.room_socket import room_Socket
 from models.notification_model import notification
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 
