@@ -43,9 +43,13 @@ $(function() {
                             }
                         });
                     });
-
                 dropdown.append(li);
             });
+            const a = document.createElement('a');
+            a.textContent = "전체보기";
+            a.classList.add("text-white");
+            a.href = "/report"
+            dropdown.append(a);
         }
     });
 });
