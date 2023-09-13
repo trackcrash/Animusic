@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(function() {
     const notificationIcon = $("#notificationIcon");
     const dropdown = $("#notificationList");
     const notificationCountElem = $("#notificationCount");
