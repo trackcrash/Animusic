@@ -67,7 +67,7 @@ def save_to_db(data):
         MissionMapProducer = data[-1]['MapProducer']
         MissionThumbnail = data[-1]['Thumbnail']
         MissionDescription = data[-1]['Description']
-        MissionActive = True if data[-1]['ActiveSetting']['1'] == 'fa-lock-open' else False
+        MissionActive = True if 'fa-lock-open' in data[-1]['ActiveSetting'].values() else False
         new_mission = Mission(MissionMapName, MissionMapProducer, MissionThumbnail, current_user.id, MissionDescription, MissionActive)
         session.add(new_mission)
         session.flush()
@@ -115,7 +115,7 @@ def update_to_db(data):
         now_mission_info.MapName = mission_data['MapName']
         now_mission_info.Thumbnail = mission_data['Thumbnail']
         now_mission_info.Description = mission_data['Description']
-        now_mission_info.active = True if mission_data['ActiveSetting']['1'] == 'fa-lock-open' else False
+        now_mission_info.active = True if 'fa-lock-open' in mission_data['ActiveSetting'].values() else False
         now_music_info = session.query(Music).filter_by(mission_id=mission_id).all() #현재 맵 미션id를 가진 모든 곡 불러오기
         now_music_idset = set(music.id for music in now_music_info) # id값만 추출한 set() 생성
         data_idset = set() # 비어있는 set() 생성

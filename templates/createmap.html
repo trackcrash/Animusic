@@ -140,9 +140,6 @@
                 <div class="flex space-x-2">
                     <div class="flex w-1/2 mt-2 active-check">
                         <label class="mr-1">공개 여부</label>
-                        <!-- 여기 i에 클래스 추가할때 조건문 앞에추가하면
-                             서버에서 클래스 배열의 인덱스번호 고정값으로 체크해서 전송오류남
-                             그러니 뒤에다가 해야 됨-->
                         <i class="mt-1 fa-solid \
                         {% if data[0][0]['active'] %} fa-lock-open {% else %} fa-lock {% endif %}"></i>
                     </div>
