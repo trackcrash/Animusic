@@ -33,6 +33,7 @@ def get_report_dtos_by_user_id(user_id):
             report = session.query(Report).filter(Report.id == notification.report_id).first()
             if report:
                 report_dto = ReportDTO(
+                    id=report.id,
                     notification_content=notification.content,
                     report_reason=report.reason,
                     report_description=report.description,
@@ -61,17 +62,19 @@ def mark_report_as_read(report_id):
         close_session(engine, session)
 
 class ReportDTO:
-    def __init__(self, notification_content, report_reason, report_description, is_read):
+    def __init__(self, id, notification_content, report_reason, report_description, is_read):
+        self.id = id
         self.notification_content = notification_content
         self.report_reason = report_reason
         self.report_description = report_description
         self.is_read = is_read
     
     def __repr__(self):
-        return f"<ReportDTO(notification_content={self.notification_content}, report_reason={self.report_reason}, report_description={self.report_description}, is_read={self.is_read})>"
+        return f"<ReportDTO(id={self.id}, notification_content={self.notification_content}, report_reason={self.report_reason}, report_description={self.report_description}, is_read={self.is_read})>"
 
     def to_dict(self):
         return {
+            'id': self.id,
             'notification_content': self.notification_content,
             'report_reason': self.report_reason,
             'report_description': self.report_description,

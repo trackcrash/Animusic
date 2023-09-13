@@ -3,7 +3,7 @@ $(document).ready(function() {
     const dropdown = $("#notificationList");
     const notificationCountElem = $("#notificationCount");
 
-    notificationIcon.click(function() {
+    notificationIcon.on("click", function() {
         dropdown.parent().toggleClass("hidden");
     });
 
@@ -23,10 +23,10 @@ $(document).ready(function() {
                 const li = $('<li></li>')
                     .addClass("p-3 hover:bg-green-300 cursor-pointer")
                     .text(notification.content)
-                    .click(function() {
+                    .on("click", function() {
                         $.ajax({
-                            url: `/api/notification/mark-read/${notification.id}`,
-                            method: 'POST',
+                            url: `/api/notification/${notification.id}`,
+                            method: 'PUT',
                             success: function(data) {
                                 if (data.status === "success") {
                                     li.remove();
