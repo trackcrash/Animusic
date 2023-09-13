@@ -15,77 +15,6 @@ document.getElementById('excelUpload').addEventListener('change', (e) => {
     };
 });
 
-// 파일 전용 active check
-const file_active_check = document.querySelector('.file-active-check');
-const file_active_check_icon = file_active_check.querySelector('i');
-
-file_active_check.addEventListener('click', ()=> {
-    file_active_check_icon.classList.toggle('fa-lock-open');
-    file_active_check_icon.classList.toggle('fa-lock');
-    file_active_check_icon.classList.remove('1');
-});
-
-
-let progressBar = document.querySelector('.progress-bar');
-let progressFill = progressBar.querySelector('.progress-fill');
-let spinnerText = progressBar.querySelector('.spinner-text');
-let spinner = document.querySelector('.spinner');
-
-// 진행률 관련 초기 스타일 값
-document.addEventListener('DOMContentLoaded', function() {
-    progressBar.style.display = 'none';
-    spinner.style.display = 'none';
-})
-
-// 진행률 관련 이미지 switch 함수
-const switch_progress_display = {
-    show: function() {
-        progressBar.style.display = 'block';
-        spinner.style.display = 'block';
-    },
-    hide: function() {
-        progressBar.style.display = 'none';
-        spinner.style.display = 'none';
-    }
-};
-
-const progress_step = {
-    step_fail: function() {
-        switch_progress_display.hide();
-        progressFill.style.width = 0 + "%";
-        spinnerText.textContent = '요청 처리중...';
-    },
-    step_start: function() {
-        switch_progress_display.show();
-        progressFill.style.width = 10 + "%";
-        spinnerText.textContent = '파일을 읽어오는중...';
-    },
-    step_1: function() {
-        progressFill.style.width = 20 + "%";
-        spinnerText.textContent = '데이터 로드중...';
-    },
-    step_2: function() {
-        progressFill.style.width = 40 + "%";
-        spinnerText.textContent = '양식 체크중...';
-    },
-    step_3: function() {
-        progressFill.style.width = 60 + "%";
-        spinnerText.textContent = '데이터 변환중...';
-    },
-    step_4: function() {
-        progressFill.style.width = 70 + "%";
-        spinnerText.textContent = '영상 주소의 유효성 확인중...';
-    },
-    step_5: function() {
-        progressFill.style.width = 85 + "%";
-        spinnerText.textContent = '데이터 전송중...';
-    },
-    step_end: function() {
-        progressFill.style.width = 100 + "%";
-        spinnerText.textContent = '업로드 완료';
-    }
-};
-
 // 파일 로드 함수
 async function file_load() {
     const excelFile = document.getElementById('excelUpload').files[0];
@@ -102,12 +31,6 @@ async function file_load() {
         alert("올바른 양식 파일이 아닙니다.");
         return;
     }
-    //함수가 종료될 때까지 로딩표시
-    progress_step.step_start();
-
-    reader.readAsBinaryString(excelFile);
-
-    progress_step.step_1();
 
     await new Promise((resolve) => {
         reader.onload = function(event) {
@@ -281,114 +204,6 @@ function push_exceldata(excelFile_data) {
     };
     return [check_videoid_list, check_array];
 };
-
-// videoid의 유효성을 검사하는 함수
-async function checking_videoid(check_videoid_list, check_array) {
-    const videoid_checking = await fetch('/check_videoid', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(check_videoid_list)
-    });
-
-    //유효성 검사결과를 수신
-
-    const videoid_check_result = await videoid_checking.json();
-
-    // 유효하지 못한 링크 발견 시 해당 곡 정보를 담은 텍스트파일을 다운로드 시킴
-    if (videoid_check_result.length > 0) {
-        let textdata = "";
-
-        progress_step.step_fail();
-
-        alert('재생되지 않는 영상링크가 발견되었습니다.');
-        alert('해당링크의 곡정보가 담긴 파일을 다운로드합니다.');
-
-        for (let videoid of videoid_check_result) {
-            textdata += String(check_videoid_list.indexOf(videoid) + 9) + ". ";
-            textdata += check_array[check_videoid_list.indexOf(videoid)].slice(0, 2).join(', ');
-            textdata += "\n";
-        }
-
-        const blob = new Blob([textdata], { type: 'text/plain' });
-        const link = document.createElement('a');
-
-        link.href = URL.createObjectURL(blob);
-        link.download = '잘못된 링크를 가진 곡 목록.txt';
-        link.click();
-
-        URL.revokeObjectURL(link.href);
-    };
-    return videoid_check_result;
-};
-
-function trans_data(check_array) {
-    let data = [];
-
-    for (let i of check_array) {
-        const title = i[0];
-        const song = i[1];
-        const thumbnail = "https://img.youtube.com/vi/" + i[4] + "/sddefault.jpg"
-        const songURL = "https://www.youtube.com/watch?v=" + i[4];
-        const answer = i[2];
-        const hint = i[3];
-        const startTime = i[5];
-        const endTime = i[6];
-        const id = i[7];
-
-        if (id) {
-            data.push({
-                Music_id: id,
-                title: title,
-                song: song,
-                thumbnail: thumbnail,
-                songURL: songURL,
-                answer: answer,
-                hint: hint,
-                startTime: startTime,
-                endTime: endTime
-            });
-        } else {
-            data.push({
-                title: title,
-                song: song,
-                thumbnail: thumbnail,
-                songURL: songURL,
-                answer: answer,
-                hint: hint,
-                startTime: startTime,
-                endTime: endTime
-            });
-        };
-    };
-    return data;
-}
-
-function response_data(data, response_url) {
-    data = JSON.stringify(data);
-    $.ajax({
-        type: "POST",
-        url: response_url,
-        dataType: "json",
-        contentType: "application/json",
-        data: data,
-        error: function(request, status, error) {
-            console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
-
-            progress_step.step_fail();
-
-            alert("서버 전송 중 오류가 발생하였습니다.")
-            location.reload();
-
-        },
-        success: function(data) {
-
-            progress_step.step_end();
-
-            alert("등록 완료되었습니다.");
-            window.location.href = '/Map';
-        }
-    });
-}
 
 async function data_convert_upload(button) {
 

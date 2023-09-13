@@ -61,78 +61,69 @@ function modifyFunction() {
             const title = box.querySelector('h3')?.innerText;
             const song = box.querySelector('p')?.innerText;
             const songURL = box.querySelector('input')?.value;
-            const h1Text = box.querySelector('h1')?.innerText;
-            const regex = /\[(.*?)\]/g; // 대괄호 내용을 추출하기 위한 정규 표현식
-            const matches = h1Text.match(regex); // 대괄호 내용을 추출하여 배열로 얻음
-            let answer;
-            if (matches) {
-                answer = matches.map(match => {
-                    const innerValue = match.match(/\[([^\]]+)\]/);
-                    return innerValue ? innerValue[1] : ''; // 대괄호 내부 값 추출
-                });
+            const h1text = box.querySelector('h1')?.innerText;
+            let answer = [];
+            let text_switch, textlist = "";
+            for (let text_element of h1text) {
+                if (text_element === '[') {
+                    text_switch = 1;
+                    continue
+                } else if (text_element === ']') {
+                    text_switch = 0;
+                    answer.push(textlist);
+                    textlist = "";
+                    continue
+                }
+                if (text_switch > 0) {textlist += text_element};
             }
-            console.log(answer);
+
             const hint = box.querySelector('h2')?.innerText;
             const id = box.querySelector('h4')?.innerText;
             const startTime = box.querySelector('h5')?.innerText;
             const endTime = box.querySelector('h6')?.innerText;
-            let answer_input=document.querySelectorAll(".answer_input");
+            let answer_input = document.querySelectorAll(".answer_input");
 
             // 정보를 설정하면서 선택적 체이닝 사용
             document.getElementById('title-input').value = title || ''; // 속성이 없을 때는 빈 문자열
             document.getElementById('song-name-input').value = song || '';
             document.getElementById('song-link-input').value = songURL || '';
-            const answer_list = document.querySelectorAll(".answer_list")
-            for(let i = 0; i < answer_input.length; i++)
-            {
-                if(!answer_input[i].id)
-                {
-                    answer_list[i].remove();
-                    answer_input[i].remove();
-                }
-                else
-                {
-                    answer_input[i].style.display = "block";
-                }
+
+            // answer의 0번째 인덱스를 제거하고 그 값을 answer-input 에 할당
+            document.querySelector('.answer_input').value = answer.shift() || '';
+
+            // 이전의 데이터로 인해 생겼던 중복정답 요소를 모두 제거 (input, button)
+            document.querySelectorAll('.answer_input[data-index]:not([data-index="0"])').forEach(input_element => {
+                input_element.remove();
+            })
+            document.querySelectorAll('.answer_list[data-index]:not([data-index="0"])').forEach(button_element => {
+                button_element.remove();
+            })
+
+            // 요소가 남아있다면 (중복 정답이였던 경우) 남은 요소 생성
+
+            if (answer.length > 0) {
+                let answer_index = 0;
+                answer.forEach(answer_element => {
+                    answer_index++;
+
+                    // 버튼 생성
+                    const newButton = document.createElement('button');
+                    newButton.dataset.index = document.querySelectorAll('.answer_list').length;
+                    newButton.className = 'answer_list';
+                    newButton.setAttribute('onclick', 'focus_answer_list(event.target.dataset.index)');
+                    newButton.textContent = answer_index + 1;
+
+                    // input 생성
+                    const newInput = document.createElement('input');
+                    newInput.dataset.index = document.querySelectorAll('.answer_input').length;
+                    newInput.className = 'w-full answer_input';
+                    newInput.value = answer_element;
+                    // 문서에 추가
+                    document.getElementById('answer_listAll').insertBefore(newButton, document.getElementById("add_answerlist"));
+                    document.getElementById('submission-form').insertBefore(newInput, document.querySelector('[for="hint-input"]'));
+                })
             }
-            for(let i = 0; i <answer.length;i++)
-            {
-                if(i != 0)
-                {
-                    const answer_listAll = document.getElementById("answer_listAll");
-                    const addanswerList =document.getElementById("add_answerlist");
-                    answer_input=document.querySelectorAll(".answer_input");
-                    // 새 버튼 생성 및 설정
-                    const button = document.createElement("button");
-                    button.classList.add("answer_list");
-                    console.log(answer_input);
-                    button.textContent = answer_input.length + 1;
-                  
-                    // 새로운 입력 필드 생성 및 설정
-                    const new_answer_input = document.createElement("input");
-                    new_answer_input.classList.add("w-full", "answer_input");
-                    new_answer_input.style.display = "none";
-                    new_answer_input.value = answer[i];
-                    // 버튼 클릭 이벤트 리스너 설정
-                    button.addEventListener("click", () => {
-                      // 모든 기존 입력 필드를 숨김
-                      let answer_input_inner = document.querySelectorAll(".answer_input");
-                      for (const element of answer_input_inner) {
-                        element.style.display = "none";
-                      }
-                      // 새 입력 필드만 보이도록 설정
-                      new_answer_input.style.display = "block";
-                    });
-                  
-                    // 버튼과 입력 필드를 문서에 추가
-                    answer_listAll.insertBefore(button,addanswerList);
-                    answer_input[answer_input.length-1].after(new_answer_input);
-                }
-                else
-                {
-                    answer_input[i].value = answer[i];
-                }
-            }
+
             document.getElementById('hint-input').value = hint || '';
             document.getElementById('startTime-input-h').value = Math.floor(parseInt(startTime) / 3600) || "";
             document.getElementById('startTime-input-m').value = Math.floor((parseInt(startTime) % 3600) / 60) || "";
@@ -143,30 +134,28 @@ function modifyFunction() {
             document.getElementById('endTime-input-s').value = Math.floor((parseInt(endTime) % 3600) % 60) || "";
             document.getElementById('endTime-input-ms').value = parseFloat(endTime) % 1 || "";
             document.getElementById('id-input').value = id || '';
-            loadVideo();
-            document.getElementById('register-btn').innerText = "수정하기";
+            try {
+                loadVideo();
+            } catch (error) {};
+            document.getElementById('register-btn').innerText = "곡 수정하기";
 
             modifyIndex = i;
         });
     });
-    addBox.addEventListener('click', () => {
-        let answer_input=document.querySelectorAll(".answer_input");
-        const answer_list = document.querySelectorAll(".answer_list")
 
-        for(let i = 0; i < answer_input.length; i++)
-        {
-            if(!answer_input[i].id)
-            {
-                answer_list[i].remove();
-                answer_input[i].remove();
-            }
-            else
-            {
-                answer_input[i].style.display = "block";
-            }
-        }
+    addBox.addEventListener('click', () => {
+
+        document.querySelectorAll('.answer_input[data-index]:not([data-index="0"])').forEach(input_element => {
+            input_element.remove();
+        });
+        document.querySelectorAll('.answer_list[data-index]:not([data-index="0"])').forEach(button_element => {
+            button_element.remove();
+        });
+
+        document.querySelector('.answer_input').value = '';
+
         const fields = [
-            'title-input', 'song-name-input', 'song-link-input', 'answer-input', 'hint-input',
+            'title-input', 'song-name-input', 'song-link-input', 'hint-input',
             'startTime-input-h', 'startTime-input-m', 'startTime-input-s', 'startTime-input-ms',
             'endTime-input-h', 'endTime-input-m', 'endTime-input-s', 'endTime-input-ms',
             'id-input'
@@ -217,11 +206,8 @@ function createInfoItem(title, song, songURL, thumbnail, answer, hint, startTime
     songURLElem.value = songURL;
     box.appendChild(songURLElem);
 
-    const AnswerElem = document.createElement('h1');
-    // 사용자에게는 보이지 않도록 hidden 유형으로 설정
-    const answerString = answer.map(val => '[' + val + ']').join(', ');
-    AnswerElem.innerText = answerString.replace(/,\s*$/, '');
-    
+    const AnswerElem = document.createElement('h1'); // 사용자에게는 보이지 않도록 hidden 유형으로 설정
+    AnswerElem.innerText = answer;
     box.appendChild(AnswerElem);
     AnswerElem.style.display = "None";
 
@@ -253,12 +239,14 @@ document.getElementById("register-btn").addEventListener("click", (e) => {
     const song = document.getElementById('song-name-input').value;
     const songURL = document.getElementById('song-link-input').value;
     const thumbnailLink = "https://img.youtube.com/vi/" + videoId + "/sddefault.jpg";
-    const answer = [];
+
+    let answer = "";
     const answer_input = document.querySelectorAll(".answer_input");
     for (const element of answer_input) {
-        const value = element.value;
-        answer.push(value);
-    }
+        if (element.value) {answer += "[" + element.value + "],"};
+    };
+    answer = answer.slice(0, -1);
+
     const hint = document.getElementById('hint-input').value;
     const id = document.getElementById('id-input').value;
 
@@ -319,7 +307,6 @@ document.getElementById("register-btn").addEventListener("click", (e) => {
     }
 });
 
-
 function changeBox(box,title, song, songURL, thumbnail, answer, hint, startTime, endTime) {
     box.querySelector('h3').innerText = title;
     box.querySelector('p').innerText = song;
@@ -328,12 +315,7 @@ function changeBox(box,title, song, songURL, thumbnail, answer, hint, startTime,
     box.querySelector('h2').innerText = hint;
     box.querySelector('h5').innerText = startTime;
     box.querySelector('h6').innerText = endTime;
-    // answer 배열의 각 요소를 []로 묶어서 표시
-    const answerString = answer.map(val => '[' + val + ']').join(', ');
-
-    // 마지막 요소 뒤에 쉼표 제거
-    box.querySelector('h1').innerText = answerString.replace(/,\s*$/, '');
-    
+    box.querySelector('h1').innerText = answer;
 }
 
 document.body.addEventListener('click', (event) => {
@@ -346,19 +328,18 @@ document.getElementById('song-link-input').addEventListener('input', () => {
     loadVideo();
 });
 
-// .box의 내용물을 정의하는 함수
+// .box의 내용물 서버로 전송하기위한 변환작업
 function box_element(item) {
     const title = item.querySelector('h3').innerText;
     const song = item.querySelector('p').innerText;
     const thumbnail = item.querySelector('img').src;
-    const songURL = "https://www.youtube.com/watch?v=" + split_ytLink(item.querySelector('input').value);
-    let answer = item.querySelector('h1').innerText;
-
-    answer = zero_space_text(answer);
-
+    let videoid = null, songURL = null, hint = null, startTime = null, endTime = null;
+    try {
+        videoid = split_ytLink(item.querySelector('input').value);
+        songURL = "https://www.youtube.com/watch?v=" + videoid;
+    } catch (error) {};
+    const answer = item.querySelector('h1').innerText;
     const id = item.querySelector('h4').innerHTML || null;
-
-    let hint = null, startTime = null, endTime = null;
 
     if (item.querySelector('h2').innerText !== '') {hint = item.querySelector('h2').innerText};
     if (parseFloat(item.querySelector('h5').innerText)) {startTime = item.querySelector('h5').innerText};
@@ -373,24 +354,86 @@ function box_element(item) {
         id: id,
         hint: hint,
         startTime: startTime,
-        endTime: endTime
+        endTime: endTime,
+        videoid: videoid
     }
 }
 
-//upload이벤트 (SaveBtn, UpdateBtn 통합)
-function UploadBtn(event) {
-    const items = document.querySelectorAll('.box');
-    let upload_url, data = [];
-    items.forEach(item => {
+// videoid 유효성 검사
+async function checking_videoid(check_videoid_list, items) {
+    const videoid_checking = await fetch('/check_videoid', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(check_videoid_list)
+    });
 
-        let {id, title, song, thumbnail, songURL, answer, hint, startTime, endTime} = box_element(item);
+    //유효성 검사결과를 수신
+
+    const videoid_check_result = await videoid_checking.json();
+
+    // 유효하지 못한 링크 발견 시 해당 곡 정보를 담은 텍스트파일을 다운로드 시킴
+    if (videoid_check_result.length > 0) {
+        let textdata = "";
+
+        alert('재생되지 않는 영상링크가 발견되었습니다.');
+        alert('해당링크의 곡정보가 담긴 파일을 다운로드합니다.');
+
+        for (let videoid of videoid_check_result) {
+            const item_index = check_videoid_list.indexOf(videoid);
+            items[item_index].classList.add("info-omission");
+            textdata += String(item_index + 1) + ". ";
+            textdata += items[item_index].querySelector('p').innerText + "\n";
+        }
+
+        const blob = new Blob([textdata], { type: 'text/plain' });
+        const link = document.createElement('a');
+
+        link.href = URL.createObjectURL(blob);
+        link.download = '잘못된 링크를 가진 곡 목록.txt';
+        link.click();
+
+        URL.revokeObjectURL(link.href);
+    };
+    return videoid_check_result;
+};
+
+//upload이벤트 (SaveBtn, UpdateBtn 통합)
+async function UploadBtn(event) {
+    const items = document.querySelectorAll('.box');
+
+    let upload_url, data = [];
+
+    if (items.length < 1) {
+        alert("곡을 등록하여 추가 후 이용해주세요.");
+        return
+    };
+
+    if (!document.querySelector("#MapName-input").value) {
+        alert("맵 제목을 입력해주세요.");
+        return
+    }
+
+    let items_index = 0;
+    let error_items = [];
+    let check_videoid_list = [];
+    items.forEach(item => {
+        items_index++;
+        item.classList.remove('info-omission');
+        let {id, title, song, thumbnail, songURL, answer, hint, startTime, endTime, videoid} = box_element(item);
+        // videoid 유효성을 체크하기 위해서 push
+        check_videoid_list.push(videoid);
+
+        // 필수 입력사항 없는 곡을 error_items에 push
+        if (!(title && song && songURL && answer)) {
+            error_items.push(items_index);
+        }
 
         let song_entry = {
             title: title,
             song: song,
             thumbnail: thumbnail,
             songURL: songURL,
-            answer: answer,
+            answer: zero_space_text(answer),
             hint: hint,
             startTime: startTime,
             endTime: endTime
@@ -403,6 +446,21 @@ function UploadBtn(event) {
             data.push(song_entry);
         };
     });
+
+    // 누락된 곡이 있다면 해당 .box 표시해주고 return
+    if(error_items.length > 0) {
+        alert("정보가 누락된 곡이 있습니다.");
+        error_items.forEach(items_number => {
+            items[items_number - 1].classList.add('info-omission');
+        })
+        return
+    }
+
+    // videoid 유효성 체크 동작 (함수에서 발견되면 목록 다운로드 시키고 결과를 return함)
+    const check_result = await checking_videoid(check_videoid_list, items);
+
+    // 그래서 return 값이 있다면 upload 이벤트 취소
+    if (check_result.length > 0) {return};
 
     let map_entry = {
         MapName: document.querySelector("#MapName-input").value,
@@ -424,6 +482,7 @@ function UploadBtn(event) {
         upload_url = "/update-to-db";
 
     };
+
     data = JSON.stringify(data);
     $.ajax({
         type: "POST",
@@ -529,72 +588,56 @@ active_check.addEventListener('click', ()=> {
     active_check_icon.classList.remove('1');
 });
 
-window.onload = ()=>
-{
-    const answer_list = document.querySelectorAll(".answer_list");
-    for(let i = 0; i < answer_list.length; i++)
-    {
-        answer_list[i].addEventListener("click",()=>
-        {
-            const answer_input = document.querySelectorAll(".answer_input");
-            for(let j = 0 ; j < answer_input.length; j++)
-            {
-                if(j == i)
-                {
-                    answer_input[j].style.display = "block";
-                }
-                else
-                {
-                    answer_input[j].style.display = "none";
-                }
-            }
-        })
-    }
-    document.getElementById("delete_answerlist").addEventListener("click",()=>
-    {
-        const answer_input = document.querySelectorAll(".answer_input");
-        if(answer_input.length > 1)
-        {
-            const answer_list_inner = document.querySelectorAll(".answer_list");
-            answer_list_inner[answer_list_inner.length-1].remove();
-            answer_input[answer_input.length-1].remove();
-        }
-        else
-        {
-            alert("첫번째 항목은 삭제할 수 없습니다.")
-        }
-    })
-}
-
+// 중복 정답 추가 기능
 document.getElementById("add_answerlist").addEventListener("click", () => {
     const answer_listAll = document.getElementById("answer_listAll");
+    const answer_list = document.querySelectorAll(".answer_list");
     const answer_input = document.querySelectorAll(".answer_input");
     const addanswerList =document.getElementById("add_answerlist");
     // 새 버튼 생성 및 설정
     const button = document.createElement("button");
-    button.classList.add("answer_list");
+    button.dataset.index = answer_list.length;
+    button.className = "answer_list";
+    button.onclick = (e) => {focus_answer_list(e.target.dataset.index)};
     button.textContent = answer_input.length + 1;
-  
+
     // 새로운 입력 필드 생성 및 설정
     const new_answer_input = document.createElement("input");
-    new_answer_input.classList.add("w-full", "answer_input");
+    new_answer_input.dataset.index = answer_input.length;
+    new_answer_input.className = "w-full answer_input";
     new_answer_input.style.display = "none";
-  
-    // 버튼 클릭 이벤트 리스너 설정
-    button.addEventListener("click", () => {
-      // 모든 기존 입력 필드를 숨김
-      let answer_input_inner = document.querySelectorAll(".answer_input");
-      for (const element of answer_input_inner) {
-        element.style.display = "none";
-      }
-      // 새 입력 필드만 보이도록 설정
-      new_answer_input.style.display = "block";
-    });
-  
+
     // 버튼과 입력 필드를 문서에 추가
     answer_listAll.insertBefore(button,addanswerList);
-    answer_input[answer_input.length-1].after(new_answer_input);
+    answer_input[answer_input.length - 1].after(new_answer_input);
   });
+
+// 중복 정답 제거 버튼 기능
+document.getElementById("delete_answerlist").addEventListener("click", () => {
+    let answerlists = document.querySelectorAll('.answer_list');
+    let answerinputs = document.querySelectorAll('.answer_input');
+
+    let last_answerlist = answerlists[answerlists.length - 1];
+    let last_answerinput = answerinputs[answerinputs.length - 1];
+
+    if (answerlists.length > 1 && answerinputs.length > 1) {
+        last_answerlist.remove();
+        last_answerinput.remove();
+    }
+})
+
+//모든 중복 정답 버튼에 대한 기능 설정 (통합 관리)
+function focus_answer_list(index) {
+    document.querySelectorAll(`.answer_input[data-index]:not([data-index="${index}"])`).forEach(input_element => {
+        input_element.style.display = 'none';
+    })
+    document.querySelector(`.answer_input[data-index="${index}"]`).style.display = 'block';
+}
+
+//정답 input이 동적으로 변경되기 때문에 label focus 기능을 여기서 만듦.
+document.getElementById('answer-label').addEventListener('click', () => {
+    document.querySelector('.answer_input[style*="display: block"]').focus();
+})
 
 /*------------- 맵 설명 입력 부분-------------*/
 const map_descript_popup = document.getElementById('map-descript-popup');
