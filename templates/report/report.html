@@ -4,32 +4,64 @@
 <head>
     <title>Reports</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/index.css') }}" rel="stylesheet">
 </head>
 
 <body class="bg-gray-900 text-white font-sans">
     {% include "header.html" %}
     <div class="container mx-auto p-5">
-        <h1 class="text-3xl font-bold mb-5">신고 내용</h1>
+        <h1 class="text-3xl font-bold mb-5">알림</h1>
         <div class="space-y-4">
             {% for report in reports %}
-            <div class="p-5 bg-gray-800 rounded shadow-lg">
-                <div class="text-green-400 mb-2">{{ report.notification_content }}</div>
-                <div>
-                    <strong class="text-gray-400">Reason:</strong> {{ report.report_reason }}
+            <div class="p-5 rounded shadow-lg flex justify-between items-start {{ 'shadow-inner' if not report.is_read else '' }} {{ 'bg-gray-700' if not report.is_read else 'bg-gray-800' }}">
+                <div class="flex-1 space-y-2">
+                    <div class="text-green-400 mb-2">{{ report.notification_content }}</div>
+                    <div>
+                        <strong class="text-gray-400">제목:</strong> {{ report.report_reason }}
+                    </div>
+                    <div>
+                        <strong class="text-gray-400">내용:</strong> {{ report.report_description }}
+                    </div>
+                    <div class="mt-3">
+                        <span class="{{ 'text-green-500 font-bold' if report.is_read else 'text-red-500 font-bold' }}">
+                            {{ "읽음" if report.is_read else "안읽음" }}
+                        </span>
+                    </div>
                 </div>
-                <div>
-                    <strong class="text-gray-400">Description:</strong> {{ report.report_description }}
-                </div>
-                <div class="mt-3">
-                    <strong class="text-gray-400">Read:</strong>
-                    <span class="{{ 'text-green-500' if report.is_read else 'text-red-500' }}">
-                        {{ "Yes" if report.is_read else "No" }}
-                    </span>
+                <div class="space-y-2 p-6">
+                    <a href="/make_map?id={{ report.mission_id }}" class="block mb-2 text-white bg-gray-500 hover:bg-blue-800 px-4 py-2 rounded transition duration-200">링크로 이동</a>
+                    <a href="#" class="block text-center text-white bg-gray-500 hover:bg-red-800 px-4 py-2 rounded transition duration-200" onclick="deleteNotification({{ report.id }}, this); return false;">삭제</a>
                 </div>
             </div>
             {% endfor %}
         </div>
+
     </div>
+    <script>
+        function deleteNotification(reportId, element) {
+            // AJAX 요청 설정
+            fetch(`/api/notification/${reportId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json()) // JSON으로 응답 파싱
+                .then(data => {
+                    if (data.status === "success") {
+                        alert(data.message);
+                        // 알림이 성공적으로 삭제된 경우 해당 항목 제거
+                        element.closest('.notification-item').remove();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again later.');
+                });
+        }
+    </script>
 </body>
 
 </html>

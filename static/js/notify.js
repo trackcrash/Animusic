@@ -47,7 +47,7 @@ $(function() {
             });
             const a = document.createElement('a');
             a.textContent = "전체보기";
-            a.classList.add("text-white");
+            a.classList.add("bg-gray-600", "text-white", "hover:bg-green-300", "p-3", "flex", "justify-center", "w-full");
             a.href = "/report"
             dropdown.append(a);
         }

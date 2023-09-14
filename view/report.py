@@ -1,4 +1,4 @@
-from controllers.report_controller import get_report_dtos_by_user_id, create_report_and_notify, mark_report_as_read
+from controllers.report_controller import get_report_dtos_by_user_id, create_report_and_notify, mark_report_as_read,delete_notify
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required, current_user
 report_bp = Blueprint('report', __name__, url_prefix='')
@@ -41,3 +41,12 @@ def mark_notification_as_read(report_id):
         return jsonify({"status": "success", "message": "Notification marked as read successfully."}), 200
     else:
         return jsonify({"status": "error", "message": "Failed to mark notification as read."}), 500
+    
+@report_bp.route('/api/notification/<int:report_id>', methods=['DELETE'])
+@login_required
+def delete_notification(report_id):
+    success = delete_notify(report_id)
+    if success:
+        return jsonify({"status": "success", "message": "Notification deleted successfully."}), 200
+    else:
+        return jsonify({"status": "error", "message": "Failed to delete notification."}), 500
