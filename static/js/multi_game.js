@@ -314,7 +314,6 @@ function initializeSocketEvents() {
         clearInterval(gameTimerInterval);
         playvideo(currentvideolink);
         const all_play = document.getElementById("all_play");
-
         songTitle.innerHTML = "";
         all_play.innerHTML = "";
         songArtist.innerText = "";
