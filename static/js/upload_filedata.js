@@ -1,4 +1,4 @@
-document.getElementById('changed-filedata').addEventListener('click', async () => await file_load());
+document.getElementById('changed-filedata').addEventListener('click', async () => data_convert_upload());
 
 document.getElementById('excelUpload').addEventListener('change', (e) => {
     const fileList = e.target.files;
@@ -41,30 +41,34 @@ async function file_load() {
             // range 값은 읽어올 시작 점 지정함 (ex. 8 = 10행부터 (9행은 헤더역할을 함))
 
             excelFile_data = XLSX.utils.sheet_to_json(firstSheet, { range: 8 });
+            explanation_data = XLSX.utils.sheet_to_json(secondSheet, { range: 2, header: ['row'] });
             resolve();
         };
         reader.readAsArrayBuffer(excelFile);
     });
-    return 0//[excelFile, excelFile_data];
+    return [excelFile, excelFile_data, explanation_data, workbook];
 };
 
 // 받은 excel data를 각종 배열에 담는 함수 ( 누가 이 함수좀 잘 보이게 줄여줘...)
 function push_exceldata(excelFile_data) {
     let check_array = [];
-
     excelFile_data.forEach(cell_data => {
-        let song_info = [];
+        let song_info;
 
         const name = cell_data['제목'];
         const song_name = cell_data['곡 이름'];
         const hint = cell_data['힌트'];
-        const songURL = cell_data['곡 링크'];
+        const songLink = cell_data['곡 링크'];
 
-        let answer = "[" + cell_data['정답'] + "]";
+        let answer = '';
+        if (cell_data['정답']) {answer = "[" + (cell_data['정답']) + "]"};
+
         let answer_plus = [];
-        let play_time = excelFile_data['재생 시간'];
-        let startTime = '';
-        let endTime = '';
+        let songURL = '';
+        let thumbnail = '';
+        let play_time = cell_data['재생 시간'] || '';
+        let start_time = 0;
+        let end_time = 0;
 
         delete cell_data['제목'];
         delete cell_data['곡 이름'];
@@ -73,8 +77,14 @@ function push_exceldata(excelFile_data) {
         delete cell_data['정답'];
         delete cell_data['재생 시간'];
 
-        // 재생 시간을 startTime, endTime 으로 분할 및 가공
+        //곡 링크를 videoid로 가공 (main.js의 함수 사용)
+        try{
+            const videoid = split_ytLink(songLink);
+            songURL = "https://www.youtube.com/watch?v=" + videoid;
+            thumbnail = "https://img.youtube.com/vi/" + videoid + "/sddefault.jpg";
+        } catch (error) {};
 
+        // 재생 시간을 startTime, endTime 으로 분할 및 가공
         if (play_time) { play_time = play_time.replace(/[^0-9:.~]/g, "") };
         if (play_time.split("~").length === 2) {
 
@@ -133,28 +143,29 @@ function push_exceldata(excelFile_data) {
         };
 
         // 복수 정답이 있다면 추가
-
         if (cell_data) {answer_plus = Object.values(cell_data).map(item => "[" + item + "]").join(',')};
-        if (answer_plus) {answer += "," + answer_plus};
+        if (answer_plus && answer) {answer += "," + answer_plus}
+        else if (answer_plus) {answer = answer_plus};
 
         song_info = {
             title: name,
             song: song_name,
             songURL: songURL,
+            thumbnail: thumbnail,
             answer: answer,
             hint: hint,
-            startTime: startTime,
-            endTime: endTime
+            startTime: start_time,
+            endTime: end_time
         };
         check_array.push(song_info);
-        song_info = [];
+        song_info = {};
     });
     return check_array;
 };
 
-async function data_convert_upload(button) {
+async function data_convert_upload() {
 
-    let [excelFile, excelFile_data, workbook] = await file_load();
+    let [excelFile, excelFile_data, explanation_data, workbook] = await file_load();
     if (!excelFile) { return };
 
     // 양식 파일이 맞는지 확인하는 부분
@@ -165,14 +176,57 @@ async function data_convert_upload(button) {
         return;
     };
 
-    let [check_videoid_list, check_array] = push_exceldata(excelFile_data);
+    // 파일 내용을 가공함
 
-    let check_videoid_list_count = await checking_videoid(check_videoid_list, check_array);
-    if (check_videoid_list_count.length > 0) {
-        location.reload();
-        return;
+    let check_array = push_exceldata(excelFile_data);
+
+    // 가공된 내용을 .box에 저장 (없으면 생성) + 변경되지않은 .box는 삭제
+
+    const boxList = document.querySelectorAll('.box');
+    check_array.forEach((song, index) => {
+        if (boxList.length >= index + 1) {
+
+            boxList[index].querySelector('h3').innerText = song.title || '';
+            boxList[index].querySelector('p').innerText = song.song || '';
+            boxList[index].querySelector('img').src = song.thumbnail;
+            boxList[index].querySelector('input').value = song.songURL;
+            boxList[index].querySelector('h1').innerText = song.answer || '';
+            boxList[index].querySelector('h2').innerText = song.hint || '';
+            boxList[index].querySelector('h5').innerText = song.startTime;
+            boxList[index].querySelector('h6').innerText = song.endTime;
+        } else {
+
+            //main.js의 함수 사용
+            const newBox = createInfoItem(
+                song.title || '',
+                song.song || '',
+                song.songURL,
+                song.thumbnail,
+                song.answer,
+                song.hint || '',
+                song.startTime,
+                song.endTime,
+                ''
+                );
+            document.querySelector('.add_box').before(newBox);
+            modifyFunction();
+        };
+    });
+
+    // 파일의 곡 갯수보다 넘치는 .box는 제거
+    if (check_array.length < boxList.length) {
+        boxList.forEach((box, index) => {
+            if (index > check_array.length - 1) {box.remove()}
+        });
     };
 
-    let data = trans_data(check_array);
+    // 파일의 이름을 맵의 제목으로 변경
+    let filename = document.getElementById('excelUpload').files[0].name.split('.');
+    filename.pop();
+    document.querySelector("#MapName-input").value = filename.join('.');
+    document.getElementById("MapName-label").textContent = filename.join('.');
 
+    // 설명문을 파일의 내용으로 변경
+    const explanation_textfield = document.getElementById('descript-textfield');
+    explanation_textfield.value = explanation_data.map(cell_data => cell_data['row']).join('\n');
 };
