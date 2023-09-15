@@ -23,7 +23,6 @@ def get_thisroom_dictAll():
 
 
 @play_bp.get("/get_user_info")
-@login_required
 def get_user_info():
     return get_user()
 
