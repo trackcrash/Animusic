@@ -245,6 +245,8 @@ function nextVideo() {
     currentIndex += 1;
     if (currentIndex < musicData.length) {
         playvideo(currentIndex, musicData[currentIndex]['startTime'], musicData[currentIndex]['endTime'], EndTimeTest);
+        const all_play = document.getElementById("all_play");
+        all_play.innerText = "";
         songTitle.innerText = "";
         songArtist.innerText = "";
     } else {
