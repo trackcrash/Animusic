@@ -10,11 +10,13 @@ $(function() {
     $.ajax({
         url: '/api/notification',
         method: 'GET',
-        success: function(notifications) {
+        success: function(data) {
+            const notifications = data.notifications || [];
             // 알림 갯수 설정
             notificationCountElem.text(notifications.length);
             if (notifications.length === 0) {
                 notificationCountElem.addClass("hidden");
+                return;
             } else {
                 notificationCountElem.removeClass("hidden");
             }
