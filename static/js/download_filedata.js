@@ -4,6 +4,12 @@ if (downloadBtn) {downloadBtn.addEventListener('click', data_convert_download)};
 async function data_convert_download() {
 
     const items = document.querySelectorAll('.box');
+
+    if (!items.length) {
+        alert("내보 낼 곡이 없습니다.")
+        return
+    }
+
     let exceldata = [];
     for (let item of items) {
         // 웹페이지에 있는 곡 정보를 각각 변수선언 하는 곳
@@ -258,6 +264,7 @@ function xlsx_style(sheetjs_data, max_col) { // max_col은 '곡 정보' 시트�
     }
 
     // 다운로드 부분
+
     workbook.xlsx.writeBuffer().then(data => {
         const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url = URL.createObjectURL(blob);

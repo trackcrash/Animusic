@@ -51,11 +51,14 @@ async function file_load() {
 
 // 받은 excel data를 각종 배열에 담는 함수 ( 누가 이 함수좀 잘 보이게 줄여줘...)
 function push_exceldata(excelFile_data) {
+
+    console.log(excelFile_data[0]);
+
     let check_array = [];
     excelFile_data.forEach(cell_data => {
         let song_info;
 
-        const name = cell_data['제목'];
+        const name = cell_data['매체 이름'];
         const song_name = cell_data['곡 이름'];
         const hint = cell_data['힌트'];
         const songLink = cell_data['곡 링크'];
@@ -70,7 +73,7 @@ function push_exceldata(excelFile_data) {
         let start_time = 0;
         let end_time = 0;
 
-        delete cell_data['제목'];
+        delete cell_data['매체 이름'];
         delete cell_data['곡 이름'];
         delete cell_data['힌트'];
         delete cell_data['곡 링크'];
@@ -160,6 +163,7 @@ function push_exceldata(excelFile_data) {
         check_array.push(song_info);
         song_info = {};
     });
+
     return check_array;
 };
 
