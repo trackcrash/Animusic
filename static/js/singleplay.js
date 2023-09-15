@@ -17,7 +17,6 @@ function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
         return;
     }
     let videolink = musicData[currentIndex]['youtube_embed_url'];
-    console.log(musicData[currentIndex]);
     // musicData[currentIndex].answer_list = JSON.parse("["+musicData[currentIndex].answer_list+"]");
     isPlayingVideo = true;
     const videoFrame = document.getElementById("videoFrame");

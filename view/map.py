@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, send_file
 from flask_login import current_user, login_required
-from controllers.map_controller import show_mission, show_table, show_mission_byProducer, show_mission_active
+from controllers.map_controller import show_mission_used, show_table, show_mission_byProducer, show_mission_active
 from controllers.map_controller import submit_to_db, update_to_db, delete_Mission
 from models.play_model import single_make_answer
 from controllers.map_controller import map_controller, videoid_check
@@ -14,7 +14,7 @@ def get_music_data():
 
 @map_bp.route('/single_list')
 def single_select():
-    missions = show_mission()
+    missions = show_mission_used()
     return render_template('single_select.html', current_user=current_user,missions=missions, notificaiotn=notification.get_notification())
 
 @map_bp.route('/make_map', methods=['GET', 'POST'])
@@ -25,7 +25,7 @@ def make_map():
 
 @map_bp.route('/view_maps', methods=['GET', 'POST'])
 def view_map():
-    missions = show_mission()
+    missions = show_mission_used()
     return render_template('view_maps.html', current_user=current_user,missions=missions)
 
 @map_bp.route('/Show')
