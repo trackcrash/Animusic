@@ -111,6 +111,14 @@ button:hover {
     /* 스크롤바 너비 설정 */
 }
 
+#mapModal div::-webkit-scrollbar {
+    display: none;
+}
+
+#mapModal div {
+    scrollbar-width: none;
+}
+
 #messages::-webkit-scrollbar-thumb {
     background-color: #888;
     /* 스크롤바의 색상 */
