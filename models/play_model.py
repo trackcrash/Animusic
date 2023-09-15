@@ -35,7 +35,6 @@ class RoomDataManger:
             # 방 중복생성 금지 (클라이언트에 해당 이벤트 요청)
             #방을 생성할 사용자의 정보를 room_data_manager에 저장
             #해당 사용자의 세션 id
-            print(f"해당 사용자의 방 생성 정보: {session_id, room_key}")
             #방 정보 room_data_manager에 담기 위한 data
             room_data = {
                 "room_info":{
@@ -62,7 +61,6 @@ class RoomDataManger:
         character = user.character
         level = user.level
         character_link = str(character)
-        print(f"{room_key}방에 연결되었습니다.")
         user_data = {'username': user_name , 'host':0 ,'score':0 ,'joined_time' : time.time(), 'character':character_link,'level':level}  # 유저 데이터를 리스트로 생성
         dict_join(self._data_store[room_key]["user"], session_id, user_data)
     
@@ -89,14 +87,12 @@ class RoomDataManger:
     def host_setting(self, room_key, callback=None):
         if room_key in self._data_store and "user" in self._data_store[room_key]:
             users = self._data_store[room_key]["user"]
-            print("users",users)
             if users:  # 유저 정보가 있는 경우
                 all_hosts_zero = all(user["host"] == 0 for user in users.values())
                 if all_hosts_zero:
                     first_user_key = list(users.keys())[0] # 첫 번째 사용자의 키를 가져옵니다.
                     users[first_user_key]["host"] = 1  # host를 1로 변경합니다.
                     # 변경된 정보 출력
-                    print(f"Host setting for user {first_user_key}: {users[first_user_key]}")
                     return first_user_key
                 else:
                     print("Not all users have host set to 0.")
@@ -176,7 +172,6 @@ class MusicDataManager:
             next_item = data[idx]
             # Check if the answer is in any group's answer list
             for group_answers in next_item['answer_list']:
-                print("group_answer",group_answers)
                 if answer in group_answers:
                     next_item['answer_list'].remove(group_answers)    
                     return True
@@ -186,7 +181,6 @@ class MusicDataManager:
         room_data = self._data_store.get(room, {})
         data = room_data.get('data', [])
         idx = room_data.get('current_index', 0)
-        print("next_item",room_data)
 
         # Data is available
         if idx < len(data):
