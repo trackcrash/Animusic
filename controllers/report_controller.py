@@ -34,6 +34,7 @@ def get_report_dtos_by_user_id(user_id):
             if report:
                 report_dto = ReportDTO(
                     id=report.id,
+                    mission_id=report.mission_id,  # 추가됨
                     notification_content=notification.content,
                     report_reason=report.reason,
                     report_description=report.description,
@@ -61,20 +62,35 @@ def mark_report_as_read(report_id):
     finally:
         close_session(engine, session)
 
+def delete_notify(report_id):
+    engine, session = create_session()
+    try:
+        notification = session.query(Notifications).filter(Notifications.report_id == report_id).first()
+        session.delete(notification)
+        session.commit()
+        return True
+    except Exception as e:
+        print(f"An error occurred while deleting report: {str(e)}")
+        return False
+    finally:
+        close_session(engine, session)
+
 class ReportDTO:
-    def __init__(self, id, notification_content, report_reason, report_description, is_read):
+    def __init__(self, id, mission_id, notification_content, report_reason, report_description, is_read):
         self.id = id
+        self.mission_id = mission_id
         self.notification_content = notification_content
         self.report_reason = report_reason
         self.report_description = report_description
         self.is_read = is_read
     
     def __repr__(self):
-        return f"<ReportDTO(id={self.id}, notification_content={self.notification_content}, report_reason={self.report_reason}, report_description={self.report_description}, is_read={self.is_read})>"
+        return f"<ReportDTO(id={self.id}, mission_id={self.mission_id}, notification_content={self.notification_content}, report_reason={self.report_reason}, report_description={self.report_description}, is_read={self.is_read})>"
 
     def to_dict(self):
         return {
             'id': self.id,
+            'mission_id': self.mission_id,
             'notification_content': self.notification_content,
             'report_reason': self.report_reason,
             'report_description': self.report_description,

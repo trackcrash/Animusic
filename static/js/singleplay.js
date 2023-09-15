@@ -17,7 +17,6 @@ function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
         return;
     }
     let videolink = musicData[currentIndex]['youtube_embed_url'];
-    console.log(musicData[currentIndex]);
     // musicData[currentIndex].answer_list = JSON.parse("["+musicData[currentIndex].answer_list+"]");
     isPlayingVideo = true;
     const videoFrame = document.getElementById("videoFrame");
@@ -245,6 +244,8 @@ function nextVideo() {
     currentIndex += 1;
     if (currentIndex < musicData.length) {
         playvideo(currentIndex, musicData[currentIndex]['startTime'], musicData[currentIndex]['endTime'], EndTimeTest);
+        const all_play = document.getElementById("all_play");
+        all_play.innerText = "";
         songTitle.innerText = "";
         songArtist.innerText = "";
     } else {

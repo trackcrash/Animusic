@@ -113,7 +113,7 @@ def show_table_bymissionid(missionid):
 def show_table_mission_top_five():
     engine,session = create_session()
     try:
-        queries = session.query(Mission).order_by(desc(Mission.PlayNum),desc(Mission.id)).limit(6)
+        queries = session.query(Mission).filter(Mission.active == True).order_by(desc(Mission.PlayNum),desc(Mission.id)).limit(6)
         entries = [dict(id=q.id, Description=q.Description,MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]        
     except Exception as e:
         # Handle exceptions or errors as needed
@@ -134,6 +134,21 @@ def show_mission():
     engine,session = create_session()
     try:
         queries = session.query(Mission)
+        # 노래 갯수 추가
+        entries = [dict(id=q.id, Description=q.Description,MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]        
+        
+    except Exception as e:
+        # Handle exceptions or errors as needed
+        print(f"An error occurred while retrieving music records: {str(e)}")
+        return []
+    finally:
+        close_session(engine, session)
+    return entries
+    
+def show_mission_used():
+    engine,session = create_session()
+    try:
+        queries = session.query(Mission).filter(Mission.active == True).all()
         # 노래 갯수 추가
         entries = [dict(id=q.id, Description=q.Description,MapName=q.MapName,MapProducer=q.MapProducer, Thumbnail= q.Thumbnail,MapProducer_id=q.MapProducer_id, PlayNum = q.PlayNum , MusicNum = session.query(func.count(Music.id)).filter_by(mission_id=q.id).scalar()) for q in queries]        
         

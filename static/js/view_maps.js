@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function() {
             document.querySelector('#myModal').classList.remove('hidden');
         });
     });
-    const createRoomBtn = document.getElementById("CreateRoomBtn");
     const multiPlayLink = document.getElementById("multiPlayLink");
     const createRoomModal = document.getElementById("CreateRoomModal");
     const createRoomModalCloseBtn = document.getElementById("CreateRoomModalCloseBtn");
@@ -30,38 +29,6 @@ document.addEventListener("DOMContentLoaded", function() {
     multiPlayLink.addEventListener('click', function(e) {
         e.preventDefault();
         createRoomModal.classList.remove('hidden');
-    });
-
-    createRoomBtn.addEventListener('click', function() {
-        const roomName = document.getElementById("room_title").value;
-        const roomPassword = document.getElementById("room_password").value;
-        const roomMaxUsers = document.getElementById("room_max_human").value;
-
-        // Verify that the necessary data is present
-        if (roomName && roomName.trim()) {
-            // Send data to the server (this is just a sample, adjust accordingly)
-            fetch('/create_room', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        room_name: roomName,
-                        room_password: roomPassword,
-                        room_max_human: roomMaxUsers
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Handle the response from the server, if necessary
-                    console.log(data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        } else {
-            alert("Please enter a valid room name.");
-        }
     });
 
     createRoomModalCloseBtn.addEventListener('click', function() {
