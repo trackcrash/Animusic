@@ -54,4 +54,8 @@ $(function() {
             }
         });
     }
+    else
+    {
+        notificationCountElem.addClass("hidden");
+    }
 });
