@@ -11,6 +11,7 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <!-- use version 0.20.0 -->
     <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/map_tutorial.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/upload_filedata.js') }}" defer></script>
@@ -59,10 +60,6 @@
                 <div class="w-1/2 mb-1 py-1 flex">
                     <label for="autoplay-check">영상 자동재생</label>
                     <input id="autoplay-check" type="checkbox" class="ml-1" checked>
-                </div>
-                <div class="w-1/2 flex mb-1 py-1 justify-end file-active-check">
-                    <label class="mr-1">파일 공개 여부</label>
-                    <i class="mt-1 fa-solid fa-lock-open"></i>
                 </div>
             </div>
             <!-- 양식 파일 다운로드/업로드 form -->
