@@ -35,7 +35,7 @@ def SuchTable(table_Name):
 def ensure_tables_exist():
     engine, session = create_session()
     try:
-        for table in [Music, Mission, Report, User, Notifications]:
+        for table in [ User, Mission,Music, Report, Notifications]:
             table.__table__.create(bind=engine, checkfirst=True)
     except Exception as e:
         # Handle exceptions or errors as needed
