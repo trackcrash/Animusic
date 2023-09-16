@@ -55,7 +55,7 @@ class User(Base):
         return str(self.id)
     
     def update_login_time(self):
-        self.last_login = datetime.now()
+        self.last_login = datetime.utcnow()
 
 def commit_or_rollback(session):
     try:
@@ -116,10 +116,11 @@ def save_google_user(user_info):
         user = session.query(User).filter_by(email=user_info['email']).first()
         if user:
             user.is_google_authenticated = True
+            user.update_login_time()
             commit_or_rollback(session)
         else:
             user = save_user(email=user_info['email'], name=user_info.get('name'), is_google_authenticated=True)
-        user.update_login_time()
+            user.update_login_time()
         commit_or_rollback(session)
         session.add(user)
         return user, session
