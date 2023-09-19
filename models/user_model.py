@@ -5,6 +5,7 @@ from flask_bcrypt import Bcrypt
 from sqlalchemy import Boolean, Column, Integer, String, DateTime
 from db.database import Base, create_tables,create_session,close_session
 from controllers import map_controller
+from sqlalchemy.orm import relationship
 from flask import jsonify
 bcrypt = Bcrypt()
 
@@ -23,7 +24,7 @@ class User(Base):
     character = Column(Integer, nullable=False)
     last_login = Column(DateTime, nullable=True)
     is_google_authenticated = Column(Boolean, default=False)
-
+    missions = relationship("Mission", back_populates="MapProducerUser")
     def __init__(self, email, name, password, level, exp, nextexp, character, is_google_authenticated):
         self.email = email
         self.name = name
@@ -34,6 +35,7 @@ class User(Base):
         self.nextexp = nextexp
         self.character = character
         self.is_google_authenticated = is_google_authenticated
+
 
     @property
     def verify_password(self, password):

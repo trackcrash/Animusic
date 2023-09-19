@@ -52,6 +52,7 @@ class Mission(Base):
     PlayNum = Column(Integer, default = 0, nullable= False)
     Description = Column(String(500), nullable=True)
     MapProducer_id = Column(Integer, ForeignKey('UserTable.id', ondelete='CASCADE'), nullable=False)
+    MapProducerUser = relationship("User", back_populates="missions")
     def __init__(self, MapName, MapProducer, Thumbnail, MapProducer_id, Description, active):
         self.MapName = MapName
         self.MapProducer = MapProducer
