@@ -1,6 +1,5 @@
 const tutorial_Container = document.getElementById('tutorial-container');
 const tutorial_Content = document.getElementById('tutorial-content');
-let tutorial_variables = [];
 
 /* html 및 스크립트 컨텐츠를 불러오는 함수 */
 async function request_htmlContent(html_name) {

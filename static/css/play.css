@@ -169,7 +169,7 @@ button {
     background-color: #952215;
 }
 
-/* 우측 곡 정보 입력부분 스타일 */
+/* 우측 곡 정보 입력부분 스타일 + 좌측상단 맵 제목 스타일 */
 
 #submission-form {
     height: 50%;
@@ -205,6 +205,21 @@ button {
     justify-content: center;
     font-size: 24px;
 }
+
+/* 다중 정답 스크롤을 위한 스타일 */
+#answer_buttonField {
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#answer_buttonField label {
+    position: -webkit-sticky;
+    position: sticky;
+    left: 0;
+    background-color: rgba(27, 28, 27, 1);
+}
+/*---------------------------*/
 
 .time-style {
     display: flex;

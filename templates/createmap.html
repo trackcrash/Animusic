@@ -159,14 +159,18 @@
                 </div>
 
                 <div class="flex justify-between">
-                    <label id="answer-label">정답</label>
-                        <div id = "answer_listAll" class="space-x-2">
-                            <button data-index="0" class="answer_list multiple_button"
-                                    onclick="focus_answer_list(event.target.dataset.index)">1</button>
-                            <button id="add_answerlist"><p class="inline">다중 정답</p></button>
-                            <button id="delete_answerlist"><p class="inline">제거</p></button>
-                        </div>
+                    <div id = 'answer_buttonField'>
+                        <label id="answer-label">정답</label>
+                        <button data-index="0" class="answer_list"
+                                style="margin-right: 0.6rem;"
+                                onclick="focus_answer_list(event.target.dataset.index)">1</button>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button id="add_answerlist">다중 정답</button>
+                        <button id="delete_answerlist">제거</button>
+                    </div>
                 </div>
+
                 <input data-index="0" class="w-full answer_input" type="text" style="display: block;">
 
                 <label for="hint-input">힌트</label>
@@ -262,15 +266,18 @@
                 </div>
 
                 <div class="flex justify-between">
-                    <label id="answer-label">정답</label>
-                        <div id = "answer_listAll" class="space-x-2">
-                            <button data-index="0" class="answer_list"
-                                    onclick="focus_answer_list(event.target.dataset.index)">1</button>
-                            <button id="add_answerlist"><p class="inline">다중 정답</p></button>
-                            <button id="delete_answerlist"><p class="inline">제거</p></button>
-                        </div>
-
+                    <div id = 'answer_buttonField'>
+                        <label id="answer-label">정답</label>
+                        <button data-index="0" class="answer_list"
+                                style="margin-right: 0.6rem;"
+                                onclick="focus_answer_list(event.target.dataset.index)">1</button>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button id="add_answerlist">다중 정답</button>
+                        <button id="delete_answerlist">제거</button>
+                    </div>
                 </div>
+
                 <input data-index="0" class="w-full answer_input" type="text" style="display: block;">
 
                 <label for="hint-input">힌트</label>

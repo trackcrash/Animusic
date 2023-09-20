@@ -130,6 +130,8 @@ function modifyFunction() {
                     newButton.className = 'answer_list';
                     newButton.setAttribute('onclick', 'focus_answer_list(event.target.dataset.index)');
                     newButton.textContent = answer_index + 1;
+                    newButton.style.marginRight = '1rem';
+                    newButton.addEventListener ('mousedown', answer_list_scroll);
 
                     // input 생성
                     const newInput = document.createElement('input');
@@ -139,7 +141,7 @@ function modifyFunction() {
                     newInput.style.display = 'none';
 
                     // 문서에 추가
-                    document.getElementById('answer_listAll').insertBefore(newButton, document.getElementById("add_answerlist"));
+                    document.getElementById('answer_buttonField').appendChild(newButton);
                     document.getElementById('submission-form').insertBefore(newInput, document.querySelector('[for="hint-input"]'));
                 })
             }
@@ -610,7 +612,6 @@ active_check.addEventListener('click', ()=> {
 
 // 중복 정답 추가 기능
 document.getElementById("add_answerlist").addEventListener("click", () => {
-    const answer_listAll = document.getElementById("answer_listAll");
     const answer_list = document.querySelectorAll(".answer_list");
     const answer_input = document.querySelectorAll(".answer_input");
     const addanswerList =document.getElementById("add_answerlist");
@@ -620,6 +621,8 @@ document.getElementById("add_answerlist").addEventListener("click", () => {
     button.className = "answer_list";
     button.onclick = (e) => {focus_answer_list(e.target.dataset.index)};
     button.textContent = answer_input.length + 1;
+    button.style.marginRight = '1rem';
+    button.addEventListener ('mousedown', answer_list_scroll);
 
     // 새로운 입력 필드 생성 및 설정
     const new_answer_input = document.createElement("input");
@@ -628,7 +631,7 @@ document.getElementById("add_answerlist").addEventListener("click", () => {
     new_answer_input.style.display = "none";
 
     // 버튼과 입력 필드를 문서에 추가
-    answer_listAll.insertBefore(button,addanswerList);
+    document.getElementById('answer_buttonField').appendChild(button);
     answer_input[answer_input.length - 1].after(new_answer_input);
   });
 
@@ -644,6 +647,10 @@ document.getElementById("delete_answerlist").addEventListener("click", () => {
         last_answerlist.remove();
         last_answerinput.remove();
     }
+
+    const submission_form = document.getElementById('submission-form');
+    let check_blockStyle = submission_form.querySelectorAll('[style*="display: block"]');
+    if (!check_blockStyle.length) {answerinputs[answerinputs.length - 2].style.display = 'block'};
 })
 
 //모든 중복 정답 버튼에 대한 기능 설정 (통합 관리)
@@ -671,3 +678,17 @@ function open_descript() {
 function close_descript() {
     map_descript_popup.style.display = '';
 }
+
+/* 다중 정답 스크롤 기능 */
+
+document.querySelector('.answer_list').addEventListener('mousedown', answer_list_scroll);
+
+function answer_list_scroll(e) {
+    let answer_buttonField = document.getElementById('answer_buttonField');
+    let mouse_point = e.clientX, mouse_switch = 0;
+
+    document.addEventListener('mouseup', () => {mouse_switch = 1});
+    document.addEventListener('mousemove', (e) => {
+        if (mouse_switch < 1) {answer_buttonField.scrollTo({left: mouse_point - e.clientX})};
+    });
+};
