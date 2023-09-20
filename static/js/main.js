@@ -1,6 +1,15 @@
 let videoId = "";
 let modifyIndex = null;
 modifyFunction();
+window.onbeforeunload = function(event) {
+  // 확인 대화상자를 표시하고 사용자의 응답을 저장합니다.
+  var userResponse = confirm('페이지를 나가시겠습니까? 저장하지 않은 변경 사항이 있을 수 있습니다.');
+
+  // 사용자가 '확인'을 클릭한 경우에만 경고 메시지를 표시하도록 합니다.
+  if (!userResponse) {
+    event.returnValue = '페이지를 나가지 않겠습니다.';
+  }
+}
 function delete_mission()
 {
     const urlParams = new URLSearchParams(window.location.search);
@@ -11,6 +20,7 @@ function delete_mission()
     if(confirm("정말 삭제하시겠습니까?"))
     {
         let delete_link = `/delete-mission?id=${id}`;
+        window.onbeforeunload = "";
         location.href=delete_link;
     }
 }
@@ -517,6 +527,7 @@ async function UploadBtn(event) {
         },
         success: (data) => {
             alert("등록 완료되었습니다.");
+            window.onbeforeunload = "";
             window.location.href = '/Map'
         }
     });
