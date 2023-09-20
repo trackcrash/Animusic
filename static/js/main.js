@@ -524,6 +524,7 @@ async function UploadBtn(event) {
         },
         success: (data) => {
             alert("등록 완료되었습니다.");
+            window.onbeforeunload = "";
             window.location.href = '/Map'
         }
     });
