@@ -19,14 +19,17 @@
         <h1 class="text-center text-3xl font-bold mb-8 text-white">내 맵</h1>
         <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
             {% if data_list is defined and data_list %} {% for data in data_list %}
-            <a href="/make_map?id={{data['id']}}" class="block bg-gray-400 p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300">
-                <p class="text-xl mb-4 truncate text-white">{{ data['MapName'] }}</p>
-                <div class="mb-4">
-                    <img src="{{ data['Thumbnail'] }}" alt="{{ data['MapName'] }}" class="mx-auto w-full h-56 object-cover rounded-lg" />
-                </div>
-                <p class="text-white mb-2 ">제작자: {{ data['MapProducer'] }}</p>
-                <p class="text-white">곡수: {{ data['MusicNum'] }}곡</p>
-            </a>
+            <div class="flex flex-col">
+                <a href="/make_map?id={{data['id']}}" class="block bg-gray-400 p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300 mb-2">
+                    <p class="text-xl mb-4 truncate text-white">{{ data['MapName'] }}</p>
+                    <div class="mb-4">
+                        <img src="{{ data['Thumbnail'] }}" alt="{{ data['MapName'] }}" class="mx-auto w-full h-56 object-cover rounded-lg" />
+                    </div>
+                    <p class="text-white mb-2 ">제작자: {{ data['MapProducer'] }}</p>
+                    <p class="text-white">곡수: {{ data['MusicNum'] }}곡</p>
+                </a>
+                <a href="/single-play?id={{data['id']}}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-center transition duration-300">테스트 플레이</a>
+            </div>
             {% endfor %} {% endif %}
         </div>
         <div class="mt-10 text-center">
