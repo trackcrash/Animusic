@@ -20,6 +20,7 @@ function delete_mission()
     if(confirm("정말 삭제하시겠습니까?"))
     {
         let delete_link = `/delete-mission?id=${id}`;
+        window.onbeforeunload = "";
         location.href=delete_link;
     }
 }
