@@ -106,7 +106,7 @@ def play_Socket(socketio):
                 emit('showAnswer', {'name': name, 'leftAnswer':leftAnswer,'msg':msg}, room=room)
             room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
             emit('message', {'name': name, 'msg': msg}, room=room)
-            update_room_player_count(room, "님이 정답을 맞췄습니다.", name)
+            update_room_player_count(room, "님이 정답을 맞췄습니다.", name, 1)
         else:
             emit('message', {'name': name, 'msg': msg}, room=room)
     #다음 데이터 요청

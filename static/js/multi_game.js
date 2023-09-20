@@ -650,7 +650,10 @@ socket.on('MapNotSelect', () => {
 socket.on('room_players_update', (data) => {
     if (data.room_key == room_key) {
         const item = document.createElement('div');
-        item.innerHTML = `<span class="font-semibold">${data.player}</span> ${data.msg}`;
+        if (data.color === 0)
+            item.innerHTML = `<span class="font-semibold">${data.player}</span> ${data.msg}`;
+        else
+            item.innerHTML = `<span class="font-semibold text-green-500">${data.player}</span> ${data.msg}`;
         elements.messages.appendChild(item);
         elements.messages.scrollTop = elements.messages.scrollHeight;
         playerListGet(data.players);
