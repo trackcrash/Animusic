@@ -182,11 +182,16 @@ function getidtourl() {
     }
 }
 
-function EndTimeTest(startTime, fendTime, totalSong, nowSong) {
+function EndTimeTest(startTime, fendTime, totalSong, nowSong, category) {
     clearInterval(gameTimerInterval);
     player.playVideo();
+    for (let key in category) {
+        if (category.hasOwnProperty(key)) {
+            let value = category[key];
+            console.log(key + ": " + value);
+        }
+    }
     let endTime = fendTime;
-
     setVolume(document.querySelector("#VolumeBar").value);
     if (startTime > 0) {
         seekTo(startTime);
@@ -291,10 +296,9 @@ function initializeSocketEvents() {
         elements.nextButton.style.display = "block";
         elements.hintButton.style.display = "block";
         elements.StartButton.style.display = "none";
-        const all_play = document.getElementById("all_play");
+
 
         songTitle.innerHTML = "";
-        all_play.innerHTML = "";
         nextButton.disabled = false;
         updateVoteCountUI(0);
         showHostContent(true);
@@ -506,7 +510,7 @@ socket.on("failed_user_change", () => {
 });
 // EndTimeTest(startTime, fendTime, totalSong, nowSong)
 socket.on("PlayVideoReadyOk", (data) => {
-    EndTimeTest(data['startTime'], data['endTime'], data['current_data']['totalSong'], data['current_data']['nowSong']);
+    EndTimeTest(data['startTime'], data['endTime'], data['current_data']['totalSong'], data['current_data']['nowSong'],data['category']);    
 })
 socket.on("user_change", (data) => {
     let count = data["count"];

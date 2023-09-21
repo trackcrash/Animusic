@@ -182,9 +182,10 @@ def play_Socket(socketio):
         current_data = music_data_manager.retrieve_data(room_key)
         current_data['totalSong'] =len(music_data_manager._data_store[room_key]['data'])
         current_data["nowSong"] = int(music_data_manager._data_store.get(room_key, {})['current_index'])+1     
+        category = current_data['category']
         startTime = float(current_data['startTime'])
         if len(socket_class.play_vote[room_key]) >= socket_class.totalPlayers[room_key] :
-            emit("PlayVideoReadyOk", {'current_data':current_data,'startTime':startTime, 'endTime': data['endTime'] if data['endTime'] == "stop" else current_data['endTime'], "vote": len(socket_class.play_vote[room_key]), "totalPlayer": socket_class.totalPlayers[room_key]} , room=room_key)
+            emit("PlayVideoReadyOk", {'current_data':current_data,'startTime':startTime, 'endTime': data['endTime'] if data['endTime'] == "stop" else current_data['endTime'], "vote": len(socket_class.play_vote[room_key]), "totalPlayer": socket_class.totalPlayers[room_key], 'category':category} , room=room_key)
             if data["endTime"] != "stop":
                 if room_key not in socket_class.vote_counts:
                     socket_class.vote_counts[room_key] = 0
