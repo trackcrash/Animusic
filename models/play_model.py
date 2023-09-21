@@ -176,10 +176,10 @@ class MusicDataManager:
             for section_idx, group_answers in enumerate(music_data['answer_list']):
                 category_name = list(categories.keys())[section_idx]
                 category_value = int(categories[category_name])
-                if isinstance(group_answers[0], list) and category_value == 0:
+                if group_answers and isinstance(group_answers[0], list) and category_value == 0:
                     category_value = len(group_answers)
                 
-                if isinstance(group_answers[0], list):
+                if group_answers and isinstance(group_answers[0], list):
                     for sub_idx, sub_group in enumerate(group_answers):
                         if answer in sub_group:
                             if music_data['matched_answers'].get(category_name, 0) >= category_value:
@@ -215,7 +215,7 @@ class MusicDataManager:
                 
                 # 배열의 갯수를 밸류로 주기
                 if category_value == 0:
-                    if isinstance(group_answers[0], list):  # 2차원 배열인 경우
+                    if group_answers and isinstance(group_answers[0], list):  # 2차원 배열인 경우
                         category_value = len(group_answers)   # 서브 그룹의 개수로 카테고리 밸류 설정
                     else:  # 1차원 배열인 경우
                         category_value = 1  # 그룹 내부의 항목 중 하나만 맞추면 됨
