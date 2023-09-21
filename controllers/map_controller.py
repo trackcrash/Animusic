@@ -87,7 +87,7 @@ def show_table():
     engine, session = create_session()
     try:
         queries = session.query(Music)
-        entries = [dict(id=q.id, title=q.title, song=q.song, youtube_url=q.youtube_url, thumbnail_url=q.thumbnail_url, answer=q.answer, hint=q.hint if q.hint is not None else "", startTime=q.startTime if q.startTime is not None else "", endTime=q.endTime if q.endTime is not None else "") for q in queries]
+        entries = [dict(id=q.id, title=q.title, song=q.song, youtube_url=q.youtube_url, thumbnail_url=q.thumbnail_url, answer=q.answer, hint=q.hint if q.hint is not None else "", startTime=q.startTime if q.startTime is not None else "", endTime=q.endTime if q.endTime is not None else "", category=q.category) for q in queries]
         return entries
     except Exception as e:
         # Handle exceptions or errors as needed

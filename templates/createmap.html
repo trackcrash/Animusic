@@ -17,7 +17,13 @@
     <script src="{{ url_for('static', filename='js/upload_filedata.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/download_filedata.js') }}" defer></script>
 </head>
-
+<style>
+    .selected
+    {
+        color: black;
+        background-color: #1ed760;
+   }
+</style>
 <body class="font-sans text-white h-screen custom-body">
     {% include "header.html" %}
     <!-- 왼쪽 영역 -->
@@ -128,6 +134,7 @@
                     <h2 style="display: none;">{{d['hint']}}</h2>
                     <h5 style="display: none;">{{d['startTime']}}</h5>
                     <h6 style="display: none;">{{d['endTime']}}</h6>
+                    <cate style="display: none;">{{d['category']}}</cate>
                 </div>
                 {% endfor %}
                 <div class="add_box"> + </div>
@@ -160,22 +167,40 @@
 
                 <div class="flex justify-between">
                     <div id = 'answer_buttonField'>
-                        <label id="answer-label">정답</label>
-                        <button data-index="0" class="answer_list"
+                        <button onclick="zero_space_text('[여름 하늘 선선 세븐,나츠 소라 선선 세븐,여름하늘선선세븐,나츠소라선선세븐],[이치가야 아리사,이치가야아리사],[토야마 카스미,토야마카스미]')">test</button>
+                        <label id="answer-label">카테고리</label>
+                        <button data-index="0" class="answer_list selected"
                                 style="margin-right: 0.6rem;"
                                 onclick="focus_answer_list(event.target.dataset.index)">1</button>
                     </div>
                     <div class="flex space-x-4">
-                        <button id="add_answerlist">다중 정답</button>
+                        <button id="add_answerlist">카테고리 추가</button>
                         <button id="delete_answerlist">제거</button>
                     </div>
                 </div>
+                <div data-index="0" class="multi_answer" style="display: block;">
+                    <div class="flex justify-between w-full">
+                        <input placeholder="정답의 카테고리를 입력해주세요." class="w-1/2 category_input" value="노래제목" type="text" style="display: block;">
+                        <input placeholder="해당 카테고리내에서 몇개이상의 정답을 맞췄을때 모든정답을 맞췃다고 인식" class="w-1/2 answer_admit" type="text" style="display: block;">
+                    </div>
+                    <div class="flex justify-between">
+                        <div class = 'answer2_buttonField'>
+                            <label class="answer2-label">정답</label>
+                            <button data-index="0" class="answer2_list selected"
+                                    onclick="focus_answer2_list(event.target.dataset.index)" style="margin-right: 0.6rem;">1</button>
+                        </div>
+                        <div class="flex space-x-4">
+                            <button class="add2_answerlist">정답 추가</button>
+                            <button class="delete2_answerlist">정답 제거</button>
+                        </div>
+                    </div>
+                    <input class="w-full answer_input" type="text" style="display: block;">    
 
-                <input data-index="0" class="w-full answer_input" type="text" style="display: block;">
-
-                <label for="hint-input">힌트</label>
-                <input id="hint-input" class="w-full" type="text">
-
+                </div>
+                <div class="hint-input">
+                    <label for="hint-input">힌트</label>
+                    <input id="hint-input" class="w-full" type="text">
+                </div>  
                 <label for="song-link-input">곡 링크</label>
                 <input id="song-link-input" class="w-full" type="url">
 
@@ -267,22 +292,38 @@
 
                 <div class="flex justify-between">
                     <div id = 'answer_buttonField'>
-                        <label id="answer-label">정답</label>
-                        <button data-index="0" class="answer_list"
+                        <label id="answer-label">카테고리</label>
+                        <button data-index="0" class="answer_list selected"
                                 style="margin-right: 0.6rem;"
                                 onclick="focus_answer_list(event.target.dataset.index)">1</button>
                     </div>
                     <div class="flex space-x-4">
-                        <button id="add_answerlist">다중 정답</button>
-                        <button id="delete_answerlist">제거</button>
+                        <button id="add_answerlist">카테고리 추가</button>
+                        <button id="delete_answerlist">카테고리 제거</button>
                     </div>
                 </div>
-
-                <input data-index="0" class="w-full answer_input" type="text" style="display: block;">
-
-                <label for="hint-input">힌트</label>
-                <input id="hint-input" class="w-full" type="text">
-
+                <div data-index="0" class="multi_answer" style="display: block;">
+                    <div class="flex justify-between w-full">
+                        <input placeholder="정답의 카테고리를 입력해주세요." class="w-1/2 category_input" value="노래제목" type="text" style="display: block;">
+                        <input placeholder="해당 카테고리내에서 몇개이상의 정답을 맞췄을때 모든정답을 맞췃다고 인식" class="w-1/2 answer_admit" type="text" style="display: block;">
+                    </div>
+                    <div class = "flex justify-between">
+                        <div class = 'answer2_buttonField'>
+                            <label class="answer2-label">정답</label>
+                            <button data-index="0" class="answer2_list selected"
+                                    onclick="focus_answer2_list(event.target.dataset.index)" style="margin-right: 0.6rem;">1</button>
+                        </div>
+                        <div class="flex space-x-4">
+                            <button class="add2_answerlist">정답 추가</button>
+                            <button class="delete2_answerlist">정답 제거</button>
+                        </div>
+                    </div>
+                    <input class="w-full answer_input" type="text" style="display: block;">    
+                </div>
+                <div class="hint-input">
+                    <label for="hint-input">힌트</label>
+                    <input id="hint-input" class="w-full" type="text">
+                </div>                
                 <label for="song-link-input">곡 링크</label>
                 <input id="song-link-input" class="w-full" type="url">
 

@@ -3,18 +3,20 @@ let modifyIndex = null;
 modifyFunction();
 window.onbeforeunload = function(event) {
   // 확인 대화상자를 표시하고 사용자의 응답을 저장합니다.
-  var userResponse = confirm('페이지를 나가시겠습니까? 저장하지 않은 변경 사항이 있을 수 있습니다.');
+  let userResponse = confirm('페이지를 나가시겠습니까? 저장하지 않은 변경 사항이 있을 수 있습니다.');
 
   // 사용자가 '확인'을 클릭한 경우에만 경고 메시지를 표시하도록 합니다.
   if (!userResponse) {
     event.returnValue = '페이지를 나가지 않겠습니다.';
   }
 }
+document.querySelector(".delete2_answerlist").addEventListener("click",()=>
+{
+    answer_delete();
+})
 function delete_mission()
 {
     const urlParams = new URLSearchParams(window.location.search);
-
-    // Get the 'id' parameter value
     const id = urlParams.get('id');
 
     if(confirm("정말 삭제하시겠습니까?"))
@@ -29,30 +31,45 @@ const delete_btn = document.getElementById('delete-btn');
 if (delete_btn) {delete_btn.addEventListener("click", ()=> {delete_mission()})}
 
 function zero_space_text(answer) {
-    const text_list = [];
+    // console.log(answer);
+    let answer_list = [];
+    if (answer.includes('/')) {
+        answer_list = answer.split('/');
+    } else {
+        answer_list[0] = answer;
+    }
     let answertext_list = '', element_str = '', element_switch = 0;
-    Array.from(answer).forEach(element => {
-        if (element === "[") {
-            element_switch = 1;
-            return
-        } else if (element === "]") {
-            element_switch = 0
-            text_list.push(element_str);
-            element_str = '';
-            return
-        }
-        if (element_switch > 0) {element_str += element};
-    });
-    text_list.forEach(text => {
-        const answerList = text.split(',').map(str => str.trim()).filter(Boolean);
-        const zeroSpaceList = answerList.map(str => str.replace(/\s+/g, ''));
-
-        const combinedList = answerList.concat(zeroSpaceList);
-        const combinedSet = new Set(combinedList);
-
-        answertext_list += "[" + Array.from(combinedSet).join(',') + "],"
+    answer_list.forEach(answer=>
+    {
+        const text_list = [];
+        
+        Array.from(answer).forEach(element => {
+            if (element === "[") {
+                element_switch = 1;
+                return
+            } else if (element === "]") {
+                element_switch = 0
+                text_list.push(element_str);
+                element_str = '';
+                return
+            }
+            // console.log(element_str);
+            if (element_switch > 0) {element_str += element};
+        });
+        text_list.forEach(text => {
+            const answerList = text.split(',').map(str => str.trim()).filter(Boolean);
+            const zeroSpaceList = answerList.map(str => str.replace(/\s+/g, ''));
+    
+            const combinedList = answerList.concat(zeroSpaceList);
+            const combinedSet = new Set(combinedList);
+    
+            answertext_list += "[" + Array.from(combinedSet).join(',') + "],"
+        })   
+        answertext_list = answertext_list.slice(0,-1);
+        answertext_list+= "/";
+        // answertext_list.slice(0, -1); 
     })
-    return answertext_list.slice(0, -1);
+    return answertext_list.slice(0,-1);
 }
  // 유튜브 영상링크 videoId분리 함수(일반링크, 공유링크)
 function split_ytLink(ytLink) {
@@ -90,72 +107,50 @@ function modifyFunction() {
             const songURL = box.querySelector('input')?.value;
             const h1text = box.querySelector('h1')?.innerText;
             let answer = [];
-            let text_switch, textlist = "";
-            for (let text_element of h1text) {
-                if (text_element === '[') {
-                    text_switch = 1;
-                    continue
-                } else if (text_element === ']') {
-                    text_switch = 0;
-                    answer.push(textlist);
-                    textlist = "";
-                    continue
-                }
-                if (text_switch > 0) {textlist += text_element};
+            if (h1text.includes('/')) {
+                answer = h1text.split('/');
+            } else {
+                answer[0] = h1text;
             }
-
-            const hint = box.querySelector('h2')?.innerText;
-            const id = box.querySelector('h4')?.innerText;
-            const startTime = box.querySelector('h5')?.innerText;
-            const endTime = box.querySelector('h6')?.innerText;
-            let answer_input = document.querySelectorAll(".answer_input");
-
-            // 정보를 설정하면서 선택적 체이닝 사용
-            document.getElementById('title-input').value = title || ''; // 속성이 없을 때는 빈 문자열
-            document.getElementById('song-name-input').value = song || '';
-            document.getElementById('song-link-input').value = songURL || '';
-
-            // answer의 0번째 인덱스를 제거하고 그 값을 answer-input 에 할당
-            document.querySelector('.answer_input').value = answer.shift() || '';
-            document.querySelector('.answer_input').style.display = 'block';
-
             // 이전의 데이터로 인해 생겼던 중복정답 요소를 모두 제거 (input, button)
-            document.querySelectorAll('.answer_input[data-index]:not([data-index="0"])').forEach(input_element => {
+            document.querySelectorAll('.multi_answer').forEach(input_element => {
                 input_element.remove();
             })
-            document.querySelectorAll('.answer_list[data-index]:not([data-index="0"])').forEach(button_element => {
+            document.querySelectorAll('.answer_list').forEach(button_element => {
                 button_element.remove();
             })
 
             // 요소가 남아있다면 (중복 정답이였던 경우) 남은 요소 생성
-
-            if (answer.length > 0) {
-                let answer_index = 0;
-                answer.forEach(answer_element => {
-                    answer_index++;
-
-                    // 버튼 생성
-                    const newButton = document.createElement('button');
-                    newButton.dataset.index = document.querySelectorAll('.answer_list').length;
-                    newButton.className = 'answer_list';
-                    newButton.setAttribute('onclick', 'focus_answer_list(event.target.dataset.index)');
-                    newButton.textContent = answer_index + 1;
-                    newButton.style.marginRight = '1rem';
-                    newButton.addEventListener ('mousedown', answer_list_scroll);
-
-                    // input 생성
-                    const newInput = document.createElement('input');
-                    newInput.dataset.index = document.querySelectorAll('.answer_input').length;
-                    newInput.className = 'w-full answer_input';
-                    newInput.value = answer_element;
-                    newInput.style.display = 'none';
-
-                    // 문서에 추가
-                    document.getElementById('answer_buttonField').appendChild(newButton);
-                    document.getElementById('submission-form').insertBefore(newInput, document.querySelector('[for="hint-input"]'));
+            // for (let text_element of h1text) {
+            //     if (text_element === '[') {
+            //         text_switch = 1;
+            //         continue
+            //     } else if (text_element === ']') {
+            //         text_switch = 0;
+            //         answer.push(textlist);
+            //         textlist = "";
+            //         continue
+            //     }
+            //     if (text_switch > 0) {textlist += text_element};
+            // }
+            const hint = box.querySelector('h2')?.innerText;
+            const id = box.querySelector('h4')?.innerText;
+            const startTime = box.querySelector('h5')?.innerText;
+            const endTime = box.querySelector('h6')?.innerText;
+            const catedata = box.querySelector('cate')?.innerText.match(/\[([^\]]+)\]/g);
+            // document.querySelectorAll(".answer_list")[0].classList.add("selected");
+            if (catedata.length > 0) {
+                let index = 0;
+                catedata.forEach(element => {
+                    boxClick(answer[index],index,element);
+                    document.querySelectorAll(".answer_list")[0].classList.add("selected");
+                    index++;
                 })
             }
-
+            // 정보를 설정하면서 선택적 체이닝 사용
+            document.getElementById('title-input').value = title || ''; // 속성이 없을 때는 빈 문자열
+            document.getElementById('song-name-input').value = song || '';
+            document.getElementById('song-link-input').value = songURL || '';
             document.getElementById('hint-input').value = hint || '';
             document.getElementById('startTime-input-h').value = Math.floor(parseInt(startTime) / 3600) || "";
             document.getElementById('startTime-input-m').value = Math.floor((parseInt(startTime) % 3600) / 60) || "";
@@ -177,14 +172,49 @@ function modifyFunction() {
 
     addBox.addEventListener('click', () => {
 
-        document.querySelectorAll('.answer_input[data-index]:not([data-index="0"])').forEach(input_element => {
+        document.querySelectorAll('.multi_answer[data-index]:not([data-index="0"])').forEach(input_element => {
             input_element.remove();
         });
         document.querySelectorAll('.answer_list[data-index]:not([data-index="0"])').forEach(button_element => {
             button_element.remove();
         });
-
-        document.querySelector('.answer_input').value = '';
+        document.querySelector(".answer_list[data-index='0']").classList.add("selected");
+        const multi_answer=document.querySelector('.multi_answer')
+        multi_answer.style.display="block";
+        const answer_input = multi_answer.querySelectorAll('.answer_input');
+        const answer2_list = multi_answer.querySelectorAll(".answer2_list");
+        for(let i = 0; i < answer2_list.length; i++)
+        {
+            if(i != 0)
+            {
+                answer2_list[i].remove();
+            }
+            else
+            {
+                answer2_list[i].classList.add("selected");
+            }
+        }
+        for(let i = 0; i < answer_input.length; i++)
+        {
+            if(i != 0)
+            {
+                answer_input[i].remove();
+            }
+            else
+            {
+                answer_input[i].style.display="block";
+            }
+        }
+        for(const element of multi_answer.querySelectorAll("input"))
+        {
+            if(element.classList.contains("category_input"))
+            {
+                element.value ="노래제목";
+            }else
+            {
+                element.value = "";
+            }
+        }
 
         const fields = [
             'title-input', 'song-name-input', 'song-link-input', 'hint-input',
@@ -204,7 +234,124 @@ function modifyFunction() {
     });
 }
 
-function createInfoItem(title, song, songURL, thumbnail, answer, hint, startTime, endTime, id) {
+function boxClick(answer,index,element)
+{
+    
+    const answer_data = answer;
+    const answer_list = document.querySelectorAll(".answer_list");
+    const multi_answer = document.querySelectorAll(".multi_answer");
+    // 새 버튼 생성 및 설정
+    const button = document.createElement("button");
+    button.dataset.index = answer_list.length;
+    button.className = "answer_list";
+    button.onclick = (e) => {focus_answer_list(e.target.dataset.index)};
+    button.textContent = multi_answer.length + 1;
+    button.style.marginRight = '1rem';
+    button.addEventListener ('mousedown', answer_list_scroll);
+
+    const answer_div = document.createElement('div');
+    answer_div.className = "flex justify-between";
+    const answer2_buttonField = document.createElement("div");
+    answer2_buttonField.className = "answer2_buttonField";
+
+    const answer2_buttonField_label = document.createElement("label");
+    answer2_buttonField_label.className = "answer2-label";
+    answer2_buttonField_label.textContent = "정답 ";
+    
+    const answer_div_inner_div = document.createElement("div");
+    answer_div_inner_div.className = "flex space-x-4";
+    const answer_div_inner_div_firstbutton = document.createElement("button");
+    answer_div_inner_div_firstbutton.className = "add2_answerlist";
+    answer_div_inner_div_firstbutton.textContent = "정답 추가";
+    answer_div_inner_div_firstbutton.addEventListener("click", ()=>
+    {
+        create_multi_answer_inner();
+    })
+    const answer_div_inner_div_secondbutton = document.createElement("button");
+    answer_div_inner_div_secondbutton.className = "delete2_answerlist";
+    answer_div_inner_div_secondbutton.textContent= "정답 제거";
+    answer_div_inner_div_secondbutton.addEventListener("click",()=>
+    {
+        answer_delete();
+    })
+    const new_multi_answer = document.createElement("div");
+    new_multi_answer.dataset.index = multi_answer.length;
+    new_multi_answer.className = multi_answer[0]?.className || "multi_answer";
+    if(multi_answer.length <= 0)
+    {
+        new_multi_answer.style.display="block";
+    }
+    else
+    {
+        new_multi_answer.style.display="none";
+    }
+    const new_category_input = document.createElement("input");
+    new_category_input.className = "w-1/2 category_input";
+    new_category_input.placeholder = "정답의 카테고리를 입력해주세요.";
+    new_category_input.value = element.split(":")[0].replace('[','').replace(']','');
+    
+    const new_answer_admit = document.createElement("input");
+    new_answer_admit.className = "w-1/2 answer_admit";
+    new_answer_admit.placeholder =  "해당 카테고리내에서 몇개이상의 정답을 맞췄을때 모든정답을 맞췃다고 인식";
+    new_answer_admit.value = element.split(":")[1].replace('[','').replace(']','');
+    // 새로운 입력 필드 생성 및 설정
+
+    const new_div = document.createElement("div");
+    new_div.className="flex justify-between w-full";
+    // 버튼과 입력 필드를 문서에 추가
+    answer2_buttonField.appendChild(answer2_buttonField_label);
+    answer_div_inner_div.appendChild(answer_div_inner_div_firstbutton);
+    answer_div_inner_div.appendChild(answer_div_inner_div_secondbutton);
+
+
+    const answer_data_list = answer_data.match(/\[([^\]]+)\]/g);
+    for(const data of answer_data_list)
+    {
+        const button = document.createElement("button");
+        button.dataset.index = answer2_buttonField.querySelectorAll(".answer2_list").length;
+        button.className = "answer2_list";
+        button.onclick = (e) => {focus_answer2_list(e.target.dataset.index)};
+        button.textContent = answer2_buttonField.querySelectorAll(".answer2_list").length + 1;
+        button.style.marginRight = '1rem';
+        button.addEventListener ('mousedown', answer_list_scroll);
+        if(button.dataset.index == "0")
+        {
+            button.classList.add("selected");
+        }
+        answer2_buttonField.appendChild(button);
+    }
+    answer_div.appendChild(answer2_buttonField);
+    answer_div.appendChild(answer_div_inner_div);
+    new_div.appendChild(new_category_input);
+    new_div.appendChild(new_answer_admit);
+    new_multi_answer.appendChild(new_div);
+    new_multi_answer.appendChild(answer_div);
+    let first_data = 0;
+    for(const data of answer_data_list)
+    {
+        const new_answer_input = document.createElement("input");
+        new_answer_input.className = "w-full answer_input";
+        new_answer_input.value = data.replace('[', '').replace(']','');
+        new_multi_answer.appendChild(new_answer_input);
+        new_answer_input.style.display = "none";
+        if(first_data == 0)
+        {
+            new_answer_input.style.display= "block";
+        }
+        first_data++;
+    }
+    new_multi_answer.querySelector(".answer2_buttonField").appendChild(button);
+    document.getElementById('answer_buttonField').appendChild(button);
+    if(index == 0)
+    {
+        document.querySelector(".hint-input").before(new_multi_answer);
+    }
+    else
+    {
+        multi_answer[multi_answer.length-1].after(new_multi_answer);
+    }
+}
+function createInfoItem(title, song, songURL, thumbnail, answer, hint, startTime, endTime, id,category) {
     const box = document.createElement('div');
     box.classList.add('box');
     const closeBtn = document.createElement('button');
@@ -263,6 +410,11 @@ function createInfoItem(title, song, songURL, thumbnail, answer, hint, startTime
     MusicIdElem.innerText = id;
     box.appendChild(MusicIdElem);
     MusicIdElem.style.display = "None";
+
+    const CategoryIdElem = document.createElement('cate'); // 사용자에게는 보이지 않도록 hidden 유형으로 설정
+    CategoryIdElem.innerText = category;
+    box.appendChild(CategoryIdElem);
+    CategoryIdElem.style.display = "None";
     return box;
 };
 
@@ -271,12 +423,23 @@ document.getElementById("register-btn").addEventListener("click", (e) => {
     const song = document.getElementById('song-name-input').value;
     const songURL = document.getElementById('song-link-input').value;
     const thumbnailLink = "https://img.youtube.com/vi/" + videoId + "/sddefault.jpg";
-
+    let category = "";
     let answer = "";
-    const answer_input = document.querySelectorAll(".answer_input");
-    for (const element of answer_input) {
-        if (element.value) {answer += "[" + element.value + "],"};
+    const multi_answer = document.querySelectorAll(".multi_answer");
+    for(const element of multi_answer)
+    {
+        for(const inner_elements of element.querySelectorAll(".answer_input"))
+        {
+            if(inner_elements.value)
+            {
+                answer+= "["+inner_elements.value+"],";
+            }
+        }
+        category += "["+ element.querySelector(".category_input").value+":"+element.querySelector(".answer_admit").value +"],";
+        answer = answer.slice(0,-1);
+        answer += "/";
     };
+    category = category.slice(0,-1);
     answer = answer.slice(0, -1);
 
     const hint = document.getElementById('hint-input').value;
@@ -310,7 +473,7 @@ document.getElementById("register-btn").addEventListener("click", (e) => {
         {
             if(h4List[i].innerText == id)
             {
-                changeBox(boxList[i], title, song, songURL, thumbnailLink, answer, hint, startTime, endTime)
+                changeBox(boxList[i], title, song, songURL, thumbnailLink, answer, hint, startTime, endTime,category)
             }
         }
     }
@@ -322,13 +485,13 @@ document.getElementById("register-btn").addEventListener("click", (e) => {
             {
                 if(i == modifyIndex)
                 {
-                    changeBox(boxList[i], title, song, songURL, thumbnailLink, answer, hint, startTime, endTime)
+                    changeBox(boxList[i], title, song, songURL, thumbnailLink, answer, hint, startTime, endTime,category)
 
                 }
             }
         }else
         {
-            const box = createInfoItem(title, song, songURL, thumbnailLink, answer, hint, startTime, endTime, id);
+            const box = createInfoItem(title, song, songURL, thumbnailLink, answer, hint, startTime, endTime,id,category);
             document.querySelector('.add_box').before(box);
             for(const element of inputList)
             {
@@ -339,7 +502,7 @@ document.getElementById("register-btn").addEventListener("click", (e) => {
     }
 });
 
-function changeBox(box,title, song, songURL, thumbnail, answer, hint, startTime, endTime) {
+function changeBox(box,title, song, songURL, thumbnail, answer, hint, startTime, endTime, category) {
     box.querySelector('h3').innerText = title;
     box.querySelector('p').innerText = song;
     box.querySelector('img').src = thumbnail;
@@ -348,6 +511,7 @@ function changeBox(box,title, song, songURL, thumbnail, answer, hint, startTime,
     box.querySelector('h5').innerText = startTime;
     box.querySelector('h6').innerText = endTime;
     box.querySelector('h1').innerText = answer;
+    box.querySelector('cate').innerText = category;
 }
 
 document.body.addEventListener('click', (event) => {
@@ -372,7 +536,7 @@ function box_element(item) {
     } catch (error) {};
     const answer = item.querySelector('h1').innerText;
     const id = item.querySelector('h4').innerHTML || null;
-
+    const category = item.querySelector('cate').innerHTML;
     if (item.querySelector('h2').innerText !== '') {hint = item.querySelector('h2').innerText};
     if (parseFloat(item.querySelector('h5').innerText)) {startTime = item.querySelector('h5').innerText};
     if (parseFloat(item.querySelector('h6').innerText)) {endTime = item.querySelector('h6').innerText};
@@ -387,7 +551,8 @@ function box_element(item) {
         hint: hint,
         startTime: startTime,
         endTime: endTime,
-        videoid: videoid
+        videoid: videoid,
+        category : category
     }
 }
 
@@ -451,7 +616,7 @@ async function UploadBtn(event) {
     items.forEach(item => {
         items_index++;
         item.classList.remove('info-omission');
-        let {id, title, song, thumbnail, songURL, answer, hint, startTime, endTime, videoid} = box_element(item);
+        let {id, title, song, thumbnail, songURL, answer, hint, startTime, endTime, videoid,category} = box_element(item);
         // videoid 유효성을 체크하기 위해서 push
         check_videoid_list.push(videoid);
 
@@ -468,7 +633,8 @@ async function UploadBtn(event) {
             answer: zero_space_text(answer),
             hint: hint,
             startTime: startTime,
-            endTime: endTime
+            endTime: endTime,
+            category : category
         };
 
         if(id == "" || id == null) {
@@ -623,40 +789,141 @@ active_check.addEventListener('click', ()=> {
 
 // 중복 정답 추가 기능
 document.getElementById("add_answerlist").addEventListener("click", () => {
+    create_multi_answer();
+});
+document.querySelectorAll(".multi_answer")[0].querySelector(".add2_answerlist").addEventListener("click",()=>
+{
+    create_multi_answer_inner();
+})
+function create_multi_answer_inner()
+{
+    const multi_answer = document.querySelectorAll(".multi_answer");
+    multi_answer.forEach(element =>
+    {
+        if(element.style.display == "block")
+        {
+            const button = document.createElement("button");
+            button.dataset.index = element.querySelectorAll(".answer2_list").length;
+            button.className = "answer2_list";
+            button.onclick = (e) => {focus_answer2_list(e.target.dataset.index)};
+            button.textContent = element.querySelectorAll(".answer2_list").length + 1;
+            button.style.marginRight = '1rem';
+            button.addEventListener ('mousedown', answer_list_scroll);
+            element.querySelector(".answer2_buttonField").appendChild(button);
+            const answer_number = document.createElement("input");
+            answer_number.className = element.querySelectorAll(".answer_input")[0].className;
+            answer_number.style.display = "none";
+            element.appendChild(answer_number);
+        }
+    })
+    
+}
+function create_multi_answer()
+{
     const answer_list = document.querySelectorAll(".answer_list");
-    const answer_input = document.querySelectorAll(".answer_input");
-    const addanswerList =document.getElementById("add_answerlist");
+    const multi_answer = document.querySelectorAll(".multi_answer");
     // 새 버튼 생성 및 설정
     const button = document.createElement("button");
     button.dataset.index = answer_list.length;
     button.className = "answer_list";
     button.onclick = (e) => {focus_answer_list(e.target.dataset.index)};
-    button.textContent = answer_input.length + 1;
+    button.textContent = multi_answer.length + 1;
     button.style.marginRight = '1rem';
     button.addEventListener ('mousedown', answer_list_scroll);
-
+    const new_multi_answer = document.createElement("div");
+    new_multi_answer.dataset.index = multi_answer.length;
+    new_multi_answer.className = multi_answer[0].className;
+    new_multi_answer.style.display="none";
+    const new_category_input = document.createElement("input");
+    new_category_input.className = multi_answer[0].querySelector(".category_input").className;
+    new_category_input.placeholder = multi_answer[0].querySelector(".category_input").placeholder;
+    const new_answer_admit = document.createElement("input");
+    new_answer_admit.className = multi_answer[0].querySelector(".answer_admit").className;
+    new_answer_admit.placeholder =  multi_answer[0].querySelector(".answer_admit").placeholder;
     // 새로운 입력 필드 생성 및 설정
+
+    const new_div = document.createElement("div");
+    new_div.className=multi_answer[0].getElementsByTagName('div')[0].className;
+    const answer_div = document.createElement('div');
+    answer_div.className = multi_answer[0].getElementsByTagName('div')[1].className;
+    
+    const answer2_buttonField = document.createElement("div");
+    answer2_buttonField.className = "answer2_buttonField";
+
+    const answer2_buttonField_label = document.createElement("label");
+    answer2_buttonField_label.className = "answer2-label";
+    answer2_buttonField_label.textContent = "정답 ";
+    const answer2_buttonField_button = document.createElement("button");
+    answer2_buttonField_button.dataset.index = "0";
+    answer2_buttonField_button.className = "answer2_list";
+    answer2_buttonField_button.style.marginRight = "0.6rem";
+    answer2_buttonField_button.textContent = "1";
+    answer2_buttonField_button.classList.add("selected");
+    answer2_buttonField_button.onclick = (e) => {focus_answer2_list(e.target.dataset.index)};
+    answer2_buttonField.appendChild(answer2_buttonField_label);
+    answer2_buttonField.appendChild(answer2_buttonField_button);
+    const answer_div_inner_div = document.createElement("div");
+    answer_div_inner_div.className = "flex space-x-4";
+    const answer_div_inner_div_firstbutton = document.createElement("button");
+    answer_div_inner_div_firstbutton.className = "add2_answerlist";
+    answer_div_inner_div_firstbutton.textContent = "정답 추가";
+    answer_div_inner_div_firstbutton.addEventListener("click", ()=>
+    {
+        create_multi_answer_inner();
+    })
+    const answer_div_inner_div_secondbutton = document.createElement("button");
+    answer_div_inner_div_secondbutton.className = "delete2_answerlist";
+    answer_div_inner_div_secondbutton.textContent= "정답 제거";
+    answer_div_inner_div_secondbutton.addEventListener("click",()=>
+    {
+        answer_delete();
+    })
+    answer_div_inner_div.appendChild(answer_div_inner_div_firstbutton);
+    answer_div_inner_div.appendChild(answer_div_inner_div_secondbutton);
+    answer_div.appendChild(answer2_buttonField);
+    answer_div.appendChild(answer_div_inner_div);
+
     const new_answer_input = document.createElement("input");
-    new_answer_input.dataset.index = answer_input.length;
-    new_answer_input.className = "w-full answer_input";
-    new_answer_input.style.display = "none";
-
+    new_answer_input.className = multi_answer[0].querySelectorAll(".answer_input")[0].className;
     // 버튼과 입력 필드를 문서에 추가
+    new_div.appendChild(new_category_input);
+    new_div.appendChild(new_answer_admit);
     document.getElementById('answer_buttonField').appendChild(button);
-    answer_input[answer_input.length - 1].after(new_answer_input);
-  });
-
+    new_multi_answer.appendChild(new_div);
+    new_multi_answer.appendChild(answer_div);
+    new_multi_answer.appendChild(new_answer_input);
+    multi_answer[multi_answer.length-1].after(new_multi_answer);
+}
 // 중복 정답 제거 버튼 기능
 document.getElementById("delete_answerlist").addEventListener("click", () => {
-    let answerlists = document.querySelectorAll('.answer_list');
-    let answerinputs = document.querySelectorAll('.answer_input');
-
-    let last_answerlist = answerlists[answerlists.length - 1];
-    let last_answerinput = answerinputs[answerinputs.length - 1];
-
-    if (answerlists.length > 1 && answerinputs.length > 1) {
-        last_answerlist.remove();
-        last_answerinput.remove();
+    let multi_answer = document.querySelectorAll('.multi_answer');
+    let cate_list = document.querySelectorAll(".answer_list");
+    if (cate_list.length > 1) {
+        let del_index;
+        for(let i = 0; i < multi_answer.length; i++)
+        {
+            if(multi_answer[i].style.display=="block")
+            {
+                multi_answer[i].remove();
+                cate_list[i].remove();
+                del_index = i;
+            }else
+            {
+                if(del_index!= undefined)
+                {
+                    multi_answer[i].dataset.index--;
+                    cate_list[i].textContent--;
+                }
+            }
+        }
+        cate_list = document.querySelectorAll(".answer_list");
+        multi_answer = document.querySelectorAll('.multi_answer');
+        if(del_index >= cate_list.length)
+        {
+            del_index = cate_list.length-1;
+        }
+        cate_list[del_index].classList.add("selected");
+        multi_answer[del_index].style.display="block";
     }
 
     const submission_form = document.getElementById('submission-form');
@@ -664,18 +931,98 @@ document.getElementById("delete_answerlist").addEventListener("click", () => {
     if (!check_blockStyle.length) {answerinputs[answerinputs.length - 2].style.display = 'block'};
 })
 
+function answer_delete()
+{
+    let multi_answer = document.querySelectorAll('.multi_answer');
+    multi_answer.forEach(element =>
+    {
+        if(element.style.display =="block")
+        {
+            let answer_list = element.querySelectorAll(".answer2_list");
+            let answer_input_list = element.querySelectorAll(".answer_input");
+            let del_index;
+            if(answer_list.length > 1)
+            {
+                for(let i = 0 ; i < answer_list.length; i++)
+                {
+                    if(answer_input_list[i].style.display =="block")
+                    {
+                        answer_input_list[i].remove();
+                        answer_list[i].remove();
+                        del_index = i;
+                    }
+                    else
+                    {
+                        if(del_index!= undefined)
+                        {
+                            answer_list[i].dataset.index--;
+                            answer_list[i].textContent--;
+                        }
+                    }
+                }
+                answer_list = element.querySelectorAll(".answer2_list");
+                answer_input_list = element.querySelectorAll(".answer_input");
+                if(del_index >= answer_list.length)
+                {
+                    del_index = answer_list.length-1;
+                }
+                answer_list[del_index].classList.add("selected");
+                answer_input_list[del_index].style.display = "block";
+            }
+           
+        }
+    })
+}
 //모든 중복 정답 버튼에 대한 기능 설정 (통합 관리)
 function focus_answer_list(index) {
-    document.querySelectorAll(`.answer_input[data-index]:not([data-index="${index}"])`).forEach(input_element => {
+    document.querySelectorAll(`.answer_list[data-index]:not([data-index="${index}])`).forEach(input_element=>
+    {
+        input_element.classList.remove("selected");
+    });
+    document.querySelectorAll(`.multi_answer[data-index]:not([data-index="${index}"])`).forEach(input_element => {
         input_element.style.display = 'none';
-    })
-    document.querySelector(`.answer_input[data-index="${index}"]`).style.display = 'block';
+    });
+    document.querySelector(`.multi_answer[data-index="${index}"]`).style.display = 'block';
+    document.querySelector(`.answer_list[data-index="${index}"]`).classList.add("selected");
+}
+function focus_answer2_list(index) {
+    document.querySelectorAll(`.multi_answer`).forEach(input_element=>
+        {
+            if(input_element.style.display =="block")
+            {
+                input_element.querySelectorAll(".answer2_list").forEach(element=>
+                {
+                   if(element.dataset.index == index)
+                   {
+                        element.classList.add("selected");
+                   } 
+                   else
+                   {
+                        element.classList.remove("selected");
+                   }
+                });
+                const answer_list = input_element.querySelectorAll(".answer_input");
+                for(let i = 0; i < answer_list.length; i++)
+                {
+                    if(i == index)
+                    {
+                        answer_list[i].style.display = "block";
+                    }
+                    else
+                    {
+                        answer_list[i].style.display = "none";
+                    }
+                }
+            
+            }
+        })
 }
 
-//정답 input이 동적으로 변경되기 때문에 label focus 기능을 여기서 만듦.
-document.getElementById('answer-label').addEventListener('click', () => {
-    document.querySelector('.answer_input[style*="display: block"]').focus();
-})
+// //정답 input이 동적으로 변경되기 때문에 label focus 기능을 여기서 만듦.
+// document.getElementById('answer-label').addEventListener('click', () => {
+//     document.querySelector('.multi_answer[style*="display: block"]').focus();
+// })
+
 
 /*------------- 맵 설명 입력 부분-------------*/
 const map_descript_popup = document.getElementById('map-descript-popup');
