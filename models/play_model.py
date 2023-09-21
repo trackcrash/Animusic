@@ -174,34 +174,27 @@ class MusicDataManager:
                 music_data['matched_answers'] = {}
 
             for section_idx, group_answers in enumerate(music_data['answer_list']):
-                if isinstance(group_answers[0], list):  # 2차원 배열인 경우
+                category_name = list(categories.keys())[section_idx]
+                category_value = int(categories[category_name])
+                if isinstance(group_answers[0], list) and category_value == 0:
+                    category_value = len(group_answers)
+                
+                if isinstance(group_answers[0], list):
                     for sub_idx, sub_group in enumerate(group_answers):
                         if answer in sub_group:
-                            category_name = list(categories.keys())[section_idx]
-                            category_value = int(categories[category_name])
-                            # If category_value is 0 and the answer is already matched, don't proceed
                             if music_data['matched_answers'].get(category_name, 0) >= category_value:
                                 return False, None
 
-                            # Increase the matched answer count
                             music_data['matched_answers'][category_name] = music_data['matched_answers'].get(category_name, 0) + 1
-
-                            # Remove the entire sub_group from group_answers
-                            del group_answers[sub_idx]
+                            group_answers[sub_idx] = []
                             return True, category_name
-                else:  # 1차원 배열인 경우
+                else:
                     if answer in group_answers:
-                        category_name = list(categories.keys())[section_idx]
-                        category_value = int(categories[category_name])
-                        # If category_value is 0 and the answer is already matched, don't proceed
                         if category_value == 0 and music_data['matched_answers'].get(category_name, 0) >= 1:
                             return False, None
 
-                        # Increase the matched answer count
                         music_data['matched_answers'][category_name] = music_data['matched_answers'].get(category_name, 0) + 1
-
-                        # Remove the correct answer
-                        group_answers.remove(answer)
+                        group_answers.remove(answer)  # This should be okay for 1D arrays
                         return True, category_name
         return False, None
 
@@ -210,11 +203,9 @@ class MusicDataManager:
         data = room_data.get('data', [])
         idx = room_data.get('current_index', 0)
 
-        # Data is available
         if idx < len(data):
             music_data = data[idx]
-            categories = categories = music_data.get('category', '')
-            print(categories)
+            categories = music_data.get('category', '')
             remaining_answers = 0
             
             for section_idx, group_answers in enumerate(music_data['answer_list']):
@@ -222,17 +213,20 @@ class MusicDataManager:
                 category_value = int(categories[category_name])
                 matched_count = music_data['matched_answers'].get(category_name, 0)
                 
-                # If category value is 0, consider it as 1
+                # 배열의 갯수를 밸류로 주기
                 if category_value == 0:
-                    category_value = 1
+                    if isinstance(group_answers[0], list):  # 2차원 배열인 경우
+                        category_value = len(group_answers)   # 서브 그룹의 개수로 카테고리 밸류 설정
+                    else:  # 1차원 배열인 경우
+                        category_value = 1  # 그룹 내부의 항목 중 하나만 맞추면 됨
 
                 # Calculate remaining answers based on category value and matched count
                 remaining_for_this_category = category_value - matched_count
                 
                 # Update the total remaining answers
                 remaining_answers += remaining_for_this_category
-            print(remaining_answers)
-            return remaining_answers  # Return the number of remaining answers
+
+            return remaining_answers
 
         return 0
 music_data_manager = MusicDataManager()
