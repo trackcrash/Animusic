@@ -17,9 +17,28 @@ async function data_convert_download() {
         const song = item.querySelector('p').innerText;
         const thumbnail = item.querySelector('img').src;
         const songURL = item.querySelector('input').value;
+        const cate = item.querySelector("cate").textContent;
+        console.log(cate);
         let answer = item.querySelector('h1').innerText;
         let another_answer;
-
+        
+        let cate_list;
+        if(cate.indexOf(',')>-1)
+        {
+            cate_list = cate.split(',');
+        }
+        else
+        {
+            cate_list[0] = cate;
+        }
+        let answer_list
+        if(answer.indexOf('/')>-1)
+        {
+            answer_list =answer.split('/')
+        }else
+        {
+            answer_list[0] = answer;
+        }
         let hint = "", startTime = 0, endTime = 0;
 
         if (item.querySelector('h2').innerText !== '') {hint = item.querySelector('h2').innerText};
@@ -31,14 +50,6 @@ async function data_convert_download() {
         let song_info = [];
         song_info.push(title || "");
         song_info.push(song || "");
-
-        if (answer.split('],').length > 1) {
-            another_answer = answer.split('],').slice(1);
-            answer = answer.split('],')[0].slice(1);
-        } else if (answer.split('],').length = 1) {
-            answer = answer.slice(1, -1);
-        }
-        song_info.push(answer || "");
         song_info.push(hint || "");
         song_info.push(songURL || "");
 
@@ -90,14 +101,34 @@ async function data_convert_download() {
 
         song_info.push(play_time);
 
+        for(let i = 0; i < cate_list.length; i++)
+        {
+            song_info.push(cate_list[i].replace('[','').replace(']',''));
+            let answer_list_inner = [];
+            if(answer_list[i].indexOf('],') > -1)
+            {
+                for(const element of answer_list[i].split('],'))
+                {
+                    answer_list_inner.push(element.replace('[','').replace(']',''));
+                }
+            }
+            else
+            {
+                answer_list_inner[0]=answer_list[i].replace('[','').replace(']','');
+            }
+            for(let j = 0; j < answer_list_inner.length; j++)
+            {
+                song_info.push(answer_list_inner[j]);
+            }
+        }
         // 복수정답이 있다면 추가
-        if (another_answer) {
-            const last_answer = another_answer.pop();
-            if (another_answer) {
-                song_info = song_info.concat(another_answer.map(answer_text => answer_text.slice(1)));
-            };
-            song_info.push(last_answer.slice(1, -1));
-        };
+        // if (another_answer) {
+        //     const last_answer = another_answer.pop();
+        //     if (another_answer) {
+        //         song_info = song_info.concat(another_answer.map(answer_text => answer_text.slice(1)));
+        //     };
+        //     song_info.push(last_answer.slice(1, -1));
+        // };
 
         exceldata.push(song_info);
         song_info = [];
@@ -112,7 +143,7 @@ async function data_convert_download() {
 
     // 웹페이지에서 가져온 데이터를 새로운 열에 추가
 
-    const start_row = 10;   // 양식 내용이 바뀌면 수정해야 됨
+    const start_row = 14;   // 양식 내용이 바뀌면 수정해야 됨
 
     // 내용의 끝 부분을 보장하기 위해서 최대 행과 열 번호를 구함
     let max_row = start_row + exceldata.length;
