@@ -90,12 +90,13 @@ def play_Socket(socketio):
         msg = data['content']
         room = data.get('room')
         name = current_user.name
-        if music_data_manager.check_answer(room, msg) and data['isAnswer'] and socket_class.isDuplication[room]:
+        is_correct, answer_category = music_data_manager.check_answer(room, msg)
+        if is_correct and data['isAnswer'] and socket_class.isDuplication[room]:
             leftAnswer = music_data_manager.is_group_answered(room)
             if leftAnswer == 0:
                 current_data = music_data_manager.retrieve_data(room)
                 current_data['endTime'] = "stop"
-                emit('correctAnswer', {'name':name,'data':current_data,"leftAnswer":leftAnswer}, room=room)
+                emit('correctAnswer', {'name':name, 'data':current_data, "leftAnswer":leftAnswer}, room=room)
                 if room not in socket_class.isDuplication :
                     socket_class.isDuplication[room] = False
                 socket_class.isDuplication[room] = False
@@ -126,7 +127,6 @@ def play_Socket(socketio):
             make_answer(mission_id ,room_key)
             socket_class.totalPlayers[room_key] = len(room_data_manager._data_store[room_key]['user'])
             first_data = music_data_manager.retrieve_data(room_key)
-            print(first_data)
             if first_data:
                 youtube_embed_url = first_data['youtube_embed_url']
                 emit('PlayGame', {'totalPlayers': socket_class.totalPlayers[room_key], 'youtubeLink': youtube_embed_url}, room=room_key)

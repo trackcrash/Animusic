@@ -167,16 +167,44 @@ class MusicDataManager:
         data = room_data.get('data', [])
         idx = room_data.get('current_index', 0)
 
-        # Data is available
         if idx < len(data):
-            next_item = data[idx]
-            # Check if the answer is in any group's answer list
-            for group_answers in next_item['answer_list']:
-                if answer in group_answers:
-                    next_item['answer_list'].remove(group_answers)    
-                    return True
-        return False
-    
+            music_data = data[idx]
+            categories = music_data.get('category', '')
+            if 'matched_answers' not in music_data:
+                music_data['matched_answers'] = {}
+
+            for section_idx, group_answers in enumerate(music_data['answer_list']):
+                if isinstance(group_answers[0], list):  # 2차원 배열인 경우
+                    for sub_group in group_answers:
+                        if answer in sub_group:
+                            category_name = list(categories.keys())[section_idx]
+                            category_value = int(categories[category_name])
+                            # If category_value is 0 and the answer is already matched, don't proceed
+                            if category_value == 0 and music_data['matched_answers'].get(category_name, 0) >= 1:
+                                return False, None
+
+                            # Increase the matched answer count
+                            music_data['matched_answers'][category_name] = music_data['matched_answers'].get(category_name, 0) + 1
+
+                            # Remove the correct answer
+                            sub_group.remove(answer)
+                            return True, category_name
+                else:  # 1차원 배열인 경우
+                    if answer in group_answers:
+                        category_name = list(categories.keys())[section_idx]
+                        category_value = int(categories[category_name])
+                        # If category_value is 0 and the answer is already matched, don't proceed
+                        if category_value == 0 and music_data['matched_answers'].get(category_name, 0) >= 1:
+                            return False, None
+
+                        # Increase the matched answer count
+                        music_data['matched_answers'][category_name] = music_data['matched_answers'].get(category_name, 0) + 1
+
+                        # Remove the correct answer
+                        group_answers.remove(answer)
+                        return True, category_name
+        return False, None
+
     def is_group_answered(self, room):
         room_data = self._data_store.get(room, {})
         data = room_data.get('data', [])
@@ -184,20 +212,56 @@ class MusicDataManager:
 
         # Data is available
         if idx < len(data):
-            next_item = data[idx]
-            # Count the number of remaining non-empty answer_list groups
-            remaining_groups_count = sum(1 for group_answers in next_item['answer_list'] if group_answers)
-            # Return the remaining groups count
-            return remaining_groups_count
-        # If no data or no more groups, return 0
+            music_data = data[idx]
+            categories = categories = music_data.get('category', '')
+            print(categories)
+            remaining_answers = 0
+            
+            for section_idx, group_answers in enumerate(music_data['answer_list']):
+                category_name = list(categories.keys())[section_idx]
+                category_value = int(categories[category_name])
+                matched_count = music_data['matched_answers'].get(category_name, 0)
+                
+                # If category value is 0, consider it as 1
+                if category_value == 0:
+                    category_value = 1
+
+                # Calculate remaining answers based on category value and matched count
+                remaining_for_this_category = category_value - matched_count
+                
+                # Update the total remaining answers
+                remaining_answers += remaining_for_this_category
+            print(remaining_answers)
+            return remaining_answers  # Return the number of remaining answers
+
         return 0
 music_data_manager = MusicDataManager()
 
+def parse_categories(category_str):
+    # 원래의 방식대로 카테고리 파싱
+    category_pairs = category_str.split('][')
+    category_pairs[0] = category_pairs[0][1:]
+    category_pairs[-1] = category_pairs[-1][:-1]
+    return dict(pair.split(':') for pair in category_pairs)
 
 def parse_answers(answer_str):
-    # 각 하위 그룹을 쉼표로 분할하고 좌우 공백 제거하여 리스트로 저장
-    group_strings = answer_str.strip('[]').split('],[')
-    answer_list = [group.split(',') for group in group_strings]
+    main_items = answer_str.split('/')
+    answer_list = []
+
+    for main_item in main_items:
+        # If multiple [..] exist in a main_item, then it should be considered as a group
+        grouped_items = main_item.split('],[')
+        
+        # If grouped_items has more than one item, it's a group, otherwise it's a single item
+        if len(grouped_items) > 1:
+            group = []
+            for item in grouped_items:
+                item = item.strip('[]')
+                group.append(item.split(','))
+            answer_list.append(group)
+        else:
+            item = main_item.strip('[]')
+            answer_list.append(item.split(','))
     return answer_list
 
 def make_answer(mission_id, room_key):
@@ -207,6 +271,7 @@ def make_answer(mission_id, room_key):
     for item in data:
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
         answer_list =  parse_answers(item['answer'])
+        category_list = parse_categories(item['category'])
         starttime = float(item['startTime'])
         endTime = float(item['endTime'])
         music_data = {
@@ -217,8 +282,10 @@ def make_answer(mission_id, room_key):
             'answer_list': answer_list,
             'youtube_embed_url': youtube_embed_url,
             'title': item['title'],
-            'song': item['song']
+            'song': item['song'],
+            'category': category_list
         }
+        print(category_list)
         result.append(music_data)
 
     random.shuffle(result)

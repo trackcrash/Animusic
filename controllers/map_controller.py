@@ -101,7 +101,7 @@ def show_table_bymissionid(missionid):
     engine,session = create_session()
     try:
         queries = session.query(Music).filter(Music.mission_id==missionid)
-        entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, hint= q.hint if q.hint is not None else "", startTime=q.startTime if q.startTime is not None else "0", endTime = q.endTime if q.endTime is not None and (q.startTime is None or q.endTime > q.startTime) else "0") for q in queries]
+        entries = [dict(id=q.id, title=q.title, song=q.song,youtube_url=q.youtube_url,thumnail_url=q.thumbnail_url, answer= q.answer, category= q.category, hint= q.hint if q.hint is not None else "", startTime=q.startTime if q.startTime is not None else "0", endTime = q.endTime if q.endTime is not None and (q.startTime is None or q.endTime > q.startTime) else "0") for q in queries]
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while retrieving music records: {str(e)}")
