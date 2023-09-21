@@ -22,7 +22,7 @@ async function data_convert_download() {
         let answer = item.querySelector('h1').innerText;
         let another_answer;
         
-        let cate_list;
+        let cate_list = [];
         if(cate.indexOf(',')>-1)
         {
             cate_list = cate.split(',');
@@ -31,7 +31,7 @@ async function data_convert_download() {
         {
             cate_list[0] = cate;
         }
-        let answer_list
+        let answer_list = [];
         if(answer.indexOf('/')>-1)
         {
             answer_list =answer.split('/')
