@@ -185,10 +185,18 @@ function getidtourl() {
 function EndTimeTest(startTime, fendTime, totalSong, nowSong, category) {
     clearInterval(gameTimerInterval);
     player.playVideo();
+    
+    const all_play = document.getElementById("all_play");
     for (let key in category) {
         if (category.hasOwnProperty(key)) {
             let value = category[key];
-            console.log(key + ": " + value);
+            const box = document.createElement("p");
+            box.id = value.split(":")[0];
+            box.textContent = value.split(":")[0];
+            const span = document.createElement("span");
+            span.textContent = value.split(":")[1];
+            box.appendChild(span);
+            all_play.appendChild(box);
         }
     }
     let endTime = fendTime;
