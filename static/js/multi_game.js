@@ -204,7 +204,7 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong, category) {
             const box = document.createElement("p");
             box.textContent = key+" ";
             const span = document.createElement("span");
-            span.textContent = "";
+            span.textContent = value;
             box.appendChild(span);
             all_play.appendChild(box);
         }

@@ -103,7 +103,7 @@ function EndTimeTest(startTime, fendTime, category) {
         if (GameTimer <= 0) {
             // socket.emit("TimeOut", { "room": room_name });
             clearInterval(gameTimerInterval); // 올바른 인터벌 ID 사용하여 중지
-            nextVideo();
+            nextVideo(true);
             return;
         }
         GameTimer--;
@@ -144,14 +144,14 @@ inputMessage.addEventListener('keyup', (event) => {
 document.addEventListener('keydown', (event) => {
     if (event.key === 'End') {
         if (!skipWait) {
-            nextVideo();
+            nextVideo(true);
         }
     }
 });
 
 nextButton.addEventListener('click', () => {
     if (!skipWait) {
-        nextVideo();
+        nextVideo(true);
     }
 });
 //메시지전송 and 정답확인
@@ -163,7 +163,17 @@ function sendMessage() {
             socket.emit('single_message', {
                 content: content
             }, () => {
-                checkAnswer(content);
+                const [is_correct, answer_category] = checkAnswer(content);
+                if (is_correct) {
+                    const [leftAnswer, category_length] = isGroupAnswered();
+                    console.log(leftAnswer);
+                    if (leftAnswer === 0) {
+                        nextVideo(true);
+                        showSongInfo(currentIndex,true,content,category_length)
+                    } else {
+                        showSongInfo(currentIndex,false,content,category_length)
+                    }
+                }
             });
             inputMessage.value = '';
         }
@@ -180,7 +190,34 @@ function sendMessage() {
     //     checkAnswer(content);
     // }
 }
+function isGroupAnswered() {
+    let idx = currentIndex|| 0;
+    const leftAnswer = [];
 
+    if (idx < musicData[idx].length) {
+        const music_data = musicData[idx];
+        const categories = music_data.category || {};
+        let remainingAnswers = 0;
+
+        for (let section_idx = 0; section_idx < music_data.answer_list.length; section_idx++) {
+            const category_names = Object.keys(categories);
+            const category_name = category_names[section_idx];
+            const category_value = parseInt(categories[category_name], 10);
+            const matched_count = music_data.matched_answers[category_name] || 0;
+            
+            // Calculate remaining answers based on category value and matched count
+            const remaining_for_this_category = category_value - matched_count;
+            leftAnswer.push(remaining_for_this_category);
+
+            // Update the total remaining answers
+            remainingAnswers += remaining_for_this_category;
+        }
+
+        return [remainingAnswers, leftAnswer];
+    }
+
+    return [0, []];
+}
 socket.on('single_message', (data) => {
     const item = document.createElement('div');
     if (data.name == '') {
@@ -205,43 +242,62 @@ socket.on('single_message', (data) => {
 //     videoOverlay.style.display = 'block';
 // }
 
-// 사용자의 답안 확인
-function checkAnswer(answer) {
-    const answerToFind = answer.trim();
-    let answerList = musicData[currentIndex].answer_list;
-    for (let i = 0; i < answerList.length; i++) {
-        if (Array.isArray(answerList[i]) && answerList[i].length > 0 && !Array.isArray(answerList[i][0])) {
-            answerList[i] = [answerList[i]];
-        }
+function removeGroupByKeyword(data, keyword) {
+    const hasKeyword = data.some(group => group.some(subGroup => subGroup.trim() === keyword));
+
+    if (hasKeyword) {
+        return data.filter(group => !group.some(subGroup => subGroup.trim() === keyword));
+    } else {
+        return data;
     }
-    for(const element of answerList)
-    {
-        console.log(element);
-        const isCorrectAnswer = element.some(group => group.map(item => item.trim()).includes(answerToFind));
-        if (isCorrectAnswer) {
-            console.log("정답")
-            // 정답인 경우 추가 동작 수행
-            // musicData[currentIndex].answer_list = answerList.filter(group => !group.map(item => item.trim()).includes(answerToFind));
-            // if (musicData[currentIndex].answer_list == 0) {
-            //     playvideo(currentIndex, musicData[currentIndex].startTime, "stop", null);
-            //     videoOverlay.style.display = 'none';
-            //     showSongInfo(currentIndex,true);
-            //     if (document.querySelector("#NextVideo").checked) {
-            //         setTimeout(() => {
-            //             if (!skipWait) {
-            //                 nextVideo();
-            //             }
-            //         }, 1000);
-            //     }
-            // }else
-            // {
-            //     showSongInfo(currentIndex, false, answer);
-            // }
-        }
-    } 
 }
 
-function showSongInfo(index, all, myanswer = null) {
+// 사용자의 답안 확인
+function checkAnswer(answer) {
+    if (currentIndex < musicData.length) {
+        const music_data = musicData[currentIndex];
+        const categories = music_data.category || {};
+        
+        if (!('matched_answers' in music_data)) {
+            music_data.matched_answers = {};
+        }
+
+        for (let section_idx = 0; section_idx < music_data.answer_list.length; section_idx++) {
+            const group_answers = music_data.answer_list[section_idx];
+            const category_names = Object.keys(categories);
+            const category_name = category_names[section_idx];
+            const category_value = parseInt(categories[category_name], 10);
+
+            if (group_answers && Array.isArray(group_answers[0])) {
+                for (let sub_idx = 0; sub_idx < group_answers.length; sub_idx++) {
+                    const sub_group = group_answers[sub_idx];
+                    if (sub_group.includes(answer)) {
+                        if (music_data.matched_answers[category_name] >= category_value) {
+                            return [false, null];
+                        }
+
+                        music_data.matched_answers[category_name] = (music_data.matched_answers[category_name] || 0) + 1;
+                        group_answers[sub_idx] = [];
+                        return [true, category_name];
+                    }
+                }
+            } else {
+                if (group_answers.includes(answer)) {
+                    if (music_data.matched_answers[category_name] >= category_value) {
+                        return [false, null];
+                    }
+
+                    music_data.matched_answers[category_name] = (music_data.matched_answers[category_name] || 0) + 1;
+                    group_answers.splice(group_answers.indexOf(answer), 1);
+                    return [true, category_name];
+                }
+            }
+        }
+    }
+    return [false, null];
+}
+
+function showSongInfo(index, all, myanswer = null,category) {
     const songTitle = document.getElementById('songTitle');
     const songArtist = document.getElementById('songArtist');
     const all_play = document.getElementById('all_play');
@@ -254,22 +310,33 @@ function showSongInfo(index, all, myanswer = null) {
     else
     {
         songTitle.innerText = "정답: " + myanswer;
-        all_play.innerText = `${musicData[index].answer_list.length}문제 남았습니다.`;
+        const answer_list = all_play.querySelectorAll("p");
+        for(let i = 0; i < category.length; i++)
+        {
+            answer_list[i].querySelector("span").textContent = category[i];
+        }
     }
 }
 // 다음 영상 재생
-function nextVideo() {
+function nextVideo(skip) {
     skipWait = true;
-    currentIndex += 1;
-    if (currentIndex < musicData.length) {
-        playvideo(currentIndex, musicData[currentIndex]['startTime'], musicData[currentIndex]['endTime'], EndTimeTest);
-        const all_play = document.getElementById("all_play");
-        all_play.innerText = "";
-        songTitle.innerText = "";
-        songArtist.innerText = "";
-    } else {
-        window.location.href = '/single_list';
+    if(skip)
+    {
+        currentIndex += 1;
+        if (currentIndex < musicData.length) {
+            playvideo(currentIndex, musicData[currentIndex]['startTime'], musicData[currentIndex]['endTime'], EndTimeTest);
+            const all_play = document.getElementById("all_play");
+            all_play.innerText = "";
+            songTitle.innerText = "";
+            songArtist.innerText = "";
+        } else {
+            window.location.href = '/single_list';
+        }
+    }else
+    {
+        playvideo(currentIndex, musicData[currentIndex]['startTime'], "stop", EndTimeTest);
     }
+   
 }
 
 $(document).ready(() => {
