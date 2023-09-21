@@ -11,7 +11,6 @@ let doMessage = true;
 let playerStateChangeHandler; // 이벤트 핸들러를 저장할 변수
 let gameTimerInterval; //setInteval 이벤트
 let currentData = null;
-let isVideoPlaying = false;
 let Num = 0;
 let isAnswer = false;
 let session_id = "";
@@ -120,7 +119,6 @@ function playvideo(videolink, endTime = null) {
         if (document.querySelector("div #videoFrame")) {
             document.querySelector("div #videoFrame").remove();
         }
-        isVideoPlaying = false;
         videoFrame = document.createElement("div");
         videoFrame.id = "videoFrame";
         videoFrame.classList.add("absolute", "top-0", "left-0", "w-full", "h-full")
@@ -139,7 +137,6 @@ function playvideo(videolink, endTime = null) {
         },
         events: {
             'onReady': function(event) {
-                console.log("OnReady");
                 onPlayerReady(event, endTime)
             }
         }
@@ -190,18 +187,6 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong, category) {
     clearInterval(gameTimerInterval);
     player.playVideo();
     
-    const all_play = document.getElementById("all_play");
-    for (let key in category) {
-        if (category.hasOwnProperty(key)) {
-            let value = category[key];
-            const box = document.createElement("p");
-            box.textContent = key+" ";
-            const span = document.createElement("span");
-            span.textContent = value;
-            box.appendChild(span);
-            all_play.appendChild(box);
-        }
-    }
     let endTime = fendTime;
     setVolume(document.querySelector("#VolumeBar").value);
     if (startTime > 0) {
@@ -211,6 +196,18 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong, category) {
         elements.videoOverlay.style.display = 'none';
         isAnswer = false;
         return;
+    }
+    const all_play = document.getElementById("all_play");
+    for (let key in category) {
+        if (category.hasOwnProperty(key)) {
+            let value = category[key];
+            const box = document.createElement("p");
+            box.textContent = key+" ";
+            const span = document.createElement("span");
+            span.textContent = "";
+            box.appendChild(span);
+            all_play.appendChild(box);
+        }
     }
     if (endTime == 0 || endTime > player.getDuration()) {
         endTime = player.getDuration();

@@ -294,6 +294,7 @@ def single_make_answer(mission_id):
     for item in data:
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
         answer_list = parse_answers(item['answer'])
+        category_list = parse_categories(item['category'])
         music_data = {
             'hint': item['hint'],
             'is_answered': 'false',
@@ -302,7 +303,8 @@ def single_make_answer(mission_id):
             'title': item['title'],
             'song': item['song'],
             'startTime' : item['startTime'],
-            'endTime' : item['endTime']
+            'endTime' : item['endTime'],
+            'category' : category_list
         }
         result.append(music_data)
 

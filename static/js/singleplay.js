@@ -5,88 +5,103 @@ const videoOverlay = document.getElementById('videoOverlay');
 const nextButton = document.getElementById('nextButton');
 let musicData = [];
 let player;
-let isPlayingVideo = true;
 let currentIndex = 0;
 let GameTimer = 0;
 let doMessage = true;
 let skipWait = false;
 let gameTimerInterval; //setInteval 이벤트
 function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
-    if (isPlayingVideo) {
-        // 이미 비디오를 재생 중인 경우 아무 작업도 하지 않음
-        return;
-    }
     let videolink = musicData[currentIndex]['youtube_embed_url'];
+    let category = musicData[currentIndex]['category'];
     // musicData[currentIndex].answer_list = JSON.parse("["+musicData[currentIndex].answer_list+"]");
-    isPlayingVideo = true;
-    const videoFrame = document.getElementById("videoFrame");
+    let videoFrame = document.getElementById("videoFrame");
     const videoId = getYoutubeVideoId(videolink);
     if (!videoId) {
         console.error("Invalid YouTube URL provided");
         return;
     }
-    if (!player) {
-        player = new YT.Player(videoFrame, {
-            height: '100%',
-            width: '100%',
-            videoId: videoId,
-            events: {
-                'onReady': (event) => {
-                    // 비디오 정보를 가져와서 endTime을 설정합니다.
-                    onPlayerReady(event, startTime, endTime, callback); // endTime와 callback 전달
-                },
-            }
-        });
-    } else {
-        // 기존 플레이어를 사용하여 비디오를 변경합니다.
-
-        player.cueVideoById({ videoId: videoId, startSeconds: startTime });
-        setTimeout(() => {
-            onNextReady(startTime, endTime, callback)
-        }, 1000)
+    if (player) {
+        player.destroy();
+        if (document.querySelector("div #videoFrame")) {
+            document.querySelector("div #videoFrame").remove();
+        }
+        let videoFrame = document.createElement("div");
+        videoFrame.id = "videoFrame";
+        videoFrame.classList.add("absolute", "top-0", "left-0", "w-full", "h-full")
+        document.getElementById("videoContainer").insertBefore(videoFrame, document.getElementById("videoOverlay"));
     }
+    videoFrame = document.getElementById("videoFrame");
+    player = new YT.Player(videoFrame, {
+        height: '100%',
+        width: '100%',
+        videoId: videoId,
+        events: {
+            'onReady': (event) => {
+                // 비디오 정보를 가져와서 endTime을 설정합니다.
+                onPlayerReady(event, startTime, endTime, callback , category); // endTime와 callback 전달
+            },
+        }
+    });
+    console.log(player);
     //videooverlay style block 추가
-    videoOverlay.style.display = '';
+    videoOverlay.style.display = 'block';
 }
 
-function onPlayerReady(event, startTime, endTime, callback) {
+function onPlayerReady(event, startTime, endTime, callback, category) {
     setVolume(document.querySelector("#VolumeBar").value);
-    event.target.playVideo();
+    console.log("test");
     if (startTime > 0) {
         seekTo(startTime);
     }
     if (callback != null) {
-        callback(startTime, endTime); // endTime을 콜백으로 전달
+        callback(startTime, endTime,category); // endTime을 콜백으로 전달
     }
 }
 
-function onNextReady(startTime, endTime, callback) {
+function EndTimeTest(startTime, fendTime, category) {
     clearInterval(gameTimerInterval); // 올바른 인터벌 ID 사용하여 중지
     player.playVideo();
     skipWait = false;
+
+    let endTime = fendTime;
     if (startTime > 0) {
         seekTo(startTime);
     }
     if (endTime == "stop") {
-        isPlayingVideo = false;
         return;
     }
-    if (callback != null) {
-        callback(startTime, endTime); // endTime을 콜백으로 전달
+    const all_play = document.getElementById("all_play");
+    for (let key in category) {
+        if (category.hasOwnProperty(key)) {
+            let value = category[key];
+            const box = document.createElement("p");
+            box.textContent = key+" ";
+            const span = document.createElement("span");
+            span.textContent = "";
+            box.appendChild(span);
+            all_play.appendChild(box);
+        }
     }
-}
-
-function EndTimeTest(startTime, fendTime) {
-    let endTime = fendTime;
+    let answer_list = musicData[currentIndex]['answer_list'];
+    for (let i = 0; i < answer_list.length; i++) {
+        if (Array.isArray(answer_list[i]) && answer_list[i].length > 0 && !Array.isArray(answer_list[i][0])) {
+            answer_list[i] = [answer_list[i]];
+        }
+    }
+    const inner_p = all_play.querySelectorAll("p");
+    for(let i = 0 ; i < inner_p.length; i++)
+    {
+        inner_p[i].querySelector("span").textContent = answer_list[i].length;
+    }
     if (endTime == 0 || endTime > player.getDuration()) {
         endTime = player.getDuration();
     }
-    GameTimer = endTime - startTime;
+    
+    GameTimer = parseInt(endTime - startTime);
     gameTimerInterval = setInterval(() => {
         document.querySelector("#GameTimer span").innerText = GameTimer;
         if (GameTimer <= 0) {
             // socket.emit("TimeOut", { "room": room_name });
-            isPlayingVideo = false;
             clearInterval(gameTimerInterval); // 올바른 인터벌 ID 사용하여 중지
             nextVideo();
             return;
@@ -128,7 +143,6 @@ inputMessage.addEventListener('keyup', (event) => {
 // 키보드 버튼 'End' 키를 눌러도 스킵이 되게끔 하는 동작
 document.addEventListener('keydown', (event) => {
     if (event.key === 'End') {
-        isPlayingVideo = false;
         if (!skipWait) {
             nextVideo();
         }
@@ -136,7 +150,6 @@ document.addEventListener('keydown', (event) => {
 });
 
 nextButton.addEventListener('click', () => {
-    isPlayingVideo = false;
     if (!skipWait) {
         nextVideo();
     }
@@ -194,32 +207,38 @@ socket.on('single_message', (data) => {
 
 // 사용자의 답안 확인
 function checkAnswer(answer) {
-   const answerToFind = answer.trim();
-    const answerList = musicData[currentIndex].answer_list;
-
-    // 정답 확인
-    const isCorrectAnswer = answerList.some(group => group.map(item => item.trim()).includes(answerToFind));
-
-    if (isCorrectAnswer) {
-        // 정답인 경우 추가 동작 수행
-        musicData[currentIndex].answer_list = answerList.filter(group => !group.map(item => item.trim()).includes(answerToFind));
-        if (musicData[currentIndex].answer_list == 0) {
-            isPlayingVideo = false;
-            playvideo(currentIndex, musicData[currentIndex].startTime, "stop", null);
-            videoOverlay.style.display = 'none';
-            showSongInfo(currentIndex,true);
-            if (document.querySelector("#NextVideo").checked) {
-                setTimeout(() => {
-                    if (!skipWait) {
-                        nextVideo();
-                    }
-                }, 1000);
-            }
-        }else
-        {
-            showSongInfo(currentIndex, false, answer);
+    const answerToFind = answer.trim();
+    let answerList = musicData[currentIndex].answer_list;
+    for (let i = 0; i < answerList.length; i++) {
+        if (Array.isArray(answerList[i]) && answerList[i].length > 0 && !Array.isArray(answerList[i][0])) {
+            answerList[i] = [answerList[i]];
         }
     }
+    for(const element of answerList)
+    {
+        console.log(element);
+        const isCorrectAnswer = element.some(group => group.map(item => item.trim()).includes(answerToFind));
+        if (isCorrectAnswer) {
+            console.log("정답")
+            // 정답인 경우 추가 동작 수행
+            // musicData[currentIndex].answer_list = answerList.filter(group => !group.map(item => item.trim()).includes(answerToFind));
+            // if (musicData[currentIndex].answer_list == 0) {
+            //     playvideo(currentIndex, musicData[currentIndex].startTime, "stop", null);
+            //     videoOverlay.style.display = 'none';
+            //     showSongInfo(currentIndex,true);
+            //     if (document.querySelector("#NextVideo").checked) {
+            //         setTimeout(() => {
+            //             if (!skipWait) {
+            //                 nextVideo();
+            //             }
+            //         }, 1000);
+            //     }
+            // }else
+            // {
+            //     showSongInfo(currentIndex, false, answer);
+            // }
+        }
+    } 
 }
 
 function showSongInfo(index, all, myanswer = null) {
@@ -257,7 +276,6 @@ $(document).ready(() => {
     const missionId = new URLSearchParams(window.location.search).get('id');
     $.getJSON("/get-music-data?id=" + missionId, (data) => {
         musicData = data;
-        isPlayingVideo = false;
         playvideo(currentIndex, musicData[currentIndex]['startTime'], musicData[currentIndex]['endTime'], EndTimeTest);
         document.querySelector("#AllNumber").innerText = musicData.length;
     });
