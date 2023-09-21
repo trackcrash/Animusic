@@ -176,8 +176,6 @@ class MusicDataManager:
             for section_idx, group_answers in enumerate(music_data['answer_list']):
                 category_name = list(categories.keys())[section_idx]
                 category_value = int(categories[category_name])
-                if group_answers and isinstance(group_answers[0], list) and category_value == 0:
-                    category_value = len(group_answers)
                 
                 if group_answers and isinstance(group_answers[0], list):
                     for sub_idx, sub_group in enumerate(group_answers):
@@ -190,11 +188,11 @@ class MusicDataManager:
                             return True, category_name
                 else:
                     if answer in group_answers:
-                        if category_value == 0 and music_data['matched_answers'].get(category_name, 0) >= 1:
+                        if music_data['matched_answers'].get(category_name, 0) >= category_value:
                             return False, None
 
                         music_data['matched_answers'][category_name] = music_data['matched_answers'].get(category_name, 0) + 1
-                        group_answers.remove(answer)  # This should be okay for 1D arrays
+                        group_answers.remove(answer)
                         return True, category_name
         return False, None
 
@@ -203,6 +201,7 @@ class MusicDataManager:
         data = room_data.get('data', [])
         idx = room_data.get('current_index', 0)
         left_answer = []
+
         if idx < len(data):
             music_data = data[idx]
             categories = music_data.get('category', '')
@@ -213,20 +212,14 @@ class MusicDataManager:
                 category_value = int(categories[category_name])
                 matched_count = music_data['matched_answers'].get(category_name, 0)
                 
-                # 배열의 갯수를 밸류로 주기
-                if category_value == 0:
-                    if group_answers and isinstance(group_answers[0], list):  # 2차원 배열인 경우
-                        category_value = len(group_answers)   # 서브 그룹의 개수로 카테고리 밸류 설정
-                    else:  # 1차원 배열인 경우
-                        category_value = 1  # 그룹 내부의 항목 중 하나만 맞추면 됨
-
                 # Calculate remaining answers based on category value and matched count
                 remaining_for_this_category = category_value - matched_count
                 left_answer.append(remaining_for_this_category)
+                
                 # Update the total remaining answers
                 remaining_answers += remaining_for_this_category
 
-            return remaining_answers,left_answer
+            return remaining_answers, left_answer
 
         return 0
 music_data_manager = MusicDataManager()
@@ -266,6 +259,14 @@ def make_answer(mission_id, room_key):
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
         answer_list =  parse_answers(item['answer'])
         category_list = parse_categories(item['category'])
+        for category, value in category_list.items():
+            if int(value) == 0:
+                idx = list(category_list.keys()).index(category)
+                if answer_list[idx] and isinstance(answer_list[idx][0], list):
+                    category_list[category] = str(len(answer_list[idx]))
+                else:
+                    category_list[category] = '1'
+
         starttime = float(item['startTime'])
         endTime = float(item['endTime'])
         music_data = {
