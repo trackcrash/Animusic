@@ -175,19 +175,19 @@ class MusicDataManager:
 
             for section_idx, group_answers in enumerate(music_data['answer_list']):
                 if isinstance(group_answers[0], list):  # 2차원 배열인 경우
-                    for sub_group in group_answers:
+                    for sub_idx, sub_group in enumerate(group_answers):
                         if answer in sub_group:
                             category_name = list(categories.keys())[section_idx]
                             category_value = int(categories[category_name])
                             # If category_value is 0 and the answer is already matched, don't proceed
-                            if category_value == 0 and music_data['matched_answers'].get(category_name, 0) >= 1:
+                            if music_data['matched_answers'].get(category_name, 0) >= category_value:
                                 return False, None
 
                             # Increase the matched answer count
                             music_data['matched_answers'][category_name] = music_data['matched_answers'].get(category_name, 0) + 1
 
-                            # Remove the correct answer
-                            sub_group.remove(answer)
+                            # Remove the entire sub_group from group_answers
+                            del group_answers[sub_idx]
                             return True, category_name
                 else:  # 1차원 배열인 경우
                     if answer in group_answers:
