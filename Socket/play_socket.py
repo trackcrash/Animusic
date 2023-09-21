@@ -92,11 +92,11 @@ def play_Socket(socketio):
         name = current_user.name
         is_correct, answer_category = music_data_manager.check_answer(room, msg)
         if is_correct and data['isAnswer'] and socket_class.isDuplication[room]:
-            leftAnswer = music_data_manager.is_group_answered(room)
+            leftAnswer, category_length = music_data_manager.is_group_answered(room)
             if leftAnswer == 0:
                 current_data = music_data_manager.retrieve_data(room)
                 current_data['endTime'] = "stop"
-                emit('correctAnswer', {'name':name, 'data':current_data, "answer_category":answer_category}, room=room)
+                emit('correctAnswer', {'name':name, 'data':current_data, "category_length":category_length}, room=room)
                 if room not in socket_class.isDuplication :
                     socket_class.isDuplication[room] = False
                 socket_class.isDuplication[room] = False
@@ -104,7 +104,7 @@ def play_Socket(socketio):
                     socket_class.play_vote[room] = []
                 socket_class.play_vote[room] = []
             else : 
-                emit('showAnswer', {'name': name, "answer_category":answer_category,'msg':msg}, room=room)
+                emit('showAnswer', {'name': name, "category_length":category_length,'msg':msg}, room=room)
             room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
             emit('message', {'name': name, 'msg': msg}, room=room)
             update_room_player_count(room, "님이 정답을 맞췄습니다.", name, 1)

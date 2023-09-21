@@ -202,7 +202,7 @@ class MusicDataManager:
         room_data = self._data_store.get(room, {})
         data = room_data.get('data', [])
         idx = room_data.get('current_index', 0)
-
+        left_answer = []
         if idx < len(data):
             music_data = data[idx]
             categories = music_data.get('category', '')
@@ -222,11 +222,11 @@ class MusicDataManager:
 
                 # Calculate remaining answers based on category value and matched count
                 remaining_for_this_category = category_value - matched_count
-                
+                left_answer.append(remaining_for_this_category)
                 # Update the total remaining answers
                 remaining_answers += remaining_for_this_category
 
-            return remaining_answers
+            return remaining_answers,left_answer
 
         return 0
 music_data_manager = MusicDataManager()
@@ -279,7 +279,6 @@ def make_answer(mission_id, room_key):
             'song': item['song'],
             'category': category_list
         }
-        print(category_list)
         result.append(music_data)
 
     random.shuffle(result)

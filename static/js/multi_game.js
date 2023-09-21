@@ -62,7 +62,7 @@ function sendMessage() {
 
 }
 //정답 출력용
-function showSongInfo(title, song, correctusername, all) {
+function showSongInfo(title, song, correctusername, all, left_answer) {
     const songTitle = document.getElementById('songTitle');
     const songArtist = document.getElementById('songArtist');
     const correctUser = document.getElementById('correctUser');
@@ -73,7 +73,11 @@ function showSongInfo(title, song, correctusername, all) {
         songArtist.innerText = song;
         all_play.innerText = "모든 정답을 맞추셨습니다.";
     } else {
-        all_play.innerText = `${song}개의 정답이 남았습니다.`;
+        const answer_list = all_play.querySelectorAll("p");
+        for(let i = 0; i < left_answer.length; i++)
+        {
+            answer_list[i].querySelector("span").textContent = left_answer[i];
+        }
     }
 }
 
@@ -191,10 +195,9 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong, category) {
         if (category.hasOwnProperty(key)) {
             let value = category[key];
             const box = document.createElement("p");
-            box.id = value.split(":")[0];
-            box.textContent = value.split(":")[0];
+            box.textContent = key+" ";
             const span = document.createElement("span");
-            span.textContent = value.split(":")[1];
+            span.textContent = value;
             box.appendChild(span);
             all_play.appendChild(box);
         }
@@ -447,17 +450,19 @@ function initializeSocketEvents() {
 
     socket.on('correctAnswer', data => {
         isAnswer = false;
+        const left_answer= data["category_length"];
         const videolink = data["data"]["youtube_embed_url"];
         clearInterval(gameTimerInterval);
         playvideo(videolink, data.data.endTime);
-        showSongInfo(data.data.title, data.data.song, data.name, true);
+        showSongInfo(data.data.title, data.data.song, data.name, true,left_answer);
         if (document.querySelector("#NextVideo").checked) {
             voteSkip();
         }
     });
 
     socket.on('showAnswer', data => {
-        showSongInfo(data.msg, data.leftAnswer, data.name, false);
+        const left_answer = data["category_length"];
+        showSongInfo(data.msg, null , data.name, false, left_answer);
     })
     socket.on('hint', data => {
         showHint(data.hint);
