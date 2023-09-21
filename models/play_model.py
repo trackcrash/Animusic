@@ -239,7 +239,7 @@ music_data_manager = MusicDataManager()
 
 def parse_categories(category_str):
     # 원래의 방식대로 카테고리 파싱
-    category_pairs = category_str.split('][')
+    category_pairs = category_str.split('],[')
     category_pairs[0] = category_pairs[0][1:]
     category_pairs[-1] = category_pairs[-1][:-1]
     return dict(pair.split(':') for pair in category_pairs)
