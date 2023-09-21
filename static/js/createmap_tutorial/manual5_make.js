@@ -2,17 +2,16 @@ if (typeof tutorial5_manual === 'undefined') {
 
     class tutorial5_manual {
         constructor () {
-            this.Timeclass = document.getElementById('tutorial-Timeclass');
-            this.Timeinputlist = Array.from(tutorial_Timeclass.querySelectorAll('input'));
-            this.Time = document.getElementById('tutorial-Time');
+            this.Timeinputlist = $('#tutorial-Timeclass input')
+            this.Time = $('#tutorial-Time');
         }
     }
 
     const tutorial5 = new tutorial5_manual();
 
-    tutorial5.Timeinputlist.forEach(input => {
-        input.addEventListener('input', (e) => {
-            tutorial5.Time.textContent = '';
+    $.each(tutorial5.Timeinputlist, (_, input) => {
+        $(input).on('input', () => {
+            tutorial5.Time.text('');
 
             let tutorial_startTime = 0, tutorial_endTime = 0;
             let tutorial_startText = '', tutorial_endText = '';
@@ -64,13 +63,13 @@ if (typeof tutorial5_manual === 'undefined') {
 
             if (tutorial_startTime < tutorial_endTime) {
 
-                if (tutorial_startText) {tutorial5.Time.textContent = tutorial_startText + " ~ " + tutorial_endText}
-                else {tutorial5.Time.textContent = '0초 ~ ' + tutorial_endText};
+                if (tutorial_startText) {tutorial5.Time.text(tutorial_startText + " ~ " + tutorial_endText)}
+                else {tutorial5.Time.text('0초 ~ ' + tutorial_endText)};
 
             } else {
 
-                if (tutorial_startText) {tutorial5.Time.textContent = tutorial_startText + " ~ 영상의 끝 까지"}
-                else {tutorial5.Time.textContent = '0초 ~ 영상의 끝 까지'};
+                if (tutorial_startText) {tutorial5.Time.text(tutorial_startText + " ~ 영상의 끝 까지")}
+                else {tutorial5.Time.text('0초 ~ 영상의 끝 까지')};
             };
         });
     });

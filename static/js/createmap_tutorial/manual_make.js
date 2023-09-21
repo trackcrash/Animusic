@@ -1,37 +1,33 @@
 if (typeof tutorial_manual === 'undefined') {
     class tutorial_manual {
         constructor() {
-            this.mapname = document.getElementById('tutorial-mapname');
-            this.mapname_label = document.getElementById('tutorial-mapname-label');
-            this.mapname_input = document.getElementById('tutorial-mapname-input');
-            this.mapname_insert = document.getElementById('tutorial-mapname-insert');
-            this.mapname_savebtn = document.getElementById('tutorial-mapname-savebtn');
-            this.mapname_insertbtn = document.getElementById('tutorial-mapname-insertbtn')
+            this.mapname = $('#tutorial-mapname');
+            this.mapname_label = $('#tutorial-mapname-label');
+            this.mapname_input = $('#tutorial-mapname-input');
+            this.mapname_insert = $('#tutorial-mapname-insert');
+            this.mapname_savebtn = $('#tutorial-mapname-savebtn');
+            this.mapname_insertbtn = $('#tutorial-mapname-insertbtn');
         };
     };
 
     const tutorial = new tutorial_manual();
 
-    tutorial.mapname_insert.addEventListener('click', () => {
-        if (tutorial.mapname_input.classList.contains('hidden')) {
-            tutorial.mapname_insert.classList.remove('w-full');
-            tutorial.mapname_insert.classList.add('w-1/2');
-            tutorial.mapname_input.classList.remove('hidden');
-            tutorial.mapname_insert.innerText = '제목 저장하기';
+    tutorial.mapname_insert.click(() => {
+        if (tutorial.mapname_input.hasClass('hidden')) {
+            tutorial.mapname_input.removeClass('hidden');
+            tutorial.mapname_insert.removeClass('w-full').addClass('w-1/2').text('제목 저장하기');
         } else {
-            tutorial.mapname_label.textContent = "맵 이름: " + tutorial.mapname_input.value;
-            tutorial.mapname_input.classList.add('hidden');
-            tutorial.mapname_insert.classList.remove('w-1/2');
-            tutorial.mapname_insert.classList.add('w-full');
-            tutorial.mapname_insert.innerText = '제목 변경하기';
+            tutorial.mapname_input.addClass('hidden');
+            tutorial.mapname_insert.removeClass('w-1/2').addClass('w-full').text('제목 변경하기');
+            tutorial.mapname_label.text("맵 이름: " + tutorial.mapname_input.val());
         };
     });
 
-    tutorial.mapname_savebtn.addEventListener('click', () => {
-        tutorial.mapname.textContent = tutorial.mapname_input.value;
+    tutorial.mapname_savebtn.click(() => {
+        tutorial.mapname.text(tutorial.mapname_input.val());
     });
 
-    tutorial.mapname_insertbtn.addEventListener('click', () => {
-        tutorial.mapname.textContent = tutorial.mapname_input.value;
+    tutorial.mapname_insertbtn.click(() => {
+        tutorial.mapname.text(tutorial.mapname_input.val());
     });
 };

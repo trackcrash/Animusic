@@ -23,6 +23,7 @@ class Music(Base):
     # 시작시간, 종료시간 설정
     startTime = Column(DECIMAL(precision=9, scale=3), nullable=True)
     endTime = Column(DECIMAL(precision=9, scale=3), nullable=True)
+    category = Column(String(255), nullable=False)
     # ORM 관계 설정
     mission = relationship("Mission", back_populates="musics")
     category = Column(String(255), nullable=False)
