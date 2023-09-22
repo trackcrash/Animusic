@@ -6,8 +6,10 @@ from flask_login import current_user
 from models.user_model import get_userinfo_by_name
 from controllers.map_controller import show_mission_byid
 from Socket.socket import socket_class
+from models.data_model import save_category
 import re
 import copy
+import json
 class RoomDataManger:
     def __init__(self):
         self._data_store = dict()
@@ -223,13 +225,28 @@ class MusicDataManager:
 
         return 0
 music_data_manager = MusicDataManager()
-
+def save_data(id, answer):
+    answer_list = answer.split('/')
+    category_data= ""
+    i = 0
+    for data in answer_list:
+        category_data+="[카테고리",i,":],"
+        i=i+1
+    if category_data.endswith(','):
+        category_data = category_data[:-1]
+    save_category(id,category_data)
+    return category_data
 def parse_categories(category_str):
-    # 원래의 방식대로 카테고리 파싱
-    category_pairs = category_str.split('],[')
-    category_pairs[0] = category_pairs[0][1:]
-    category_pairs[-1] = category_pairs[-1][:-1]
-    return dict(pair.split(':') for pair in category_pairs)
+    try:
+        category_str = category_str.strip('[]')
+        category_pairs = category_str.split('],[')
+        category_dict = {}
+        for pair in category_pairs:
+            key, value = pair.split(':')
+            category_dict[key.strip()] = value.strip() if value.strip() != "" else "0"
+        return category_dict
+    except Exception as e:
+        return None
 
 def parse_answers(answer_str):
     main_items = answer_str.split('/')
@@ -259,6 +276,8 @@ def make_answer(mission_id, room_key):
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
         answer_list =  parse_answers(item['answer'])
         category_list = parse_categories(item['category'])
+        if not category_list :
+            category_list = parse_categories(save_data(item['id'],item['answer']))
         for category, value in category_list.items():
             if int(value) == 0:
                 idx = list(category_list.keys()).index(category)
@@ -296,6 +315,16 @@ def single_make_answer(mission_id):
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
         answer_list = parse_answers(item['answer'])
         category_list = parse_categories(item['category'])
+        if not category_list :
+            category_list = parse_categories(save_data(item['id'],item['answer']))
+        for category, value in category_list.items():
+            if int(value) == 0:
+                idx = list(category_list.keys()).index(category)
+                if answer_list[idx] and isinstance(answer_list[idx][0], list):
+                    category_list[category] = str(len(answer_list[idx]))
+                else:
+                    category_list[category] = '1'
+        category_json = json.dumps(category_list)
         music_data = {
             'hint': item['hint'],
             'is_answered': 'false',
@@ -305,7 +334,7 @@ def single_make_answer(mission_id):
             'song': item['song'],
             'startTime' : item['startTime'],
             'endTime' : item['endTime'],
-            'category' : category_list
+            'category' : category_json
         }
         result.append(music_data)
 

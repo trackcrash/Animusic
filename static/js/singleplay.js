@@ -12,7 +12,7 @@ let skipWait = false;
 let gameTimerInterval; //setInteval 이벤트
 function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
     let videolink = musicData[currentIndex]['youtube_embed_url'];
-    let category = musicData[currentIndex]['category'];
+    let category = JSON.parse(musicData[currentIndex]['category']);
     // musicData[currentIndex].answer_list = JSON.parse("["+musicData[currentIndex].answer_list+"]");
     let videoFrame = document.getElementById("videoFrame");
     const videoId = getYoutubeVideoId(videolink);
@@ -42,14 +42,12 @@ function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
             },
         }
     });
-    console.log(player);
     //videooverlay style block 추가
     videoOverlay.style.display = 'block';
 }
 
 function onPlayerReady(event, startTime, endTime, callback, category) {
     setVolume(document.querySelector("#VolumeBar").value);
-    console.log("test");
     if (startTime > 0) {
         seekTo(startTime);
     }
@@ -77,22 +75,12 @@ function EndTimeTest(startTime, fendTime, category) {
             const box = document.createElement("p");
             box.textContent = key+" ";
             const span = document.createElement("span");
-            span.textContent = "";
+            span.textContent = value;
             box.appendChild(span);
             all_play.appendChild(box);
         }
     }
-    let answer_list = musicData[currentIndex]['answer_list'];
-    for (let i = 0; i < answer_list.length; i++) {
-        if (Array.isArray(answer_list[i]) && answer_list[i].length > 0 && !Array.isArray(answer_list[i][0])) {
-            answer_list[i] = [answer_list[i]];
-        }
-    }
-    const inner_p = all_play.querySelectorAll("p");
-    for(let i = 0 ; i < inner_p.length; i++)
-    {
-        inner_p[i].querySelector("span").textContent = answer_list[i].length;
-    }
+
     if (endTime == 0 || endTime > player.getDuration()) {
         endTime = player.getDuration();
     }
@@ -163,15 +151,26 @@ function sendMessage() {
             socket.emit('single_message', {
                 content: content
             }, () => {
-                const [is_correct, answer_category] = checkAnswer(content);
-                if (is_correct) {
-                    const [leftAnswer, category_length] = isGroupAnswered();
-                    console.log(leftAnswer);
+                let [isAnswerd, categories]=checkAnswer(content);
+                let leftAnswer = 0
+                for(const data of categories)
+                {
+                    leftAnswer += data;
+                }
+                if (isAnswerd) {
                     if (leftAnswer === 0) {
-                        nextVideo(true);
-                        showSongInfo(currentIndex,true,content,category_length)
+                        if(document.querySelector("#NextVideo").checked)
+                        {
+                            if (!skipWait) {
+                                nextVideo(true);
+                            }
+                        }else
+                        {
+                            nextVideo(false);
+                            showSongInfo(currentIndex,true,content,categories)
+                        }
                     } else {
-                        showSongInfo(currentIndex,false,content,category_length)
+                        showSongInfo(currentIndex,false,content,categories)
                     }
                 }
             });
@@ -181,43 +180,8 @@ function sendMessage() {
             doMessage = true;
         }, 200)
     }
-    // const content = inputMessage.value.trim();
-    // if (content) {
-    //     socket.emit('single_message', {
-    //         content: content
-    //     });
-    //     inputMessage.value = '';
-    //     checkAnswer(content);
-    // }
 }
-function isGroupAnswered() {
-    let idx = currentIndex|| 0;
-    const leftAnswer = [];
 
-    if (idx < musicData[idx].length) {
-        const music_data = musicData[idx];
-        const categories = music_data.category || {};
-        let remainingAnswers = 0;
-
-        for (let section_idx = 0; section_idx < music_data.answer_list.length; section_idx++) {
-            const category_names = Object.keys(categories);
-            const category_name = category_names[section_idx];
-            const category_value = parseInt(categories[category_name], 10);
-            const matched_count = music_data.matched_answers[category_name] || 0;
-            
-            // Calculate remaining answers based on category value and matched count
-            const remaining_for_this_category = category_value - matched_count;
-            leftAnswer.push(remaining_for_this_category);
-
-            // Update the total remaining answers
-            remainingAnswers += remaining_for_this_category;
-        }
-
-        return [remainingAnswers, leftAnswer];
-    }
-
-    return [0, []];
-}
 socket.on('single_message', (data) => {
     const item = document.createElement('div');
     if (data.name == '') {
@@ -256,45 +220,31 @@ function removeGroupByKeyword(data, keyword) {
 function checkAnswer(answer) {
     if (currentIndex < musicData.length) {
         const music_data = musicData[currentIndex];
-        const categories = music_data.category || {};
-        
-        if (!('matched_answers' in music_data)) {
-            music_data.matched_answers = {};
+        const all_play = document.getElementById('all_play').querySelectorAll("p");
+        let categories =[];
+        let isAnswerd = false;
+        for(let i =0; i < all_play.length; i++)
+        {
+           categories[i] =parseInt(all_play[i].querySelector('span').textContent);
         }
+        let i = 0;
+        for (element of music_data["answer_list"]) {
+            if (Array.isArray(element) && categories[i] != 0) {
+                for (let j = 0; j < element.length; j++) {
+                    if (element[j].indexOf(answer) !== -1) {
+                        element.splice(j, 1);
+                        categories[i]--;
+                        isAnswerd = true;
 
-        for (let section_idx = 0; section_idx < music_data.answer_list.length; section_idx++) {
-            const group_answers = music_data.answer_list[section_idx];
-            const category_names = Object.keys(categories);
-            const category_name = category_names[section_idx];
-            const category_value = parseInt(categories[category_name], 10);
-
-            if (group_answers && Array.isArray(group_answers[0])) {
-                for (let sub_idx = 0; sub_idx < group_answers.length; sub_idx++) {
-                    const sub_group = group_answers[sub_idx];
-                    if (sub_group.includes(answer)) {
-                        if (music_data.matched_answers[category_name] >= category_value) {
-                            return [false, null];
-                        }
-
-                        music_data.matched_answers[category_name] = (music_data.matched_answers[category_name] || 0) + 1;
-                        group_answers[sub_idx] = [];
-                        return [true, category_name];
+                        break;
                     }
-                }
-            } else {
-                if (group_answers.includes(answer)) {
-                    if (music_data.matched_answers[category_name] >= category_value) {
-                        return [false, null];
-                    }
-
-                    music_data.matched_answers[category_name] = (music_data.matched_answers[category_name] || 0) + 1;
-                    group_answers.splice(group_answers.indexOf(answer), 1);
-                    return [true, category_name];
                 }
             }
+            i++;
         }
+        return [isAnswerd, categories];   
+
     }
-    return [false, null];
 }
 
 function showSongInfo(index, all, myanswer = null,category) {
@@ -335,6 +285,7 @@ function nextVideo(skip) {
     }else
     {
         playvideo(currentIndex, musicData[currentIndex]['startTime'], "stop", EndTimeTest);
+        videoOverlay.style.display = "none";
     }
    
 }

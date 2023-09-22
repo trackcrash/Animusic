@@ -41,7 +41,6 @@ class Music(Base):
     def __repr__(self):
         return f"title='{self.title}', song='{self.song}', youtube_url='{self.youtube_url}', thumbnail_url='{self.thumbnail_url}', answer='{self.answer}', hint='{self.hint}', mission_id='{self.mission_id}', startTime='{self.startTime}', endTime='{self.endTime}'"
 
-
 class Mission(Base):
     __tablename__ = 'MissionTable'
     id = Column(Integer, primary_key=True)
@@ -152,6 +151,24 @@ def update_to_db(data):
         for delete_id in idset_for_delete: # 해당 id를 가진 모든 곡을 삭제
             delete_music_info = session.query(Music).filter_by(id=delete_id).first()
             session.delete(delete_music_info)
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        error_msg = f'Error saving data: {str(e)}'
+        print(error_msg)
+        return error_msg
+    finally:
+        close_session(engine,session)
+def save_category(id, category):
+    engine, session = create_session()
+    try:
+        music_record = session.query(Music).filter_by(id=id).first()
+
+        if music_record:
+        # 레코드를 찾았을 경우, category 필드에 새로운 값을 할당
+            music_record.category = category
+
+        # 변경사항을 세션에 반영
         session.commit()
     except SQLAlchemyError as e:
         session.rollback()
