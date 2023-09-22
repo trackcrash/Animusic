@@ -106,12 +106,6 @@ function modifyFunction() {
             const song = box.querySelector('p')?.innerText;
             const songURL = box.querySelector('input')?.value;
             const h1text = box.querySelector('h1')?.innerText;
-            let answer = [];
-            if (h1text.includes('/')) {
-                answer = h1text.split('/');
-            } else {
-                answer[0] = h1text;
-            }
             // 이전의 데이터로 인해 생겼던 중복정답 요소를 모두 제거 (input, button)
             document.querySelectorAll('.multi_answer').forEach(input_element => {
                 input_element.remove();
@@ -137,7 +131,20 @@ function modifyFunction() {
             const id = box.querySelector('h4')?.innerText;
             const startTime = box.querySelector('h5')?.innerText;
             const endTime = box.querySelector('h6')?.innerText;
-            const catedata = box.querySelector('cate')?.innerText.match(/\[([^\]]+)\]/g);
+            let answer = [];
+            let catedata = box.querySelector('cate')?.innerText.match(/\[([^\]]+)\]/g) || [];
+            if(catedata == "")
+            {
+                catedata[0] = "카테고리:";
+                answer[0] = h1text.replace('/');
+            }else
+            {
+                if (h1text.includes('/')) {
+                    answer = h1text.split('/');
+                } else {
+                    answer[0] = h1text;
+                }
+            }
             // document.querySelectorAll(".answer_list")[0].classList.add("selected");
             if (catedata.length > 0) {
                 let index = 0;
