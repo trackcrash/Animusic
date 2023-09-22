@@ -518,6 +518,10 @@ window.addEventListener('scroll', function() {
 
     }
 });
+document.querySelector("#disconect").addEventListener("click",()=>
+{
+    window.location = "/room_list";
+})
 socket.on("failed_user_change", () => {
     alert("현재 유저수가 변경할 인원수 보다 많습니다.");
 });
@@ -646,10 +650,11 @@ function populateModalWithMissionData(data) {
 
 function selectAndClose(id) {
     setSelectedId(id);
+
     // Close the modal
     document.getElementById('mapModal').classList.add('hidden');
-    socket.emit('MissionSelect', { "room_key": room_key, "selected_id": selectedId });
-
+    socket.emit('MissionSelect', { "room_key": room_key, "selected_id": selectedId });    
+    console.log(id);
 }
 
 function closeModal() {

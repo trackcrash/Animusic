@@ -12,20 +12,21 @@ from models.data_model import save_category
 import re
 import copy
 import json
+
 class RoomDataManger:
     def __init__(self):
         self._data_store = dict()
     def remove_room(self, room_key):
-        if room_key in self._data_store:
-            del self._data_store[room_key]
-        if room_key in socket_class.play_vote:
-            del socket_class.play_vote[room_key]
-        if room_key in socket_class.totalPlayers:
-            del socket_class.totalPlayers[room_key]
-        if room_key in socket_class.isDuplication:
-            del socket_class.isDuplication[room_key]
-        if room_key in socket_class.BanList:
-            del socket_class.BanList[room_key]
+            if room_key in self._data_store:
+                del self._data_store[room_key]
+            if room_key in socket_class.play_vote:
+                del socket_class.play_vote[room_key]
+            if room_key in socket_class.totalPlayers:
+                del socket_class.totalPlayers[room_key]
+            if room_key in socket_class.isDuplication:
+                del socket_class.isDuplication[room_key]
+            if room_key in socket_class.BanList:
+                del socket_class.BanList[room_key]
     def room_check(self, room_key):
         if room_key in self._data_store:
             return True
@@ -67,7 +68,6 @@ class RoomDataManger:
         character_link = str(character)
         user_data = {'username': user_name , 'host':0 ,'score':0 ,'joined_time' : time.time(), 'character':character_link,'level':level}  # 유저 데이터를 리스트로 생성
         dict_join(self._data_store[room_key]["user"], session_id, user_data)
-    
     def get_all_session_ids_in_rooms(self):
         session_ids = []
 

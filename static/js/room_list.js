@@ -33,8 +33,12 @@ function createRoomElement(room_key, room_name, room_status, user_count, mission
     const roomCountElement = document.createElement('span');
     roomCountElement.id = `${roomNameElementIdPrefix}${room_key}`;
     roomCountElement.classList.add('block', 'text-sm', 'font-medium');
-    roomCountElement.textContent = `👥 ${user_count ? user_count + "명" : "0명"} / ${max_user}명`;
-
+    let user = user_count ? user_count + "명" : "0명";
+    roomCountElement.textContent = `👥 ${user} / ${max_user}명`;
+    if(user == "0명")
+    {
+        roomContainer.style.display = "none"; 
+    }
     const roomMissionElement = document.createElement('span');
     roomMissionElement.id = `${roomNameElementMissionPrefix}1-${room_key}`;
     roomMissionElement.classList.add('block', 'text-sm', 'font-medium');
@@ -91,9 +95,19 @@ function ContaineraddClickListener(roomContainer, room_key) {
 
 function updateRoomCount(room_key, playerCount) {
     const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${room_key}`);
+    const roomContainer = document.getElementById(`roomContainer_${room_key}`);
+    let player = playerCount ? playerCount + "명" : "0명"
     if (roomCountElement) {
         const textContents = roomCountElement.textContent.split('/');
-        roomCountElement.textContent = `👥 ${playerCount ? playerCount + "명" : "0명"} / ${textContents[1]}`;
+        roomCountElement.textContent = `👥 ${player} / ${textContents[1]}`;
+    }
+    if(player == "0명")
+    {
+        roomContainer.style.display = "none";
+    }
+    else
+    {
+        roomContainer.style.display = "block";
     }
 }
 
@@ -192,6 +206,7 @@ socket.on('user_check_not_ok', () => {
 });
 
 socket.on('room_removed', (data) => {
+    console.log(data);
     removeRoomFromList(data);
 });
 socket.on('Join_room', (data) => {

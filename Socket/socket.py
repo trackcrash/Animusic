@@ -12,4 +12,5 @@ class socketClass:
         self.play_vote = {}
         self.isDuplication ={}
         self.BanList = {}
+        self.is_threading = False
 socket_class = socketClass()

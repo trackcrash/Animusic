@@ -140,12 +140,15 @@ def play_Socket(socketio):
             emit("MapNotSelect", room=request.sid)
     @socketio.on('MissionSelect')
     def send_saved_data(data):
-        room_key = data.get("room_key")
-        # make_answer(map_controller.get_music_data(data['selected_id']), room_name)
-        mission = show_mission_byid(data['selected_id'])
-        room_data_manager.Mission_select(room_key, mission, data['selected_id'])
-        emit('MissionSelect_get', {'room_key' : room_key, "map_data": mission}, broadcast= True)
-
+        try : 
+            room_key = data.get("room_key")
+            # make_answer(map_controller.get_music_data(data['selected_id']), room_name)
+            mission = show_mission_byid(data['selected_id'])
+            room_data_manager.Mission_select(room_key, mission, data['selected_id'])
+            emit('MissionSelect_get', {'room_key' : room_key, "map_data": mission}, broadcast= True)
+        except Exception as e :
+            pass
+        
     #스킵투표
     @socketio.on('voteSkip')
     def handle_vote_skip(data):
