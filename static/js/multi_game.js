@@ -199,6 +199,7 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong, category) {
         return;
     }
     const all_play = document.getElementById("all_play");
+    all_play.innerText = "";
     for (let key in category) {
         if (category.hasOwnProperty(key)) {
             let value = category[key];
