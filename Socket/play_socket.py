@@ -9,6 +9,7 @@ from models.room_model import update_room_player_count
 from models.user_model import get_userinfo_by_name, update_level_info
 from controllers.map_controller import show_mission_byid
 #반복이라 함수로 분리
+
 def skip_song(room):
     next_data = music_data_manager.retrieve_next_data(room)
     if next_data:
@@ -72,7 +73,6 @@ def exp_calculator(name, exp, nextexp, score, level, room_key,session_id):
         'nextexp': int(nextexp),
         'level': level
     }
-
 def play_Socket(socketio):
     @socketio.on('single_message')
     def handle_single_message(data):
@@ -194,3 +194,4 @@ def play_Socket(socketio):
                 socket_class.vote_counts[room_key] = 0
                 socket_class.voted_users[room_key] = [] 
                 room_data_manager._data_store[room_key]["room_info"]["is_skip"] = True            
+    

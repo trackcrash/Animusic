@@ -18,7 +18,7 @@ from Socket.connect_socket import connect_MySocket
 from Socket.play_socket import play_Socket
 from Socket.room_socket import room_Socket
 from models.notification_model import notification
-
+from models.room_model import thread_start
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 
@@ -59,7 +59,7 @@ def sitemap():
 @app.route('/ads.txt')
 def ads():
     return send_file('ads.txt')
-
+thread_start()
 if __name__ == '__main__':
     ensure_tables_exist()
     socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)

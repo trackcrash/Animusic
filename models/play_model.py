@@ -1,6 +1,8 @@
 import random
+from flask_socketio import emit
 from controllers.map_controller import show_table_bymissionid
 from models.user_model import get_user_by_id
+from flask import request
 from flask import jsonify
 from flask_login import current_user
 from models.user_model import get_userinfo_by_name
@@ -230,7 +232,7 @@ def save_data(id, answer):
     category_data= ""
     i = 0
     for data in answer_list:
-        category_data+="[카테고리",i,":],"
+        category_data += f"[카테고리{i}:],"
         i=i+1
     if category_data.endswith(','):
         category_data = category_data[:-1]
@@ -310,7 +312,6 @@ def make_answer(mission_id, room_key):
 def single_make_answer(mission_id):
     data = show_table_bymissionid(mission_id)
     result = []
-
     for item in data:
         youtube_embed_url = f"https://www.youtube.com/embed/{item['youtube_url'].split('=')[-1]}?autoplay=1"
         answer_list = parse_answers(item['answer'])

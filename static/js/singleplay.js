@@ -43,6 +43,7 @@ function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
         }
     });
     //videooverlay style block 추가
+    videoOverlay.querySelector('span').innerText = "정답을 맞춰야 영상을 볼 수 있습니다.";
     videoOverlay.style.display = 'block';
 }
 
@@ -291,6 +292,8 @@ function nextVideo(skip) {
 }
 
 $(document).ready(() => {
+    videoOverlay.querySelector('span').innerText = "데이터를 불러오는 중입니다.";
+
     const missionId = new URLSearchParams(window.location.search).get('id');
     $.getJSON("/get-music-data?id=" + missionId, (data) => {
         musicData = data;

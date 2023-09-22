@@ -141,6 +141,7 @@ function playvideo(videolink, endTime = null) {
             }
         }
     });
+    videoOverlay.querySelector('span').innerText ="";
     videoOverlay.style.display = 'block';
 }
 
@@ -281,6 +282,8 @@ function initEventListeners() {
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
         socket.emit('playTheGame', { "room_key": room_key, "selected_id": selectedId });
+        videoOverlay.querySelector('span').innerText = "데이터를 불러오는 중입니다.";
+
     });
     elements.MapSelect.addEventListener('click', MapSelectPopUp);
     elements.textClear.addEventListener('click', () => {
