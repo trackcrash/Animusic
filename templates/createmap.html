@@ -167,7 +167,6 @@
 
                 <div class="flex justify-between">
                     <div id = 'answer_buttonField'>
-                        <button onclick="zero_space_text('[여름 하늘 선선 세븐,나츠 소라 선선 세븐,여름하늘선선세븐,나츠소라선선세븐],[이치가야 아리사,이치가야아리사],[토야마 카스미,토야마카스미]')">test</button>
                         <label id="answer-label">카테고리</label>
                         <button data-index="0" class="answer_list selected"
                                 style="margin-right: 0.6rem;"
@@ -179,15 +178,20 @@
                     </div>
                 </div>
                 <div data-index="0" class="multi_answer" style="display: block;">
-                    <div class="flex justify-between w-full">
-                        <input placeholder="정답의 카테고리를 입력해주세요." class="w-1/2 category_input" value="노래제목" type="text" style="display: block;">
-                        <input placeholder="해당 카테고리내에서 몇개이상의 정답을 맞췄을때 모든정답을 맞췃다고 인식" class="w-1/2 answer_admit" type="text" style="display: block;">
+                    <div class="flex justify-between w-full space-x-2">
+                        <input placeholder="정답의 카테고리를 입력해주세요."
+                               class="w-1/2 category_input" value="노래제목"
+                               type="text" style="display: block;">
+                        <input placeholder="해당 카테고리내에서 몇개이상의 정답을 맞췄을때 모든정답을 맞췃다고 인식"
+                               class="w-1/2 answer_admit"
+                               type="text" style="display: block;">
                     </div>
                     <div class="flex justify-between">
                         <div class = 'answer2_buttonField'>
                             <label class="answer2-label">정답</label>
                             <button data-index="0" class="answer2_list selected"
-                                    onclick="focus_answer2_list(event.target.dataset.index)" style="margin-right: 0.6rem;">1</button>
+                                    onclick="focus_answer2_list(event.target.dataset.index)"
+                                    style="margin-right: 0.6rem;">1</button>
                         </div>
                         <div class="flex space-x-4">
                             <button class="add2_answerlist">정답 추가</button>
@@ -303,7 +307,7 @@
                     </div>
                 </div>
                 <div data-index="0" class="multi_answer" style="display: block;">
-                    <div class="flex justify-between w-full">
+                    <div class="flex justify-between w-full space-x-2">
                         <input placeholder="정답의 카테고리를 입력해주세요." class="w-1/2 category_input" value="노래제목" type="text" style="display: block;">
                         <input placeholder="해당 카테고리내에서 몇개이상의 정답을 맞췄을때 모든정답을 맞췃다고 인식" class="w-1/2 answer_admit" type="text" style="display: block;">
                     </div>

@@ -207,12 +207,14 @@ button {
 }
 
 /* 다중 정답 스크롤을 위한 스타일 */
+.answer2_buttonField,
 #answer_buttonField {
     position: relative;
     white-space: nowrap;
     overflow: hidden;
 }
 
+.answer2_buttonField label,
 #answer_buttonField label {
     position: -webkit-sticky;
     position: sticky;

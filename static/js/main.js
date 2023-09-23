@@ -264,6 +264,13 @@ function boxClick(answer,index,element)
     const answer2_buttonField_label = document.createElement("label");
     answer2_buttonField_label.className = "answer2-label";
     answer2_buttonField_label.textContent = "정답 ";
+    answer2_buttonField_label.addEventListener("click", (e)=>
+    {
+        const this_multi_answer_element = e.target.parentNode.parentNode.parentNode;
+        const block_answer_input = this_multi_answer_element.querySelector('.answer_input[style*="display: block"]');
+        if (block_answer_input) {block_answer_input.focus()}
+        else {this_multi_answer_element.querySelector('.answer_input').focus()};
+    })
     
     const answer_div_inner_div = document.createElement("div");
     answer_div_inner_div.className = "flex space-x-4";
@@ -860,6 +867,13 @@ function create_multi_answer()
     const answer2_buttonField_label = document.createElement("label");
     answer2_buttonField_label.className = "answer2-label";
     answer2_buttonField_label.textContent = "정답 ";
+    answer2_buttonField_label.addEventListener("click", (e)=>
+    {
+        const this_multi_answer_element = e.target.parentNode.parentNode.parentNode;
+        const block_answer_input = this_multi_answer_element.querySelector('.answer_input[style*="display: block"]');
+        if (block_answer_input) {block_answer_input.focus()}
+        else {this_multi_answer_element.querySelector('.answer_input').focus()};
+    })
     const answer2_buttonField_button = document.createElement("button");
     answer2_buttonField_button.dataset.index = "0";
     answer2_buttonField_button.className = "answer2_list";
@@ -1025,11 +1039,15 @@ function focus_answer2_list(index) {
         })
 }
 
-// //정답 input이 동적으로 변경되기 때문에 label focus 기능을 여기서 만듦.
-// document.getElementById('answer-label').addEventListener('click', () => {
-//     document.querySelector('.multi_answer[style*="display: block"]').focus();
-// })
+//카테고리 input이 동적으로 변경되기 때문에 label focus 기능을 여기서 만듦.
+document.getElementById('answer-label').addEventListener('click', () => {
+    document.querySelector('.multi_answer[style*="display: block"]').firstElementChild.firstElementChild.focus();
+})
 
+//첫번째 카테고리의 정답 label은 설정되지 않아서 따로 focus 기능을 만듦.
+document.querySelector('.answer2-label').addEventListener('click', (e) => {
+    e.target.parentNode.parentNode.parentNode.querySelector('.answer_input[style*="display: block"]').focus();
+})
 
 /*------------- 맵 설명 입력 부분-------------*/
 const map_descript_popup = document.getElementById('map-descript-popup');
@@ -1047,9 +1065,10 @@ function close_descript() {
 /* 다중 정답 스크롤 기능 */
 
 document.querySelector('.answer_list').addEventListener('mousedown', answer_list_scroll);
+document.querySelector('.answer2_list').addEventListener('mousedown', answer_list_scroll);
 
 function answer_list_scroll(e) {
-    let answer_buttonField = document.getElementById('answer_buttonField');
+    let answer_buttonField = e.target.parentNode;
     let mouse_point = e.clientX, mouse_switch = 0;
 
     document.addEventListener('mouseup', () => {mouse_switch = 1});
