@@ -176,6 +176,8 @@ function sendMessage() {
                     leftAnswer += data;
                 }
                 if (isAnswerd) {
+                    $("#correctSound").prop("volume", 0.12);
+                    $("#correctSound").get(0).play();
                     if (leftAnswer === 0) {
                         if(document.querySelector("#NextVideo").checked)
                         {
