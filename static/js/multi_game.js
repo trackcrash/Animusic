@@ -208,7 +208,7 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong, category) {
             categoryInfo.textContent = key + " ";
 
             const spanValue = document.createElement("span");
-            spanValue.textContent = "남은곡수: " + value;
+            spanValue.textContent = "남은항목: " + value;
             categoryInfo.appendChild(spanValue);
 
             box.appendChild(categoryInfo);
