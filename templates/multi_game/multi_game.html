@@ -20,6 +20,7 @@
     {% include "header.html" %}
     <div class="container mx-auto px-4 py-4 bg-gray-800 h-full">
         <div id="dummy"></div>
+        <audio id="correctSound" volume="0.0" src="static/audio/correctSound.wav" preload="auto"></audio>
         <button id="room_setting" onclick="Setting_room_btn()" class="btn-green" style="display:none;">방설정 변경</button>
         <div class="flex justify-center items-center mb-2">
             <h2 id="room_name" class="text-xl text-white items-center font-bold text-center bg-gray-600 inline-block px-4 py-2 rounded"></h2>
@@ -38,7 +39,17 @@
                 <div id="videoContainer" class="relative mb-2" style="padding-bottom: 50%;">
                     <div id="videoFrame" class="absolute top-0 left-0 w-full h-full"></div>
                     <div id="videoOverlay" class="absolute top-0 left-0 w-full h-full z-1 flex items-center justify-center bg-black bg-opacity-100 text-white">
-                        <div id="songHint" class="bg-gray-800 p-4 rounded text-white" style="display: none;"></div>
+                        <div class="bg-gray-900 p-4 rounded text-white w-1/2 max-w-lg flex flex-col items-center justify-center space-y-4">
+                            <div id="songHint" style="display: none;"></div>
+
+                            <!-- Song Artist and Correct User -->
+                            <div id="songInfo">
+                                <h2 id="songArtist" class="text-xl font-semibold"></h2>
+                                <p id="correctUser" class="text-white"></p>
+                                <p id="all_play"></p>
+                            </div>
+                        </div>
+
                         <span></span>
                     </div>
                 </div>
@@ -66,12 +77,6 @@
                     <button id="hintButton" class="btn-green" style="display: none;">힌트 보기</button>
                     <button id="MapSelect" class="btn-green" style="display: none;">맵선택</button>
                     <button id="StartButton" class="btn-green" style="display: none;">시작하기</button>
-                </div>
-                <!-- Song Artist and Correct User -->
-                <div id="songInfo" class="mt-2 bg-gray-900 p-4 rounded-lg">
-                    <h2 id="songArtist" class="text-xl font-semibold"></h2>
-                    <p id="correctUser" class="text-white"></p>
-                    <p id="all_play"></p>
                 </div>
 
                 <!-- Chat Section -->
