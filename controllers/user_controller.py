@@ -47,21 +47,20 @@ def register(request):
             return redirect(url_for('user.register'))
 
 
-def user_controller():
+def site_login():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
 
         # 일반 로그인 검증
-        user,session = user_model.validate_user(email, password)
+        user = user_model.validate_user(email, password)
         if user:
-            print(f"로그인 성공: {user.email}")
             login_user(user)
-            session.close()
             return redirect(url_for('index'))
         else:
             flash('Invalid email or password')
-            return False
+            return redirect(url_for('user.login'))
+            
 
 
 def google_login():
@@ -70,8 +69,8 @@ def google_login():
 
     request_uri = client.prepare_request_uri(
         authorization_endpoint,
-        redirect_uri="https://www.igeo.site/login/google/callback",
-        # redirect_uri=request.base_url + "/callback",
+        # redirect_uri="https://www.igeo.site/login/google/callback",
+        redirect_uri=request.base_url + "/callback",
         scope=["openid", "email", "profile"],
     )
     return redirect(request_uri)
@@ -79,19 +78,19 @@ def google_login():
 
 def google_callback():
     token_endpoint = requests.get(GOOGLE_DISCOVERY_URL).json()["token_endpoint"]
-    temp = request.url
-    token_url, headers, body = client.prepare_token_request(
-        token_endpoint,
-        authorization_response=temp.replace('http','https'),
-        redirect_url="https://www.igeo.site/login/google/callback",
-        code=request.args.get("code")
-    )
+    # temp = request.url
     # token_url, headers, body = client.prepare_token_request(
     #     token_endpoint,
-    #     authorization_response=request.url,
-    #     redirect_url=request.base_url,
+    #     authorization_response=temp.replace('http','https'),
+    #     redirect_url="https://www.igeo.site/login/google/callback",
     #     code=request.args.get("code")
     # )
+    token_url, headers, body = client.prepare_token_request(
+        token_endpoint,
+        authorization_response=request.url,
+        redirect_url=request.base_url,
+        code=request.args.get("code")
+    )
     token_response = requests.post(
         token_url,
         headers=headers,
