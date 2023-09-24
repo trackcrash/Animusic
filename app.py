@@ -22,10 +22,10 @@ from models.room_model import thread_start
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config('SECRET_KEY')
 
+app.register_blueprint(user_bp)
 app.register_blueprint(index_bp)
 app.register_blueprint(play_bp)
 app.register_blueprint(map_bp)
-app.register_blueprint(user_bp)
 app.register_blueprint(room_bp)
 app.register_blueprint(char_bp)
 app.register_blueprint(report_bp)
