@@ -40,7 +40,7 @@ def connect_MySocket(socketio):
                 room = room_data_manager.host_setting(room_key)
                 emit("host_updated", {"user": room, "game_status": game_status}, room=room_key)
                 if user_name:
-                    update_room_player_count(room_key, "님이 퇴장 하셨습니다.", user_name,0)  # 플레이어 수 업데이트
+                    update_room_player_count(room_key, "님이 퇴장 하셨습니다.", user_name,0,0)  # 플레이어 수 업데이트
                 if not room_data['user']:  # 방에 더 이상 유저가 없으면 방 제거
                     removed_rooms.append(room_key)
                 else:

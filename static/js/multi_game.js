@@ -14,6 +14,7 @@ let currentData = null;
 let Num = 0;
 let isAnswer = false;
 let session_id = "";
+let current_answer_user = "";
 // let is_api_load= false;
 
 // function onYouTubeIframeAPIReady() {
@@ -61,23 +62,28 @@ function sendMessage() {
 
 }
 //정답 출력용
-function showSongInfo(title, song, correctusername, all, left_answer) {
+function showSongInfo(title, song, correctusername, all, left_answer, category) {
     const songTitle = document.getElementById('songTitle');
     const songArtist = document.getElementById('songArtist');
     const correctUser = document.getElementById('correctUser');
     const all_play = document.getElementById("all_play");
-    songTitle.innerText = "정답: " + title;
-    correctUser.innerText = "정답자: " + correctusername;
     if (all == true) {
-        songArtist.innerText = song;
         all_play.innerText = "모든 정답을 맞추셨습니다.";
     } else {
-        const answer_list = all_play.querySelectorAll("p");
-        for(let i = 0; i < left_answer.length; i++)
-        {
-            answer_list[i].querySelector("span").textContent = left_answer[i];
+        const answer_list = all_play.querySelectorAll("div");
+        for (let i = 0; i < left_answer.length; i++) {
+            let correctAnswerText = answer_list[i].querySelector(".correct-answer") ? answer_list[i].querySelector(".correct-answer").textContent : "";
+            // 카테고리 이름만 가져오기 위해 span과 correct-answer 내용을 제외시킵니다.
+            let categoryName = answer_list[i].textContent.replace(answer_list[i].querySelector("span").textContent, "").replace(correctAnswerText, "").trim();
+
+            if (categoryName === category) {
+                const correctSpan = answer_list[i].querySelector(".correct-answer");
+                correctSpan.textContent += " " + title;
+            }
+            answer_list[i].querySelector("span").textContent = " 남은항목: " + left_answer[i];
         }
     }
+    current_answer_user = correctusername;
 }
 
 function showHint(hint) {
@@ -93,7 +99,6 @@ function voteSkip() {
 
 
 function dummyplay() {
-    console.log("호출됨");
     let embedLink = "https://www.youtube.com/embed/LN1ASBClb0Q?autoplay=1";
     const iframe = document.createElement("iframe");
     iframe.src = embedLink;
@@ -110,7 +115,6 @@ function playvideo(videolink, endTime = null) {
     const videoId = getYoutubeVideoId(videolink);
     let videoFrame;
     if (!videoId) {
-        console.error("Invalid YouTube URL provided");
         return;
     }
 
@@ -141,8 +145,8 @@ function playvideo(videolink, endTime = null) {
             }
         }
     });
-    videoOverlay.querySelector('span').innerText ="";
-    videoOverlay.style.display = 'block';
+    videoOverlay.querySelector('span').innerText = "";
+    videoOverlay.style.display = 'flex';
 }
 
 
@@ -152,23 +156,17 @@ function onPlayerReady(event, endTime) {
 }
 socket.on("CheckPlayer", function(data) {
     const endTime = data['endTime'];
-
-    console.log("체크", data["vote"], data["totalPlayer"]);
     if (player && player.playVideo) {
-        console.log("레디");
         socket.emit("ReadyPlayer", { "room_key": room_key, "endTime": endTime });
     } else {
-        console.log("제거");
         socket.emit("WaitPlay", { "room_key": room_key, "endTime": endTime });
     }
 })
 socket.on("reCheck", function(data) {
     const endTime = data['endTime'];
     if (player && player.playVideo) {
-        console.log("레디");
         socket.emit("ReadyPlayer", { "room_key": room_key, "endTime": endTime });
     } else {
-        console.log("제거");
         socket.emit("WaitPlay", { "room_key": room_key, "endTime": endTime });
     }
 });
@@ -187,7 +185,7 @@ function getidtourl() {
 function EndTimeTest(startTime, fendTime, totalSong, nowSong, category) {
     clearInterval(gameTimerInterval);
     player.playVideo();
-    
+
     let endTime = fendTime;
     setVolume(document.querySelector("#VolumeBar").value);
     if (startTime > 0) {
@@ -203,11 +201,23 @@ function EndTimeTest(startTime, fendTime, totalSong, nowSong, category) {
     for (let key in category) {
         if (category.hasOwnProperty(key)) {
             let value = category[key];
-            const box = document.createElement("p");
-            box.textContent = key+" ";
-            const span = document.createElement("span");
-            span.textContent = value;
-            box.appendChild(span);
+            const box = document.createElement("div");
+            box.classList.add('player-box');
+
+            const categoryInfo = document.createElement("p");
+            categoryInfo.textContent = key + " ";
+
+            const spanValue = document.createElement("span");
+            spanValue.textContent = "남은곡수: " + value;
+            categoryInfo.appendChild(spanValue);
+
+            box.appendChild(categoryInfo);
+
+            const spanCorrect = document.createElement("span");
+            spanCorrect.classList.add("correct-answer");
+            spanCorrect.textContent = "";
+            box.appendChild(spanCorrect);
+
             all_play.appendChild(box);
         }
     }
@@ -354,7 +364,7 @@ function initializeSocketEvents() {
         correctUser.innerText = "";
         songHint.innerText = "";
         songHint.style.display = "none";
-        videoOverlay.style.display = 'block';
+        videoOverlay.style.display = 'flex';
         nextButton.disabled = true;
         nextButton.style.display = "none";
         document.getElementById('skipVoteCount').innerText = "";
@@ -385,7 +395,7 @@ function initializeSocketEvents() {
 
         $('#scoreModal').removeClass('hidden');
         let players = data['players'];
-        playerListGet(players)
+        playerListGet(players);
     });
 
     $('#scoreModalCloseBtn').click(function() {
@@ -451,11 +461,11 @@ function initializeSocketEvents() {
 
     socket.on('correctAnswer', data => {
         isAnswer = false;
-        const left_answer= data["category_length"];
+        const left_answer = data["category_length"];
         const videolink = data["data"]["youtube_embed_url"];
         clearInterval(gameTimerInterval);
         playvideo(videolink, data.data.endTime);
-        showSongInfo(data.data.title, data.data.song, data.name, true,left_answer);
+        showSongInfo(data.data.title, data.data.song, data.name, true, left_answer);
         if (document.querySelector("#NextVideo").checked) {
             voteSkip();
         }
@@ -463,7 +473,8 @@ function initializeSocketEvents() {
 
     socket.on('showAnswer', data => {
         const left_answer = data["category_length"];
-        showSongInfo(data.msg, null , data.name, false, left_answer);
+        const category = data["answer_category"];
+        showSongInfo(data.msg, null, data.name, false, left_answer, category);
     })
     socket.on('hint', data => {
         showHint(data.hint);
@@ -519,8 +530,7 @@ window.addEventListener('scroll', function() {
 
     }
 });
-document.querySelector("#disconect").addEventListener("click",()=>
-{
+document.querySelector("#disconect").addEventListener("click", () => {
     window.location = "/room_list";
 })
 socket.on("failed_user_change", () => {
@@ -528,7 +538,7 @@ socket.on("failed_user_change", () => {
 });
 // EndTimeTest(startTime, fendTime, totalSong, nowSong)
 socket.on("PlayVideoReadyOk", (data) => {
-    EndTimeTest(data['startTime'], data['endTime'], data['current_data']['totalSong'], data['current_data']['nowSong'],data['category']);    
+    EndTimeTest(data['startTime'], data['endTime'], data['current_data']['totalSong'], data['current_data']['nowSong'], data['category']);
 })
 socket.on("user_change", (data) => {
     let count = data["count"];
@@ -654,8 +664,7 @@ function selectAndClose(id) {
 
     // Close the modal
     document.getElementById('mapModal').classList.add('hidden');
-    socket.emit('MissionSelect', { "room_key": room_key, "selected_id": selectedId });    
-    console.log(id);
+    socket.emit('MissionSelect', { "room_key": room_key, "selected_id": selectedId });
 }
 
 function closeModal() {
@@ -665,7 +674,7 @@ function closeModal() {
 
 function setSelectedId(id) {
     selectedId = id;
-    videoOverlay.style.display = 'block';
+    videoOverlay.style.display = 'flex';
 }
 socket.on('MapNotSelect', () => {
     alert("맵을 선택 후 시작해주세요");
@@ -679,11 +688,32 @@ socket.on('room_players_update', (data) => {
             item.innerHTML = `<span class="font-semibold text-green-500">${data.player}</span> ${data.msg}`;
         elements.messages.appendChild(item);
         elements.messages.scrollTop = elements.messages.scrollHeight;
-        playerListGet(data.players);
+        playerListGet(data.players, data.effect);
     }
 });
 
-function playerListGet(players) {
+function highlightCorrectPlayer(playerName) {
+    // 소리 재생
+    $("#correctSound").prop("volume", 0.12);
+    $("#correctSound").get(0).play();
+
+    // 모든 플레이어 카드를 순회
+    console.log(playerName);
+    $(".player-card").each(function() {
+        // 해당 카드 내의 플레이어 이름이 정답과 일치하는지 확인
+        const currentPlayerName = $(this).find("p.text-lg").text();
+
+        if (currentPlayerName === playerName) {
+            $(this).addClass("shine-animation");
+
+            setTimeout(() => {
+                $(this).removeClass("shine-animation");
+            }, 1500);
+        }
+    });
+}
+
+function playerListGet(players, effect) {
     let leftContainer = document.getElementById("Players_Box_Left");
     let rightContainer = document.getElementById("Players_Box_Right");
 
@@ -717,7 +747,6 @@ function playerListGet(players) {
                 <p class="font-medium text-white">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
             </div>
         `;
-
         let actionButtonsHTML = session_id == key ? "" : `
             <div class="flex justify-between mt-4">
                 <button id='${username}_kick_button' class='kick_button'>강퇴</button>
@@ -755,6 +784,8 @@ function playerListGet(players) {
         }
         index++;
     });
+    if (effect)
+        highlightCorrectPlayer(current_answer_user);
 }
 
 function Setting_room_btn() {
