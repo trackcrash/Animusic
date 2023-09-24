@@ -43,8 +43,8 @@ function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
         }
     });
     //videooverlay style block 추가
-    videoOverlay.querySelector('span').innerText = "정답을 맞춰야 영상을 볼 수 있습니다.";
-    videoOverlay.style.display = 'block';
+    videoOverlay.querySelector('span').innerText = "";
+    videoOverlay.style.display = 'flex';
 }
 
 function onPlayerReady(event, startTime, endTime, callback, category) {
@@ -73,11 +73,28 @@ function EndTimeTest(startTime, fendTime, category) {
     for (let key in category) {
         if (category.hasOwnProperty(key)) {
             let value = category[key];
-            const box = document.createElement("p");
-            box.textContent = key+" ";
-            const span = document.createElement("span");
-            span.textContent = value;
-            box.appendChild(span);
+            const box = document.createElement("div");
+            box.classList.add('player-box');
+
+            const categoryInfo = document.createElement("p");
+            categoryInfo.textContent = key + " ";
+
+            const spanValue = document.createElement("span");
+            spanValue.textContent = "남은곡수: ";
+            
+            const left_answer = document.createElement("span");
+            left_answer.className = "left_answer_span";
+            left_answer.textContent = value;
+            categoryInfo.appendChild(spanValue);
+            categoryInfo.appendChild(left_answer);
+
+            box.appendChild(categoryInfo);
+
+            const spanCorrect = document.createElement("span");
+            spanCorrect.classList.add("correct-answer");
+            spanCorrect.textContent = "";
+            box.appendChild(spanCorrect);
+
             all_play.appendChild(box);
         }
     }
@@ -152,8 +169,8 @@ function sendMessage() {
             socket.emit('single_message', {
                 content: content
             }, () => {
-                let [isAnswerd, categories]=checkAnswer(content);
-                let leftAnswer = 0
+                let [isAnswerd, categories, answer_array]=checkAnswer(content);
+                let leftAnswer = 0;
                 for(const data of categories)
                 {
                     leftAnswer += data;
@@ -168,10 +185,10 @@ function sendMessage() {
                         }else
                         {
                             nextVideo(false);
-                            showSongInfo(currentIndex,true,content,categories)
+                            showSongInfo(currentIndex,true,content,answer_array,categories)
                         }
                     } else {
-                        showSongInfo(currentIndex,false,content,categories)
+                        showSongInfo(currentIndex,false,content,answer_array,categories)
                     }
                 }
             });
@@ -221,12 +238,13 @@ function removeGroupByKeyword(data, keyword) {
 function checkAnswer(answer) {
     if (currentIndex < musicData.length) {
         const music_data = musicData[currentIndex];
-        const all_play = document.getElementById('all_play').querySelectorAll("p");
+        const all_play = document.getElementById('all_play').querySelectorAll(".player-box");
         let categories =[];
         let isAnswerd = false;
+        let answer_array = [];
         for(let i =0; i < all_play.length; i++)
         {
-           categories[i] =parseInt(all_play[i].querySelector('span').textContent);
+           categories[i] =parseInt(all_play[i].querySelector('.left_answer_span').textContent);
         }
         let i = 0;
         for (element of music_data["answer_list"]) {
@@ -238,7 +256,7 @@ function checkAnswer(answer) {
                             element.splice(j, 1);
                             categories[i]--;
                             isAnswerd = true;
-    
+                            answer_array.push(i);
                             break;
                         }
                     }
@@ -250,32 +268,44 @@ function checkAnswer(answer) {
                             element.splice(element.indexOf(answer), 1); // element에서 answer 요소 제거
                             categories[i]--;
                             isAnswerd = true;
+                            answer_array.push(i);
                         }
                     }
             }
             i++;
         }
-        return [isAnswerd, categories];   
+        return [isAnswerd, categories, answer_array];   
     }
 }
+function showHint(hint) {
+    const songHint = document.getElementById('songHint');
+    songHint.style.display = "block"
+    songHint.innerText = "힌트: " + hint;
+}
+document.getElementById("hintButton").addEventListener("click",()=>
+{
+    showHint(musicData[currentIndex]['hint'])
+})
 
-function showSongInfo(index, all, myanswer = null,category) {
-    const songTitle = document.getElementById('songTitle');
-    const songArtist = document.getElementById('songArtist');
+
+function showSongInfo(index, all, myanswer = null,answer_array,category) {
     const all_play = document.getElementById('all_play');
     if(all == true)
     {
-        songTitle.innerText = "정답: " + musicData[index].title;
-        songArtist.innerText = "곡 제목: " + musicData[index].song;    
-        all_play.innerText = "모든 문제를 다 맞췄습니다.";
+        all_play.innerText = "모든 정답을 맞추셨습니다.";
     }
     else
     {
-        songTitle.innerText = "정답: " + myanswer;
-        const answer_list = all_play.querySelectorAll("p");
-        for(let i = 0; i < category.length; i++)
-        {
-            answer_list[i].querySelector("span").textContent = category[i];
+        const answer_list = all_play.querySelectorAll("div");
+        for (let i = 0; i < answer_list.length; i++) {
+            // 카테고리 이름만 가져오기 위해 span과 correct-answer 내용을 제외시킵니다.
+            const isIncluded = answer_array.includes(i);
+            if(isIncluded)
+            {
+                const correctSpan = answer_list[i].querySelector(".correct-answer");
+                correctSpan.textContent += " " + myanswer;
+            }
+            answer_list[i].querySelector(".left_answer_span").textContent = category[i];
         }
     }
 }

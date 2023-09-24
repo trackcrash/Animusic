@@ -63,9 +63,6 @@ function sendMessage() {
 }
 //정답 출력용
 function showSongInfo(title, song, correctusername, all, left_answer, category) {
-    const songTitle = document.getElementById('songTitle');
-    const songArtist = document.getElementById('songArtist');
-    const correctUser = document.getElementById('correctUser');
     const all_play = document.getElementById("all_play");
     if (all == true) {
         all_play.innerText = "모든 정답을 맞추셨습니다.";
@@ -342,8 +339,6 @@ function initializeSocketEvents() {
         const all_play = document.getElementById("all_play");
         songTitle.innerHTML = "";
         all_play.innerHTML = "";
-        songArtist.innerText = "";
-        correctUser.innerText = "";
         songHint.style.display = "none";
         songHint.innerText = "";
         elements.nextButton.style.display = "block";
@@ -360,8 +355,6 @@ function initializeSocketEvents() {
 
         songTitle.innerHTML = "";
         all_play.innerHTML = "";
-        songArtist.innerText = "";
-        correctUser.innerText = "";
         songHint.innerText = "";
         songHint.style.display = "none";
         videoOverlay.style.display = 'flex';

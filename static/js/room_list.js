@@ -1,6 +1,6 @@
 const roomNameElementIdPrefix = 'room-count-';
 const roomNameElementMissionPrefix = 'room-Mission-'
-
+let users;
 function fetchData(url, callback) {
     $.getJSON(url, callback);
 }
@@ -205,7 +205,6 @@ socket.on('user_check_not_ok', () => {
 });
 
 socket.on('room_removed', (data) => {
-    console.log(data);
     removeRoomFromList(data);
 });
 socket.on('Join_room', (data) => {
@@ -213,7 +212,7 @@ socket.on('Join_room', (data) => {
 })
 
 socket.on('update_waiting_userlist', (data) => {
-    console.log(data);
+    users = data;
     let userlist = document.getElementById("userlist");
     userlist.innerText = "현재 대기실 인원 수: " + Object.keys(data).length + "명\n" + Object.keys(data).join('\n');
 });
