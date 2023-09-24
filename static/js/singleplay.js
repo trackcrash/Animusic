@@ -230,21 +230,32 @@ function checkAnswer(answer) {
         }
         let i = 0;
         for (element of music_data["answer_list"]) {
-            if (Array.isArray(element) && categories[i] != 0) {
-                for (let j = 0; j < element.length; j++) {
-                    if (element[j].indexOf(answer) !== -1) {
-                        element.splice(j, 1);
-                        categories[i]--;
-                        isAnswerd = true;
-
-                        break;
+            if(categories[i] != 0)
+            {
+                if (Array.isArray(element[0])) {
+                    for (let j = 0; j < element.length; j++) {
+                        if (element[j].indexOf(answer) !== -1) {
+                            element.splice(j, 1);
+                            categories[i]--;
+                            isAnswerd = true;
+    
+                            break;
+                        }
                     }
-                }
+                } 
+                else if(Array.isArray(element))
+                    {
+                        if(element.indexOf(answer) !== -1)
+                        {
+                            element.splice(element.indexOf(answer), 1); // element에서 answer 요소 제거
+                            categories[i]--;
+                            isAnswerd = true;
+                        }
+                    }
             }
             i++;
         }
         return [isAnswerd, categories];   
-
     }
 }
 

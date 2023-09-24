@@ -182,12 +182,17 @@ function UsedEmailcheck(email) {
 }
 document.getElementById("nicknameCheck").addEventListener("click", () => {
     const name = document.getElementById("name").value;
-    if (nicknameCheck(name)) {
-        alert("사용가능한 닉네임입니다.");
-        nameOk = true;
-    } else {
-        alert("사용불가능한 닉네임입니다.");
-    }
+    (async () => {
+        const checkResult = await nicknameCheck(name);
+        console.log(checkResult); // 여기서 서버 응답값을 확인할 수 있습니다.
+        if (checkResult) {
+            alert("사용가능한 닉네임입니다.");
+            nameOk = true;
+        } else {
+            alert("사용불가능한 닉네임입니다.");
+        }
+    })();
+    
 })
 document.getElementById("name").addEventListener("input", () => {
     nameOk = false;
@@ -222,15 +227,18 @@ function validateForm(name) {
     }
 }
 
-function nicknameCheck(name) {
-    return $.get(`/api/name_check?name=${name}`)
-        .then(data => {
-            return data === "Success";
-        })
-        .catch(error => {
-            console.error('Error fetching email check data:', error);
-            return false; // 에러가 발생한 경우, 가입된 이메일이 아닌 것으로 처리
-        });
+async function nicknameCheck(name) {
+    if(name)
+    {
+        try {
+            const data = await $.get(`/api/name_check?name=${name}`);
+            return data == "Success";
+        } catch (error) {
+            console.error('Error fetching name check data:', error);
+            return false; // 에러가 발생한 경우, 가입된 이름이 아닌 것으로 처리
+        }
+    }
+    return false;
 }
 // 약관 모달 보이기 함수
 function showTermsModal() {

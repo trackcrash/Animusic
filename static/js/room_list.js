@@ -137,7 +137,7 @@ function firstCreateRoom() {
             location.href = "/login";
             return;
         }
-
+        
         fetchData("/get-room-dict", (room_dict) => {
             const roomButtonsContainer = document.getElementById('room-buttons');
             for (let room_key in room_dict) {
@@ -179,7 +179,6 @@ window.onload = () => {
     socket.emit('Waiting', () => {
         firstCreateRoom();
     }); // 클라이언트에서 서버로 데이터를 전송
-
 }
 
 socket.on('room_players_update', (data) => {;
@@ -214,6 +213,7 @@ socket.on('Join_room', (data) => {
 })
 
 socket.on('update_waiting_userlist', (data) => {
+    console.log(data);
     let userlist = document.getElementById("userlist");
     userlist.innerText = "현재 대기실 인원 수: " + Object.keys(data).length + "명\n" + Object.keys(data).join('\n');
 });
