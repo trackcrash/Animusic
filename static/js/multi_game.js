@@ -80,7 +80,7 @@ function showSongInfo(title, song, correctusername, all, left_answer, category) 
                 const correctSpan = answer_list[i].querySelector(".correct-answer");
                 correctSpan.textContent += " " + title;
             }
-            answer_list[i].querySelector("span").textContent = " 남은곡수: " + left_answer[i];
+            answer_list[i].querySelector("span").textContent = " 남은항목: " + left_answer[i];
         }
     }
     current_answer_user = correctusername;
@@ -688,7 +688,7 @@ socket.on('room_players_update', (data) => {
             item.innerHTML = `<span class="font-semibold text-green-500">${data.player}</span> ${data.msg}`;
         elements.messages.appendChild(item);
         elements.messages.scrollTop = elements.messages.scrollHeight;
-        playerListGet(data.players);
+        playerListGet(data.players, data.effect);
     }
 });
 
@@ -713,7 +713,7 @@ function highlightCorrectPlayer(playerName) {
     });
 }
 
-function playerListGet(players) {
+function playerListGet(players, effect) {
     let leftContainer = document.getElementById("Players_Box_Left");
     let rightContainer = document.getElementById("Players_Box_Right");
 
@@ -784,7 +784,8 @@ function playerListGet(players) {
         }
         index++;
     });
-    highlightCorrectPlayer(current_answer_user);
+    if (effect)
+        highlightCorrectPlayer(current_answer_user);
 }
 
 function Setting_room_btn() {

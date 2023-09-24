@@ -46,7 +46,7 @@ def room_Socket(socketio):
         user_id = room_data_manager.host_setting(room_key)
         game_status = room_data_manager._data_store[room_key]['room_info']['room_status']
         emit("set_session_id", {"user":user_id, "session_id":session_id}, room=session_id)
-        update_room_player_count(room_key, "님이 참가 하셨습니다.", room_data_manager._data_store[room_key]['user'][session_id]['username'],0)
+        update_room_player_count(room_key, "님이 참가 하셨습니다.", room_data_manager._data_store[room_key]['user'][session_id]['username'],0,0)
         if user_id != "":
             emit("host_updated", {"user":user_id, "game_status":game_status}, room=room_key)
         try:
