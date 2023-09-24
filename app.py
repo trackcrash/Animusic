@@ -29,12 +29,6 @@ app.register_blueprint(map_bp)
 app.register_blueprint(room_bp)
 app.register_blueprint(char_bp)
 app.register_blueprint(report_bp)
-socketio.init_app(app, cors_allowed_origins="*")
-
-connect_MySocket(socketio)
-play_Socket(socketio)
-room_Socket(socketio)
-
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -43,6 +37,12 @@ login_manager.login_view = 'user.login'
 @login_manager.user_loader
 def load_user(user_id):
     return get_user_by_id(int(user_id))
+
+socketio.init_app(app, cors_allowed_origins="*")
+
+connect_MySocket(socketio)
+play_Socket(socketio)
+room_Socket(socketio)
 
 @app.route('/')
 def index():
