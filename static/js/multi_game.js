@@ -151,22 +151,7 @@ function onPlayerReady(event, endTime) {
     // YouTube 플레이어가 준비되었을 때 호출됩니다.
     socket.emit("ReadyPlay", { "room_key": room_key, "endTime": endTime })
 }
-socket.on("CheckPlayer", function(data) {
-    const endTime = data['endTime'];
-    if (player && player.playVideo) {
-        socket.emit("ReadyPlayer", { "room_key": room_key, "endTime": endTime });
-    } else {
-        socket.emit("WaitPlay", { "room_key": room_key, "endTime": endTime });
-    }
-})
-socket.on("reCheck", function(data) {
-    const endTime = data['endTime'];
-    if (player && player.playVideo) {
-        socket.emit("ReadyPlayer", { "room_key": room_key, "endTime": endTime });
-    } else {
-        socket.emit("WaitPlay", { "room_key": room_key, "endTime": endTime });
-    }
-});
+
 let onetime = false;
 
 function getidtourl() {
@@ -328,6 +313,22 @@ function initializeSocketEvents() {
             }
         })
         dummyplay();
+    });
+    socket.on("CheckPlayer", function(data) {
+        const endTime = data['endTime'];
+        if (player && player.playVideo) {
+            socket.emit("ReadyPlayer", { "room_key": room_key, "endTime": endTime });
+        } else {
+            socket.emit("WaitPlay", { "room_key": room_key, "endTime": endTime });
+        }
+    })
+    socket.on("reCheck", function(data) {
+        const endTime = data['endTime'];
+        if (player && player.playVideo) {
+            socket.emit("ReadyPlayer", { "room_key": room_key, "endTime": endTime });
+        } else {
+            socket.emit("WaitPlay", { "room_key": room_key, "endTime": endTime });
+        }
     });
     //다음 곡 진행
     socket.on('NextData', (data) => {
