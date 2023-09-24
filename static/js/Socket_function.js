@@ -1,1 +1,1 @@
-const socket = io.connect('http://' + document.domain + ':' + location.port+"/");
+const socket = io.connect('http://' + document.domain + ':' + location.port + "/");

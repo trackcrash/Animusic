@@ -138,14 +138,15 @@ def validate_user(email, password):
         user.update_login_time()
         commit_or_rollback(session)
         if user and bcrypt.check_password_hash(user.password, password):
-            return user
-        return None
+            session.add(user)
+            return user, session
+        else:
+            print(f"validate_user: fail")
+            return None
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while validating user: {str(e)}")
         return None
-    finally:
-        close_session(engine, session)
 
 def get_user_by_email(email):
     engine, session = create_session()

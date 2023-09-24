@@ -42,7 +42,7 @@ login_manager.login_view = 'user.login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    return get_user_by_id(user_id)
+    return get_user_by_id(int(user_id))
 
 @app.route('/')
 def index():
