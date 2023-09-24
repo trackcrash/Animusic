@@ -139,7 +139,9 @@ def validate_user(email, password):
         commit_or_rollback(session)
         if user and bcrypt.check_password_hash(user.password, password):
             return user
-        return None
+        else:
+            print(f"validate_user: fail")
+            return None
     except Exception as e:
         # Handle exceptions or errors as needed
         print(f"An error occurred while validating user: {str(e)}")

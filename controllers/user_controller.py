@@ -56,9 +56,10 @@ def user_controller():
         user = user_model.validate_user(email, password)
         if user:
             login_user(user)
-            return True
-        flash('Invalid email or password')
-        return False
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid email or password')
+            return False
 
 
 def google_login():
