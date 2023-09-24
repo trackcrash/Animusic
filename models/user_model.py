@@ -37,7 +37,6 @@ class User(Base):
         self.is_google_authenticated = is_google_authenticated
 
 
-    @property
     def verify_password(self, password):
         return bcrypt.check_password_hash(self.password, password)
 
@@ -132,20 +131,12 @@ def save_google_user(user_info):
         return None
 
 def validate_user(email, password):
-    engine, session = create_session()
-    try:
-        user = session.query(User).filter_by(email=email).first()
+    user = get_user_by_email(email)
+    if user and bcrypt.check_password_hash(user.password, password):
         user.update_login_time()
-        commit_or_rollback(session)
-        if user and bcrypt.check_password_hash(user.password, password):
-            session.add(user)
-            return user, session
-        else:
-            print(f"validate_user: fail")
-            return None
-    except Exception as e:
-        # Handle exceptions or errors as needed
-        print(f"An error occurred while validating user: {str(e)}")
+        return user
+    else:
+        print(f"validate_user: fail")
         return None
 
 def get_user_by_email(email):

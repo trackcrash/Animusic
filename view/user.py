@@ -4,7 +4,7 @@ from decouple import config
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, Flask
 
 from flask_login import logout_user, login_required, current_user,login_user
-from controllers.user_controller import user_controller, google_login, google_callback,register as user_register,send_verification_email,generate_verification_code,emailDict
+from controllers.user_controller import site_login, google_login, google_callback,register as user_register,send_verification_email,generate_verification_code,emailDict
 from models.user_model import delete_account, account_insert, account_insert_in_googleuser, insert_character_number,email_check_model,name_check_model,password_update
 
 SECRET_KEY = config('SECRET_KEY')
@@ -62,7 +62,7 @@ def login():
         return render_template('login.html')
 
     if request.method == 'POST':
-        return user_controller()
+        return site_login()
         
     
 @user_bp.get('/login/google')
