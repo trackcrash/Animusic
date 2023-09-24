@@ -10,6 +10,17 @@ let GameTimer = 0;
 let doMessage = true;
 let skipWait = false;
 let gameTimerInterval; //setInteval 이벤트
+
+socket.on('single_message', (data) => {
+    const item = document.createElement('div');
+    if (data.name == '') {
+        data.name = 'guest'
+    }
+    item.innerHTML = `<span class="font-semibold">${data.name}:</span> ${data.msg}`;
+    messages.appendChild(item);
+    messages.scrollTop = messages.scrollHeight;
+});
+
 function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
     let videolink = musicData[currentIndex]['youtube_embed_url'];
     let category = JSON.parse(musicData[currentIndex]['category']);
@@ -201,16 +212,6 @@ function sendMessage() {
         }, 200)
     }
 }
-
-socket.on('single_message', (data) => {
-    const item = document.createElement('div');
-    if (data.name == '') {
-        data.name = 'guest'
-    }
-    item.innerHTML = `<span class="font-semibold">${data.name}:</span> ${data.msg}`;
-    messages.appendChild(item);
-    messages.scrollTop = messages.scrollHeight;
-});
 
 // function playvideo(index) {
 //     let embedLink = musicData[index].youtube_embed_url;

@@ -5,6 +5,87 @@ function fetchData(url, callback) {
     $.getJSON(url, callback);
 }
 
+
+socket.on('room_players_update', (data) => {;
+    updateRoomCount(data.room_key, data.player_count);
+});
+
+socket.on('room_update', (data) => {
+    fetchData("/get_user_info", (user_id) => {
+        if (!user_id) return;
+        const room_key = data["room_key"];
+        const room_name = data["room_name"];
+        const max_user = data["max_user"];
+        const isPassword = data["is_password"];
+        addRoomToList(room_key, room_name, max_user, isPassword);
+    });
+});
+
+socket.on('Do_not_create_duplicates', () => {
+    alert("같은 이름의 방을 만들수 없습니다.");
+});
+
+socket.on('user_check_not_ok', () => {
+    alert("입장 제한");
+});
+
+socket.on('room_removed', (data) => {
+    removeRoomFromList(data);
+});
+socket.on('Join_room', (data) => {
+    joinChatRoom(data);
+})
+
+socket.on('update_waiting_userlist', (data) => {
+    users = data;
+    let userlist = document.getElementById("userlist");
+    userlist.innerText = "현재 대기실 인원 수: " + Object.keys(data).length + "명\n" + Object.keys(data).join('\n');
+});
+
+socket.on('request_room_changed', (data) => {
+    let playing = data["room_status"];
+    if (playing) {
+        document.getElementById(`room_status_${data['room_key']}`).innerText = "🟢 게임중";
+    } else {
+        document.getElementById(`room_status_${data['room_key']}`).innerText = "🔴 대기중";
+    }
+});
+socket.on("room_full_user", (data) => {
+    alert(data + "방의 인원이 가득 차있습니다.");
+})
+socket.on("MissionSelect_get", (data) => {
+    const room_key = data["room_key"];
+    const mission = data['map_data'];
+    updateMission(room_key, mission);
+})
+
+socket.on("passwordCheck", (data) => {
+    let password = prompt("비밀번호를 입력해주세요")
+    if (password != null && password != "") {
+        console.log(password);
+        socket.emit("passwordCheckToServer", { "room_key": data, "password": password })
+    } else {
+        alert("비밀번호를 입력해주세요");
+    }
+})
+socket.on("passwordFail", () => {
+    alert("비밀번호가 틀렸습니다.");
+})
+socket.on("room_data_update", (data) => {
+    const room_key = data["room_key"];
+    const room_name = data["room_name"];
+    const room_private = data["room_private"];
+    const room_max_human = data["room_max_human"];
+    const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${room_key}`);
+    if (roomCountElement) {
+        const textContents = roomCountElement.textContent.split('/');
+        roomCountElement.textContent = `${textContents[0]} / ${room_max_human}명`;
+    }
+    document.getElementById(`roomContainer_${room_key}`).getElementsByTagName('a')[0].innerText = `${room_key} ${room_name}`;
+    document.getElementById(`room-private-${room_key}`).innerText = room_private ? "private" : "public";
+    document.getElementById(`room-private-${room_key}`).style.backgroundColor = room_private ? "#F87171" : "#34D399";
+});
+
 function createRoomElement(room_key, room_name, room_status, user_count, mission, max_user, isPassword) {
     const roomContainer = document.createElement('div');
     roomContainer.id = `roomContainer_${room_key}`;
@@ -181,58 +262,6 @@ window.onload = () => {
     }); // 클라이언트에서 서버로 데이터를 전송
 }
 
-socket.on('room_players_update', (data) => {;
-    updateRoomCount(data.room_key, data.player_count);
-});
-
-socket.on('room_update', (data) => {
-    fetchData("/get_user_info", (user_id) => {
-        if (!user_id) return;
-        const room_key = data["room_key"];
-        const room_name = data["room_name"];
-        const max_user = data["max_user"];
-        const isPassword = data["is_password"];
-        addRoomToList(room_key, room_name, max_user, isPassword);
-    });
-});
-
-socket.on('Do_not_create_duplicates', () => {
-    alert("같은 이름의 방을 만들수 없습니다.");
-});
-
-socket.on('user_check_not_ok', () => {
-    alert("입장 제한");
-});
-
-socket.on('room_removed', (data) => {
-    removeRoomFromList(data);
-});
-socket.on('Join_room', (data) => {
-    joinChatRoom(data);
-})
-
-socket.on('update_waiting_userlist', (data) => {
-    users = data;
-    let userlist = document.getElementById("userlist");
-    userlist.innerText = "현재 대기실 인원 수: " + Object.keys(data).length + "명\n" + Object.keys(data).join('\n');
-});
-
-socket.on('request_room_changed', (data) => {
-    let playing = data["room_status"];
-    if (playing) {
-        document.getElementById(`room_status_${data['room_key']}`).innerText = "🟢 게임중";
-    } else {
-        document.getElementById(`room_status_${data['room_key']}`).innerText = "🔴 대기중";
-    }
-});
-socket.on("room_full_user", (data) => {
-    alert(data + "방의 인원이 가득 차있습니다.");
-})
-socket.on("MissionSelect_get", (data) => {
-    const room_key = data["room_key"];
-    const mission = data['map_data'];
-    updateMission(room_key, mission);
-})
 
 function updateMission(room_key, mission) {
     console.log(room_key);
@@ -255,20 +284,6 @@ function updateMission(room_key, mission) {
     roomMissionName.innerText = `🗺️ ${mission ? mission[0]['MapName'] : "미설정"}`;
     roomMissionProducer.innerText = `👤 ${mission ? mission[0]['MapProducer'] : "미설정"}`;
 }
-
-
-socket.on("passwordCheck", (data) => {
-    let password = prompt("비밀번호를 입력해주세요")
-    if (password != null && password != "") {
-        console.log(password);
-        socket.emit("passwordCheckToServer", { "room_key": data, "password": password })
-    } else {
-        alert("비밀번호를 입력해주세요");
-    }
-})
-socket.on("passwordFail", () => {
-    alert("비밀번호가 틀렸습니다.");
-})
 
 $('#CreateRoomModalCloseBtn').click(function() {
     console.log("클릭");
@@ -293,18 +308,4 @@ $('#CreateRoomBtn').click(function() {
             location.href = "/login";
         }
     });
-});
-socket.on("room_data_update", (data) => {
-    const room_key = data["room_key"];
-    const room_name = data["room_name"];
-    const room_private = data["room_private"];
-    const room_max_human = data["room_max_human"];
-    const roomCountElement = document.getElementById(`${roomNameElementIdPrefix}${room_key}`);
-    if (roomCountElement) {
-        const textContents = roomCountElement.textContent.split('/');
-        roomCountElement.textContent = `${textContents[0]} / ${room_max_human}명`;
-    }
-    document.getElementById(`roomContainer_${room_key}`).getElementsByTagName('a')[0].innerText = `${room_key} ${room_name}`;
-    document.getElementById(`room-private-${room_key}`).innerText = room_private ? "private" : "public";
-    document.getElementById(`room-private-${room_key}`).style.backgroundColor = room_private ? "#F87171" : "#34D399";
 });
