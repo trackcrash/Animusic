@@ -78,7 +78,7 @@ def google_login():
 
 def google_callback():
     token_endpoint = requests.get(GOOGLE_DISCOVERY_URL).json()["token_endpoint"]
-    # temp = request.url
+    temp = request.url
     # token_url, headers, body = client.prepare_token_request(
     #     token_endpoint,
     #     authorization_response=temp.replace('http','https'),

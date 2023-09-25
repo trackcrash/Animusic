@@ -119,7 +119,6 @@ def save_google_user(user_info):
             user.is_google_authenticated = True
             user.update_login_time()
             commit_or_rollback(session)
-            print(type(user))
         else:
             user = save_user(email=user_info['email'], name=user_info.get('name'), is_google_authenticated=True)
             user.update_login_time()

@@ -1,6 +1,6 @@
 #flask main --author: NewKyaru 11/08/2023
 from decouple import config
-from flask import Flask,render_template, send_file
+from flask import Flask,render_template, send_file, session
 from flask_login import LoginManager, current_user
 #controller&model&view(blueprint)
 from controllers.map_controller import ensure_tables_exist
