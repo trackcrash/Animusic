@@ -166,6 +166,9 @@ document.addEventListener('keydown', (event) => {
             nextVideo(true);
         }
     }
+    if (event.key === 'Home') {
+        $("#hintButton").trigger('click');
+    }
 });
 
 nextButton.addEventListener('click', () => {
@@ -189,7 +192,8 @@ function sendMessage() {
                     leftAnswer += data;
                 }
                 if (isAnswerd) {
-                    $("#correctSound").prop("volume", 0.12);
+                    let correctSoundVolume = $("#correctVolumeBar").val() / 200;
+                    $("#correctSound").prop("volume", correctSoundVolume);
                     $("#correctSound").get(0).play();
                     if (leftAnswer === 0) {
                         if(document.querySelector("#NextVideo").checked)

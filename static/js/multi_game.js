@@ -263,14 +263,17 @@ function initEventListeners() {
     elements.nextButton.addEventListener('click', () => {
         voteSkip();
     });
+    elements.hintButton.addEventListener('click', () => {
+        socket.emit('showHint', { "room": room_key });
+    });
     // 키보드의 end 버튼을 눌러도 nextButton이 눌리게끔 하는 동작
     document.addEventListener('keydown', (event) => {
         if (event.key === 'End' && elements.nextButton.disabled === false) {
             voteSkip();
         }
-    });
-    elements.hintButton.addEventListener('click', () => {
-        socket.emit('showHint', { "room": room_key });
+        if (event.key === 'Home' && elements.nextButton.disabled === false) {
+            elements.hintButton.click();
+        }
     });
     elements.StartButton.addEventListener('click', () => {
         elements.nextButton.disabled = false;
@@ -688,7 +691,9 @@ socket.on('room_players_update', (data) => {
 
 function highlightCorrectPlayer(playerName) {
     // 소리 재생
-    $("#correctSound").prop("volume", 0.12);
+    let correctVolume = $("#correctVolumeBar").val() / 200;
+
+    $("#correctSound").prop("volume", correctVolume);
     $("#correctSound").get(0).play();
 
     // 모든 플레이어 카드를 순회

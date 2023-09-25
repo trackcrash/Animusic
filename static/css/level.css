@@ -178,7 +178,7 @@ button:hover {
 
 
 /* 음량조절 스타일 */
-
+#correctVolumeBar,
 #VolumeBar {
     -webkit-appearance: none;
     width: 30%;
@@ -190,6 +190,7 @@ button:hover {
     margin-left: 10px;
 }
 
+#correctVolumeBar::-webkit-slider-thumb,
 #VolumeBar::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -202,6 +203,7 @@ button:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+#correctVolumeBar::-moz-range-thumb,
 #VolumeBar::-moz-range-thumb {
     width: 16px;
     height: 16px;
