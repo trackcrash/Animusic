@@ -77,10 +77,10 @@ def play_Socket(socketio):
     @socketio.on('single_message')
     def handle_single_message(data):
         msg = data['content']
-        print(current_user,"single_play current_user")
         if not current_user.is_authenticated:
             emit('single_message',{'name': '','msg':msg}, room=request.sid)
         else:
+            print(current_user.name,"single_play current_user")
             name = current_user.name
             emit('single_message', {'name': name, 'msg': msg},room=request.sid)
     @socketio.on("Skip")
@@ -90,27 +90,28 @@ def play_Socket(socketio):
     def handle_message(data):
         msg = data['content']
         room = data.get('room')
-        name = current_user.name
-        is_correct, answer_category = music_data_manager.check_answer(room, msg)
-        if is_correct and data['isAnswer'] and socket_class.isDuplication[room]:
-            leftAnswer, category_length = music_data_manager.is_group_answered(room)
-            if leftAnswer == 0:
-                current_data = music_data_manager.retrieve_data(room)
-                current_data['endTime'] = "stop"
-                emit('correctAnswer', {'name':name, 'data':current_data, "category_length":category_length}, room=room)
-                if room not in socket_class.isDuplication :
+        if current_user.is_authenticated:
+            name = current_user.name
+            is_correct, answer_category = music_data_manager.check_answer(room, msg)
+            if is_correct and data['isAnswer'] and socket_class.isDuplication[room]:
+                leftAnswer, category_length = music_data_manager.is_group_answered(room)
+                if leftAnswer == 0:
+                    current_data = music_data_manager.retrieve_data(room)
+                    current_data['endTime'] = "stop"
+                    emit('correctAnswer', {'name':name, 'data':current_data, "category_length":category_length}, room=room)
+                    if room not in socket_class.isDuplication :
+                        socket_class.isDuplication[room] = False
                     socket_class.isDuplication[room] = False
-                socket_class.isDuplication[room] = False
-                if room not in socket_class.play_vote :
+                    if room not in socket_class.play_vote :
+                        socket_class.play_vote[room] = []
                     socket_class.play_vote[room] = []
-                socket_class.play_vote[room] = []
-            else : 
-                emit('showAnswer', {'name': name, "category_length":category_length,'msg':msg,"answer_category":answer_category}, room=room)
-            room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
-            emit('message', {'name': name, 'msg': msg}, room=room)
-            update_room_player_count(room, "님이 정답을 맞췄습니다.", name, 1,1)
-        else:
-            emit('message', {'name': name, 'msg': msg}, room=room)
+                else : 
+                    emit('showAnswer', {'name': name, "category_length":category_length,'msg':msg,"answer_category":answer_category}, room=room)
+                room_data_manager._data_store[room]['user'][request.sid]['score'] += 1 
+                emit('message', {'name': name, 'msg': msg}, room=room)
+                update_room_player_count(room, "님이 정답을 맞췄습니다.", name, 1,1)
+            else:
+                emit('message', {'name': name, 'msg': msg}, room=room)
     #다음 데이터 요청
 
     @socketio.on('showHint')
@@ -154,19 +155,20 @@ def play_Socket(socketio):
     @socketio.on('voteSkip')
     def handle_vote_skip(data):
         room = data.get("room")
-        user = current_user.name
-        # 이름 기준으로 이미 투표한 사용자는 다시 투표할 수 없도록 처리
-        if user in socket_class.voted_users[room]:
-            return
-        socket_class.vote_counts[room] += 1
-        socket_class.voted_users[room].append(user)
-        required_votes = data['requiredSkipVotes']
-        if socket_class.vote_counts[room] >= required_votes:
-            if room_data_manager._data_store[room]["room_info"]["is_skip"]:
-                room_data_manager._data_store[room]["room_info"]["is_skip"] = False
-                skip_song(room)
-        else:
-            emit('updateVoteCount', {'count': socket_class.vote_counts[room]}, room=room)
+        if current_user.is_authenticated:
+            user = current_user.name
+            # 이름 기준으로 이미 투표한 사용자는 다시 투표할 수 없도록 처리
+            if user in socket_class.voted_users[room]:
+                return
+            socket_class.vote_counts[room] += 1
+            socket_class.voted_users[room].append(user)
+            required_votes = data['requiredSkipVotes']
+            if socket_class.vote_counts[room] >= required_votes:
+                if room_data_manager._data_store[room]["room_info"]["is_skip"]:
+                    room_data_manager._data_store[room]["room_info"]["is_skip"] = False
+                    skip_song(room)
+            else:
+                emit('updateVoteCount', {'count': socket_class.vote_counts[room]}, room=room)
             
     @socketio.on("ReadyPlay")
     def ReadyPlay(data):
@@ -200,5 +202,4 @@ def play_Socket(socketio):
                 room_data_manager._data_store[room_key]["room_info"]["is_skip"] = True            
     @socketio.on("hello")
     def hello():
-        print(request.sid,"request")
         emit("hello_receive", room= request.sid)

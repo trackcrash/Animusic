@@ -38,8 +38,8 @@ def room_Socket(socketio):
     def join_sock(data):
         room_key = data['room_key']
         session_id = request.sid
-        print(current_user," multi_game join current_user")
-        if current_user:
+        if current_user.is_authenticated:
+            print(current_user.name," multi_game join current_user")
             if room_data_manager.is_user_in_room(current_user.name, room_key):
                 emit("duplicate", {"message": "이미 방에 입장해 있습니다."}, room=session_id)
                 return
@@ -67,19 +67,20 @@ def room_Socket(socketio):
             emit('passwordFail',room=request.sid)
     @socketio.on('user_check')
     def user_check(data):
-        user_name = current_user.name
-        room_key = data['room_key']
-        session_id = request.sid
-        if room_data_manager.is_user_in_room(user_name,room_key):
-            emit('user_check_not_ok', room=session_id)
-        else :
-            if room_data_manager.room_user_check(room_key) < int(room_data_manager._data_store[room_key]["room_info"]["room_full_user"]):
-                if room_data_manager._data_store[room_key]["room_info"]["room_password"] != None and room_data_manager._data_store[room_key]["room_info"]["room_password"] != "":
-                    emit("passwordCheck",room_key, room=session_id)
-                else:
-                    emit('Join_room',room_key, room=session_id)
-            else : 
-                emit("room_full_user", room_key, room=session_id)
+        if current_user.is_authenticated:
+            user_name = current_user.name
+            room_key = data['room_key']
+            session_id = request.sid
+            if room_data_manager.is_user_in_room(user_name,room_key):
+                emit('user_check_not_ok', room=session_id)
+            else :
+                if room_data_manager.room_user_check(room_key) < int(room_data_manager._data_store[room_key]["room_info"]["room_full_user"]):
+                    if room_data_manager._data_store[room_key]["room_info"]["room_password"] != None and room_data_manager._data_store[room_key]["room_info"]["room_password"] != "":
+                        emit("passwordCheck",room_key, room=session_id)
+                    else:
+                        emit('Join_room',room_key, room=session_id)
+                else : 
+                    emit("room_full_user", room_key, room=session_id)
 
     @socketio.on('playingStatus_true')
     def playingroom_hidden(room_key):

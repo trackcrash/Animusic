@@ -21,8 +21,8 @@ def connect_MySocket(socketio):
     @socketio.on('Waiting')
     def connect_waiting():
         try:
-            print(current_user, "update_waiting_userlist current_user")
-            if current_user:
+            if current_user.is_authenticated:
+                print(current_user.name, "update_waiting_userlist current_user")
                 socket_class.waitingroom_userlist[current_user.name] = None
             emit('update_waiting_userlist', socket_class.waitingroom_userlist, broadcast=True)
         except:
@@ -58,8 +58,9 @@ def connect_MySocket(socketio):
             room_data_manager.remove_room(room_key)  # 방 제거 메서드 호출
             emit('room_removed', room_key, broadcast=True)
         try:
-            if current_user.name in socket_class.waitingroom_userlist:
-                del socket_class.waitingroom_userlist[current_user.name]
-                emit('update_waiting_userlist', socket_class.waitingroom_userlist, broadcast=True)
+            if current_user.is_authenticated:
+                if current_user.name in socket_class.waitingroom_userlist:
+                    del socket_class.waitingroom_userlist[current_user.name]
+                    emit('update_waiting_userlist', socket_class.waitingroom_userlist, broadcast=True)
         except:
             pass
