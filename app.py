@@ -12,6 +12,7 @@ from view.room import room_bp
 from view.index import index_bp
 from view.report import report_bp
 from view.character import char_bp
+from view.donate import donate_bp
 #socket
 from Socket.socket import socketio
 from Socket.connect_socket import connect_MySocket
@@ -29,6 +30,7 @@ app.register_blueprint(map_bp)
 app.register_blueprint(room_bp)
 app.register_blueprint(char_bp)
 app.register_blueprint(report_bp)
+app.register_blueprint(donate_bp)
 
 login_manager = LoginManager()
 login_manager.init_app(app)

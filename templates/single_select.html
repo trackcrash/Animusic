@@ -33,7 +33,8 @@
     </div>
     <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
         <h1 class="text-center text-3xl font-bold mb-8 text-white">맵 선택</h1>
-        <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <input type="text" id="searchInput" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md leading-5 bg-gray-700 text-white placeholder-gray-400" placeholder="맵 이름으로 검색...">
+        <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
             {% for mission in missions %}
             <a href="/single-play?id={{ mission.id }}" class="block igeo-card p-6 shadow-lg hover:shadow-xl rounded transition duration-300">
                 <p class="text-xl mb-4 truncate text-white">{{ mission.MapName }}</p>
@@ -46,6 +47,8 @@
             {% endfor %}
         </div>
     </div>
-</body>
+    {% include "footer.html" %}
+    <script src="{{ url_for('static', filename='js/single_select.js') }}"></script>
 
+</body>
 </html>

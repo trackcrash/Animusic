@@ -153,6 +153,5 @@ def send_verification_email(email, verification_code):
         print(f"이메일 전송 실패: {str(e)}")
         return False
 
-# 무작위 인증 번호 생성 함수
 def generate_verification_code():
     return str(random.randint(1000, 9999))

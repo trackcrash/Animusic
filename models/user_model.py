@@ -4,7 +4,7 @@ from flask_login import current_user
 from flask_bcrypt import Bcrypt
 from sqlalchemy import Boolean, Column, Integer, String, DateTime
 from db.database import Base, create_tables,create_session,close_session
-from controllers import map_controller
+from controllers import map_controller,donate_controller
 from sqlalchemy.orm import relationship
 from flask import jsonify
 bcrypt = Bcrypt()
@@ -24,7 +24,9 @@ class User(Base):
     character = Column(Integer, nullable=False)
     last_login = Column(DateTime, nullable=True)
     is_google_authenticated = Column(Boolean, default=False)
+    donations = relationship("Donation", back_populates="user")
     missions = relationship("Mission", back_populates="MapProducerUser")
+     # Donation과의 관계 설정
     def __init__(self, email, name, password, level, exp, nextexp, character, is_google_authenticated):
         self.email = email
         self.name = name
@@ -166,6 +168,7 @@ def delete_account():
     if current_user.is_authenticated:
         engine, session = create_session()
         try:
+            donate_controller.donate_del()
             map_controller.delete_User(current_user.id)
             user = session.query(User).filter_by(id=current_user.id).first()
             if user:

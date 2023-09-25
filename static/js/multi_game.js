@@ -628,14 +628,24 @@ function MapSelectPopUp() {
 
 function displayDataInModal(data) {
     videoOverlay.style.display = 'none';
+   
     const modalContent = populateModalWithMissionData(data);
     const modal = document.getElementById('mapModal');
+
     modal.querySelector('div').innerHTML = modalContent; // Insert content into the modal's inner div
     modal.classList.remove('hidden'); // Display the modal
     document.getElementById('mapModal').style.zIndex = 1;
+    $('#searchInput').on('keyup', function() {
+        let value = $(this).val().toLowerCase();
+
+        $('.igeo-card-modal').filter(function() {
+            $(this).toggle($(this).find('.text-xl').text().toLowerCase().indexOf(value) > -1);
+        });
+    });
 }
 
 function populateModalWithMissionData(data) {
+    const inputSubtitle =  `<input type="text" id="searchInput" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md leading-5 bg-gray-700 text-white placeholder-gray-400" placeholder="맵 이름으로 검색...">`;  
     const mapItems = data.map(item => `
         <a href="#" class="block igeo-card-modal p-6 shadow-lg hover:shadow-xl rounded transition duration-300" data-id="${item.id}" onclick="selectAndClose(${item.id})">
             <p class="text-xl mb-4 truncate text-white">${item.MapName}</p>
@@ -649,8 +659,9 @@ function populateModalWithMissionData(data) {
     return `
         <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
             <h1 class="text-center text-3xl font-bold mb-8 text-gray-700">Select Map</h1>
+            ${inputSubtitle}
             <button onclick="closeModal()" class="absolute top-2 right-2 text-white bg-red-500 rounded px-2 py-1 hover:bg-red-600 transition duration-300">닫기</button>
-            <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
                 ${mapItems}
             </div>
         </div>`;

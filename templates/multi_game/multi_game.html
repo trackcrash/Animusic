@@ -33,7 +33,9 @@
             <!-- Middle Section -->
             <div class="col-span-2 lg:col-span-2">
                 <div id="mapModal" class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 hidden">
-                    <div class="bg-black rounded w-3/4 h-3/4 relative overflow-y-scroll"></div>
+                    <div class="bg-black rounded w-3/4 h-3/4 relative overflow-y-scroll">          
+
+                    </div>
                 </div>
                 <!-- Video Section -->
                 <div id="videoContainer" class="relative mb-2" style="padding-bottom: 50%;">
@@ -185,6 +187,7 @@
             </div>
         </div>
     </div>
+    {% include "footer.html" %}
 </body>
 
 <script src="{{ url_for('static', filename='js/multi_game.js') }}"></script>

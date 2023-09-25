@@ -7,6 +7,7 @@ from models import data_model
 from db.database import create_session,close_session
 from models.data_model import Mission, Music
 from models.user_model import User
+from models.donate_model import Donation
 from models.notification_model import Report, Notifications
 def commit_or_rollback(session):
     try:
@@ -35,14 +36,15 @@ def SuchTable(table_Name):
 def ensure_tables_exist():
     engine, session = create_session()
     try:
-        for table in [ User, Mission,Music, Report, Notifications]:
-            table.__table__.create(bind=engine, checkfirst=True)
+        # 모든 테이블을 순회하며 존재하지 않으면 생성
+        for table in [User, Donation, Mission, Music, Report, Notifications]:
+            if not inspect(engine).has_table(table.__tablename__):
+                table.__table__.create(bind=engine, checkfirst=True)
     except Exception as e:
-        # Handle exceptions or errors as needed
+        # 예외 또는 오류 처리
         print(f"An error occurred while ensuring table existence: {str(e)}")
     finally:
         close_session(engine, session)
-
 def map_controller():
     data = None
     id = request.args.get('id')

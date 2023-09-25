@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi play - 도네이션</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <style>
+        /* 별도의 스타일 추가 가능 */
+        /* .container {
+            max-width: 800px;
+            margin: 0 auto;
+        } */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2; /* 배경색 변경 */
+        }
+        .donate-container {
+            text-align: center;
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+            max-width: 400px; /* 컨테이너 너비 설정 */
+            margin: 0 auto; /* 가운데 정렬 */
+        }
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 20px; /* 제목 아래 여백 추가 */
+        }
+        p {
+            font-size: 20px;
+            color: #666;
+            margin-top: 20px;
+        }
+        .donate-button {
+            display: inline-block;
+            background-color: #ff5722; /* 버튼 색상 변경 */
+            color: #fff;
+            font-size: 24px;
+            padding: 10px 30px; /* 버튼 패딩 수정 */
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .donate-button:hover {
+            background-color: #ff4500; /* 호버 시 색상 변경 */
+        }
+        .input-container {
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body class="bg-black">
+    <!-- 헤더 -->
+    {% include "header.html" %}
+    
+    <!-- 도네이션 컨테이너 -->
+    <div class="container mx-auto mt-8">
+        <div class="donate-container">
+            <h1>도네이션 페이지</h1>
+            <p>저희 프로젝트를 후원해주셔서 감사합니다!</p>
+            <div class="input-container">
+                <input type="text" id="donationAmount" placeholder="금액을 입력하세요">
+            </div>
+            <button id="donateButton" class="donate-button">후원하기</button>
+        </div>
+    </div>
+    
+    <!-- 푸터 -->
+    {% include "footer.html" %}
+    <script src="{{ url_for('static', filename='js/donate.js') }}"></script>
+
+</body>
+</html>
