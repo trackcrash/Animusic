@@ -737,7 +737,7 @@ function playerListGet(players, effect) {
             <div class="space-y-3 text-center">
                 <p class="font-semibold">${level}</p>
                 <p class="font-semibold text-lg text-white">${username}</p>
-                <img src="${characterImageUrl}" alt="Character Image" class="w-24 h-24 rounded-full shadow-md" />
+                <img src="${characterImageUrl}" alt="Character Image" class="mx-auto w-24 h-24 rounded-full shadow-md"/>
                 <p class="font-medium text-white">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
             </div>
         `;
