@@ -4,10 +4,6 @@ let users;
 function fetchData(url, callback) {
     $.getJSON(url, callback);
 }
-socket.on("hello_receive",()=>
-{
-    console.log("hello");
-})
 
 socket.on('room_players_update', (data) => {;
     updateRoomCount(data.room_key, data.player_count);
@@ -260,7 +256,6 @@ function removeRoomFromList(room_key) {
 }
 
 window.onload = () => {
-    socket.emit("hello");
     socket.emit('Waiting', () => {
         firstCreateRoom();
     }); // 클라이언트에서 서버로 데이터를 전송

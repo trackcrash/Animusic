@@ -200,6 +200,3 @@ def play_Socket(socketio):
                 socket_class.vote_counts[room_key] = 0
                 socket_class.voted_users[room_key] = [] 
                 room_data_manager._data_store[room_key]["room_info"]["is_skip"] = True            
-    @socketio.on("hello")
-    def hello():
-        emit("hello_receive", room= request.sid)
