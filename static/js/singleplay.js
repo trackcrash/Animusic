@@ -54,6 +54,8 @@ function playvideo(currentIndex, startTime = 0, endTime = 0, callback = null) {
         }
     });
     //videooverlay style block 추가
+    const songHint = document.getElementById('songHint');
+    songHint.textContent = "";
     videoOverlay.querySelector('span').innerText = "";
     videoOverlay.style.display = 'flex';
 }
