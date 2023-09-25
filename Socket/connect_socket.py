@@ -21,7 +21,9 @@ def connect_MySocket(socketio):
     @socketio.on('Waiting')
     def connect_waiting():
         try:
-            socket_class.waitingroom_userlist[current_user.name] = None
+            print(current_user, "update_waiting_userlist current_user")
+            if current_user:
+                socket_class.waitingroom_userlist[current_user.name] = None
             emit('update_waiting_userlist', socket_class.waitingroom_userlist, broadcast=True)
         except:
             pass

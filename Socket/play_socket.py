@@ -77,6 +77,7 @@ def play_Socket(socketio):
     @socketio.on('single_message')
     def handle_single_message(data):
         msg = data['content']
+        print(current_user,"single_play current_user")
         if not current_user.is_authenticated:
             emit('single_message',{'name': '','msg':msg}, room=request.sid)
         else:

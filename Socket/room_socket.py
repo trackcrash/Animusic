@@ -38,23 +38,25 @@ def room_Socket(socketio):
     def join_sock(data):
         room_key = data['room_key']
         session_id = request.sid
-        if room_data_manager.is_user_in_room(current_user.name, room_key):
-            emit("duplicate", {"message": "이미 방에 입장해 있습니다."}, room=session_id)
-            return
-        join_room(room_key)
-        room_data_manager.join(room_key,session_id,current_user, time)
-        user_id = room_data_manager.host_setting(room_key)
-        game_status = room_data_manager._data_store[room_key]['room_info']['room_status']
-        emit("set_session_id", {"user":user_id, "session_id":session_id}, room=session_id)
-        update_room_player_count(room_key, "님이 참가 하셨습니다.", room_data_manager._data_store[room_key]['user'][session_id]['username'],0,0)
-        if user_id != "":
-            emit("host_updated", {"user":user_id, "game_status":game_status}, room=room_key)
-        try:
-            if current_user.name in socket_class.waitingroom_userlist:
-                del socket_class.waitingroom_userlist[current_user.name]
-                emit('update_waiting_userlist', socket_class.waitingroom_userlist, broadcast=True)
-        except:
-            pass
+        print(current_user," multi_game join current_user")
+        if current_user:
+            if room_data_manager.is_user_in_room(current_user.name, room_key):
+                emit("duplicate", {"message": "이미 방에 입장해 있습니다."}, room=session_id)
+                return
+            join_room(room_key)
+            room_data_manager.join(room_key,session_id,current_user, time)
+            user_id = room_data_manager.host_setting(room_key)
+            game_status = room_data_manager._data_store[room_key]['room_info']['room_status']
+            emit("set_session_id", {"user":user_id, "session_id":session_id}, room=session_id)
+            update_room_player_count(room_key, "님이 참가 하셨습니다.", room_data_manager._data_store[room_key]['user'][session_id]['username'],0,0)
+            if user_id != "":
+                emit("host_updated", {"user":user_id, "game_status":game_status}, room=room_key)
+            try:
+                if current_user.name in socket_class.waitingroom_userlist:
+                    del socket_class.waitingroom_userlist[current_user.name]
+                    emit('update_waiting_userlist', socket_class.waitingroom_userlist, broadcast=True)
+            except:
+                pass
         
     @socketio.on("passwordCheckToServer")
     def password_check(data):
