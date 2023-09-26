@@ -10,9 +10,9 @@ from email.mime.multipart import MIMEMultipart
 
 coffeecode = config('BUY_COFFEE_KEY')
 
-def donation(amount):
+def donation(amount, name):
     try:
-        donate_model.save_donation(amount)
+        donate_model.save_donation(amount, name)
         print(f'금액 {amount} 원이 입금되었습니다.')
         
         return True

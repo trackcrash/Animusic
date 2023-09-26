@@ -1,11 +1,11 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
     const donateButton = document.getElementById("donateButton");
     const donationAmountInput = document.getElementById("donationAmount");
-
-    donateButton.addEventListener("click", function () {
+    const donationNameInput = document.getElementById("donationName");
+    donateButton.addEventListener("click", function() {
         const amount = donationAmountInput.value;
-
-        const data = {"amount" : amount}
+        const name = donationNameInput.value;
+        const data = { "amount": amount, "name": name };
         $.ajax({
             type: "POST",
             url: "/api/donate",
@@ -19,5 +19,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error(error);
             }
         });
+    });
+});
+
+$(showDonateContainer).ready(function() {
+    $("#showDonateContainer").click(function() {
+        $(".donate-container").removeClass("hidden");
     });
 });

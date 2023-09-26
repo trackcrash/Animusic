@@ -14,12 +14,14 @@ class Donation(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('UserTable.id', ondelete='CASCADE'), nullable=False)
+    name = Column(String(50), nullable=False)
     amount = Column(Float, nullable=False)
     donation_date = Column(DateTime, default=datetime.utcnow, nullable=False)
 
    # Donation 클래스의 user 속성 수정
     user = relationship("User", back_populates="donations")
-    def __init__(self, user_id, amount):
+    def __init__(self, user_id, amount, name):
+        self.name = name
         self.user_id = user_id
         self.amount = amount
 
@@ -43,10 +45,10 @@ def donation_delete():
         finally:
             close_session(engine, session)
     return False
-def save_donation(amount):
+def save_donation(amount, name):
     engine, session = create_session()
     try:
-        donation = Donation(user_id=current_user.id, amount=amount)
+        donation = Donation(user_id=current_user.id, amount=amount, name=name)
         session.add(donation)
         session.commit()
     except Exception as e:
