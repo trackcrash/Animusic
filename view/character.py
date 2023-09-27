@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, jsonify
 from models.user_model import insert_character_number,update_profile_background
 from flask_login import current_user
 from models.notification_model import notification
+from PIL import Image
 import os
 
 char_bp = Blueprint('char', __name__, url_prefix='')
@@ -49,8 +50,17 @@ def upload_profile_background():
             os.makedirs(user_folder)
         
         filename = os.path.join(user_folder, file.filename)
-        file.save(filename)
         
+        
+        # 이미지 사이즈 변경
+        image = Image.open(file)
+        width_ratio = (320 / float(image.size[0]))
+        height_size = int((float(image.size[1]) * float(width_ratio)))
+        
+        resized_image = image.resize((320, height_size), Image.ANTIALIAS)
+        
+        resized_image.save(filename)
+
         update_profile_background(current_user.id, filename)
         # 파일 업로드 성공 응답
         return jsonify({"success": True, "filename": file.filename})
