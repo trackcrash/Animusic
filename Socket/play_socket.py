@@ -11,11 +11,12 @@ from controllers.map_controller import show_mission_byid
 #반복이라 함수로 분리
 
 def skip_song(room):
+    current_data = music_data_manager.retrieve_data(room)
     next_data = music_data_manager.retrieve_next_data(room)
     if next_data:
         socket_class.totalPlayers[room] = len(room_data_manager._data_store[room]['user'])
         youtube_embed_url = next_data['youtube_embed_url']
-        emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers[room]}, room=room)
+        emit('NextData', {'youtubeLink': youtube_embed_url, "totalPlayers" : socket_class.totalPlayers[room], "current_data" : current_data}, room=room)
         if room not in socket_class.isDuplication :
             socket_class.isDuplication[room] = True
         socket_class.isDuplication[room] = True

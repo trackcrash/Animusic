@@ -15,6 +15,7 @@ let Num = 0;
 let isAnswer = false;
 let session_id = "";
 let current_answer_user = "";
+let flag = false;
 // let is_api_load= false;
 
 // function onYouTubeIframeAPIReady() {
@@ -63,9 +64,17 @@ function sendMessage() {
 }
 //정답 출력용
 function showSongInfo(title, song, correctusername, all, left_answer, category) {
+    const songTitle = document.getElementById('songTitle');
+    const songArtist = document.getElementById('songArtist');
     const all_play = document.getElementById("all_play");
     if (all == true) {
         all_play.innerText = "모든 정답을 맞추셨습니다.";
+        songTitle.innerHTML = '매체이름 : ' + `${title}`;
+        songArtist.innerHTML = '곡 이름 : ' + `${song}`;
+    } else if (all == 2) {
+        all_play.innerText = "스킵되었습니다 다음곡으로 넘어갑니다.";
+        songTitle.innerHTML = '매체이름 : ' + `${title}`;
+        songArtist.innerHTML = '곡 이름 : ' + `${song}`;
     } else {
         const answer_list = all_play.querySelectorAll("div");
         for (let i = 0; i < left_answer.length; i++) {
@@ -335,21 +344,50 @@ function initializeSocketEvents() {
     });
     //다음 곡 진행
     socket.on('NextData', (data) => {
-        isAnswer = false;
-        currentvideolink = data.youtubeLink;
-        totalPlayers = data['totalPlayers'];
-        clearInterval(gameTimerInterval);
-        playvideo(currentvideolink);
-        const all_play = document.getElementById("all_play");
-        songTitle.innerHTML = "";
-        all_play.innerHTML = "";
-        songHint.style.display = "none";
-        songHint.innerText = "";
-        elements.nextButton.style.display = "block";
-        nextButton.disabled = false;
-        updateVoteCountUI(0);
-        showHostContent(true);
+        const current_data = data['current_data'];
+        const songTitle = document.getElementById('songTitle');
+        const songArtist = document.getElementById('songArtist');
+        if (!flag) {
+            showSongInfo(current_data.title, current_data.song, current_answer_user, 2, null);
+            setTimeout(() => {
+                isAnswer = false;
+                currentvideolink = data.youtubeLink;
+                totalPlayers = data['totalPlayers'];
+                clearInterval(gameTimerInterval);
+                playvideo(currentvideolink);
+                const all_play = document.getElementById("all_play");
+                songTitle.innerHTML = "";
+                songArtist.innerHTML = "";
+                all_play.innerHTML = "";
+                songHint.style.display = "none";
+                songHint.innerText = "";
+                elements.nextButton.style.display = "block";
+                nextButton.disabled = false;
+                updateVoteCountUI(0);
+                showHostContent(true);
+                flag = false;
+            }, 4000);
+        } else {
+            isAnswer = false;
+            currentvideolink = data.youtubeLink;
+            totalPlayers = data['totalPlayers'];
+            clearInterval(gameTimerInterval);
+            playvideo(currentvideolink);
+            const all_play = document.getElementById("all_play");
+            songTitle.innerHTML = "";
+            songArtist.innerHTML = "";
+            all_play.innerHTML = "";
+            songHint.style.display = "none";
+            songHint.innerText = "";
+            elements.nextButton.style.display = "block";
+            nextButton.disabled = false;
+            updateVoteCountUI(0);
+            showHostContent(true);
+            flag = false;
+        }
     });
+
+
     //게임 끝났을 때 init
     socket.on('EndOfData', function(data) {
         // 기존의 게임 상태 및 UI 초기화 코드        
@@ -458,14 +496,19 @@ function initializeSocketEvents() {
 
     socket.on('correctAnswer', data => {
         isAnswer = false;
+        nextButton.disabled = true;
         const left_answer = data["category_length"];
         const videolink = data["data"]["youtube_embed_url"];
         clearInterval(gameTimerInterval);
-        playvideo(videolink, data.data.endTime);
+        setTimeout(() => {
+            playvideo(videolink, data.data.endTime);
+            if (document.querySelector("#NextVideo").checked) {
+                voteSkip();
+            }
+            nextButton.disabled = false;
+        }, 4000);
         showSongInfo(data.data.title, data.data.song, data.name, true, left_answer);
-        if (document.querySelector("#NextVideo").checked) {
-            voteSkip();
-        }
+        flag = true;
     });
 
     socket.on('showAnswer', data => {
@@ -628,7 +671,7 @@ function MapSelectPopUp() {
 
 function displayDataInModal(data) {
     videoOverlay.style.display = 'none';
-   
+
     const modalContent = populateModalWithMissionData(data);
     const modal = document.getElementById('mapModal');
 
@@ -645,7 +688,7 @@ function displayDataInModal(data) {
 }
 
 function populateModalWithMissionData(data) {
-    const inputSubtitle =  `<input type="text" id="searchInput" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md leading-5 bg-gray-700 text-white placeholder-gray-400" placeholder="맵 이름으로 검색...">`;  
+    const inputSubtitle = `<input type="text" id="searchInput" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md leading-5 bg-gray-700 text-white placeholder-gray-400" placeholder="맵 이름으로 검색...">`;
     const mapItems = data.map(item => `
         <a href="#" class="block igeo-card-modal p-6 shadow-lg hover:shadow-xl rounded transition duration-300" data-id="${item.id}" onclick="selectAndClose(${item.id})">
             <p class="text-xl mb-4 truncate text-white">${item.MapName}</p>
