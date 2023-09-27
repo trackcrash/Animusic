@@ -558,6 +558,7 @@ window.onload = () => {
                     }
                 } else {
                     songTitle.innerText = `로딩중입니다. 잠시만 기다려주세요.`;
+                    console.log(songTitle.innerText);
                 }
             });
         })
