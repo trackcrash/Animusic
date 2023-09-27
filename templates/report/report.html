@@ -6,11 +6,13 @@
     <title>Reports</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/index.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+
 </head>
 
 <body class="bg-gray-900 text-white font-sans">
     {% include "header.html" %}
-    <div class="container mx-auto p-5">
+    <div class="container mx-auto p-5 main">
         <h1 class="text-3xl font-bold mb-5">알림</h1>
         <div class="space-y-4">
             {% for report in reports %}
@@ -63,6 +65,8 @@
                 });
         }
     </script>
+    {% include "footer.html" %}
+
 </body>
 
 </html>

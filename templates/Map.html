@@ -8,33 +8,36 @@
     <title>My Map</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
 </head>
 
 <body class="bg-black font-sans">
     {% include "header.html" %}
-    <div class="flex items-center justify-center">
-        <ins class="kakao_ad_area" style="display:none;" data-ad-unit="DAN-CiN4Rej85jMBJBJQ" data-ad-width="300" data-ad-height="250"></ins>
-        <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
-    </div>
-    <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
-        <h1 class="text-center text-3xl font-bold mb-8 text-white">내 맵</h1>
-        <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {% if data_list is defined and data_list %} {% for data in data_list %}
-            <div class="flex flex-col">
-                <a href="/make_map?id={{data['id']}}" class="block bg-gray-400 p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300 mb-2">
-                    <p class="text-xl mb-4 truncate text-white">{{ data['MapName'] }}</p>
-                    <div class="mb-4">
-                        <img src="{{ data['Thumbnail'] }}" alt="{{ data['MapName'] }}" class="mx-auto w-full h-56 object-cover rounded-lg" />
-                    </div>
-                    <p class="text-white mb-2 ">제작자: {{ data['MapProducer'] }}</p>
-                    <p class="text-white">곡수: {{ data['MusicNum'] }}곡</p>
-                </a>
-                <a href="/single-play?id={{data['id']}}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-center transition duration-300">테스트 플레이</a>
-            </div>
-            {% endfor %} {% endif %}
+    <div class="main">
+        <div class="flex items-center justify-center">
+            <ins class="kakao_ad_area" style="display:none;" data-ad-unit="DAN-CiN4Rej85jMBJBJQ" data-ad-width="300" data-ad-height="250"></ins>
+            <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
         </div>
-        <div class="mt-10 text-center">
-            <button id="MyMap-button" onclick="window.location.href='/make_map'" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">등록하기</button>
+        <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
+            <h1 class="text-center text-3xl font-bold mb-8 text-white">내 맵</h1>
+            <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {% if data_list is defined and data_list %} {% for data in data_list %}
+                <div class="flex flex-col">
+                    <a href="/make_map?id={{data['id']}}" class="block bg-gray-400 p-6 shadow-lg hover:shadow-xl hover:bg-gray-200 rounded transition duration-300 mb-2">
+                        <p class="text-xl mb-4 truncate text-white">{{ data['MapName'] }}</p>
+                        <div class="mb-4">
+                            <img src="{{ data['Thumbnail'] }}" alt="{{ data['MapName'] }}" class="mx-auto w-full h-56 object-cover rounded-lg" />
+                        </div>
+                        <p class="text-white mb-2 ">제작자: {{ data['MapProducer'] }}</p>
+                        <p class="text-white">곡수: {{ data['MusicNum'] }}곡</p>
+                    </a>
+                    <a href="/single-play?id={{data['id']}}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-center transition duration-300">테스트 플레이</a>
+                </div>
+                {% endfor %} {% endif %}
+            </div>
+            <div class="mt-10 text-center">
+                <button id="MyMap-button" onclick="window.location.href='/make_map'" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">등록하기</button>
+            </div>
         </div>
     </div>
     {% include "footer.html" %}

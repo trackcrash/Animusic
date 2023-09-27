@@ -10,83 +10,101 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/level.css">
+    <style>
+       html
+        {
+            height: 100%;
+            margin: 0;
+            padding: 0;  
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100%;
+            background: #121212;
+            font-family: 'Poppins', sans-serif;
+        }
+   </style>
 </head>
-
 <body class="bg-black font-sans">
     {% include "header.html" %}
-    <audio id="correctSound" volume="0.0" src="static/audio/correctSound.wav" preload="auto"></audio>
-    <div class="flex items-center justify-center">
-        <ins class="kakao_ad_area" style="display:none;" data-ad-unit="DAN-CiN4Rej85jMBJBJQ" data-ad-width="300" data-ad-height="250"></ins>
-        <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
-    </div>
-    <div class="flex flex-col lg:flex-row p-4 space-y-4 lg:space-y-0 lg:space-x-4">
-        <!-- 왼쪽 영역 (영상 재생을 위한 iframe) -->
-        <div class="w-full lg:w-3/5">
-            <div id="videoContainer" class="w-full h-56 lg:h-full relative bg-gray-700 rounded-lg">
-                <div id="videoFrame" class="absolute top-0 left-0 w-full h-full"></div>
-                <div id="videoOverlay" class="absolute top-0 left-0 w-full h-full z-1 flex items-center justify-center bg-black bg-opacity-100 text-white">
-                    <div class="bg-gray-900 p-4 rounded text-white w-1/2 max-w-lg flex flex-col items-center justify-center space-y-4">
-                        <div id="songHint" style="display: none;"></div>
-
-                        <!-- Song Artist and Correct User -->
-                        <div id="songInfo">
-                            <h2 id="songArtist" class="text-xl font-semibold"></h2>
-                            <p id="all_play"></p>
-                        </div>
-                    </div>
-
-                    <span></span>
-                </div>
-            </div>
-            <div class="bg-gray-900 p-4 border-1 rounded-lg mt-4 shadow-lg">
-                <div class="flex justify-between items-center space-x-4">
-                    <div>
-                        <input type="checkbox" name="" id="NextVideo">
-                        <label for="NextVideo" class="text-sm text-white">자동 스킵 투표(정답을 맞춘경우에만 스킵됩니다.)</label>
-                    </div>
-                    <div class="flex flex-col">
-                        <div class="flex items-center space-x-2">
-                            <span>음량조절</span>
-                            <input type="range" id="VolumeBar" class="w-24" value="30">
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span>효과음조절</span>
-                            <input type="range" id="correctVolumeBar" class="w-24" value="30">
-                        </div>
-                    </div>
-                </div>
-                <div class="flex justify-between mt-4">
-                    <div class="space-y-2">
-                        <button id="nextButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow-lg">다음 영상</button>
-                        <button id="hintButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow-lg">힌트 보기</button>
-                        <p id="GameTimer" class="text-white ">남은 재생 시간 : <span>0</span>초</p>
-                        <div class="flex space-x-2">
-                            <p id="nowNumber">0</p>
-                            <p>/</p>
-                            <p id="AllNumber">0</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="main h-screen">
+        <audio id="correctSound" volume="0.0" src="static/audio/correctSound.wav" preload="auto"></audio>
+        <div class="flex items-center justify-center">
+            <ins class="kakao_ad_area" style="display:none;" data-ad-unit="DAN-CiN4Rej85jMBJBJQ" data-ad-width="300" data-ad-height="250"></ins>
+            <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
         </div>
+        <div class="flex flex-col lg:flex-row p-4 space-y-4 lg:space-y-0 lg:space-x-4">
+            <!-- 왼쪽 영역 (영상 재생을 위한 iframe) -->
+            <div class="w-full lg:w-3/5">
+                <div id="videoContainer" class="w-full h-56 lg:h-full relative bg-gray-700 rounded-lg">
+                    <div id="videoFrame" class="absolute top-0 left-0 w-full h-full"></div>
+                    <div id="videoOverlay" class="absolute top-0 left-0 w-full h-full z-1 flex items-center justify-center bg-black bg-opacity-100 text-white">
+                        <div class="bg-gray-900 p-4 rounded text-white w-1/2 max-w-lg flex flex-col items-center justify-center space-y-4">
+                            <div id="songHint" style="display: none;"></div>
 
+                            <!-- Song Artist and Correct User -->
+                            <div id="songInfo">
+                                <h2 id="songArtist" class="text-xl font-semibold"></h2>
+                                <p id="all_play"></p>
+                            </div>
+                        </div>
 
-        <!-- 오른쪽 영역 (채팅 창) -->
-        <div class="w-full lg:w-2/5 mt-4 lg:mt-0">
-            <div class="rounded shadow border-gray-300 bg-gray-900 p-4">
-                <div class="p-4">
-                    <div class="h-80 text-white overflow-y-scroll border-b border-gray-700 mb-4" id="messages">
-                        <!-- 채팅 내역 표시 창 -->
+                        <span></span>
                     </div>
                 </div>
-                <div class="p-2 flex justify-between">
-                    <!-- 채팅 입력 폼 -->
-                    <input type="text" id="inputMessage" class="flex-grow mr-2 border rounded-lg px-2 py-1 bg-gray-800 text-white placeholder-gray-500" placeholder="메시지 입력...">
-                    <button id="sendButton" class="bg-green-500 hover:bg-green-600 text-sm text-white px-4 py-1 rounded-lg shadow-lg">Send</button>
+                <div class="bg-gray-900 p-4 border-1 rounded-lg mt-4 shadow-lg">
+                    <div class="flex justify-between items-center space-x-4">
+                        <div>
+                            <input type="checkbox" name="" id="NextVideo">
+                            <label for="NextVideo" class="text-sm text-white">자동 스킵 투표(정답을 맞춘경우에만 스킵됩니다.)</label>
+                        </div>
+                        <div class="flex flex-col">
+                            <div class="flex items-center space-x-2">
+                                <span>음량조절</span>
+                                <input type="range" id="VolumeBar" class="w-24" value="30">
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span>효과음조절</span>
+                                <input type="range" id="correctVolumeBar" class="w-24" value="30">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <div class="space-y-2">
+                            <button id="nextButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow-lg">다음 영상</button>
+                            <button id="hintButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow-lg">힌트 보기</button>
+                            <p id="GameTimer" class="text-white ">남은 재생 시간 : <span>0</span>초</p>
+                            <div class="flex space-x-2">
+                                <p id="nowNumber">0</p>
+                                <p>/</p>
+                                <p id="AllNumber">0</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <p class="text-gray-500 mt-2">End 키를 눌러 스킵 할 수 있습니다 / Home 키를 눌러 힌트를 볼 수 있습니다</p>
+
+
+            <!-- 오른쪽 영역 (채팅 창) -->
+            <div class="w-full lg:w-2/5 mt-4 lg:mt-0">
+                <div class="rounded shadow border-gray-300 bg-gray-900 p-4">
+                    <div class="p-4">
+                        <div class="h-80 text-white overflow-y-scroll border-b border-gray-700 mb-4" id="messages">
+                            <!-- 채팅 내역 표시 창 -->
+                        </div>
+                    </div>
+                    <div class="p-2 flex justify-between">
+                        <!-- 채팅 입력 폼 -->
+                        <input type="text" id="inputMessage" class="flex-grow mr-2 border rounded-lg px-2 py-1 bg-gray-800 text-white placeholder-gray-500" placeholder="메시지 입력...">
+                        <button id="sendButton" class="bg-green-500 hover:bg-green-600 text-sm text-white px-4 py-1 rounded-lg shadow-lg">Send</button>
+                    </div>
+                </div>
+                <p class="text-gray-500 mt-2">End 키를 눌러 스킵 할 수 있습니다 / Home 키를 눌러 힌트를 볼 수 있습니다</p>
+            </div>
         </div>
     </div>
     {% include "footer.html" %}

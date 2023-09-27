@@ -8,12 +8,13 @@
     <title>Register</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 </head>
 
 <body>
     {% include "header.html" %}
-    <section class="bg-black">
+    <section class="bg-black main">
         <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
             <a href="/" class="flex items-center mb-6 text-2xl font-semibold text-white dark:text-white">
                 <img class="w-8 h-8 mr-2" src="/static/img/icon.png" alt="logo"> 아이거...

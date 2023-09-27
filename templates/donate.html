@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi play - 도네이션</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <style>
         body {
@@ -19,65 +20,66 @@
     <!-- 헤더 -->
     {% include "header.html" %}
 
-    <!-- 도네이션 컨테이너 -->
-    <div class="container mx-auto mt-8 text-center px-4 md:px-32">
-        <!-- px-32를 추가하여 양옆에 패딩을 줌 -->
-        <h1 class="text-2xl text-green-600">후원하기</h1>
-        <!-- 이미지 공간 -->
-        <div class="mt-8 flex flex-col md:flex-row justify-center md:space-x-4">
-            <div class="flex flex-col items-center rounded bg-gray-700 p-12 mb-4">
-                <div class="mb-4 flex flex-col items-center">
-                    <span class="text-2xl mb-2 text-white">토스로 후원하기</span>
-                    <img src="{{ url_for('static', filename='/img/donate/tossicon.png') }}" class="rounded-lg shadow-lg" style="width: 50px; height: 50px;">
+    <div class="main">
+        <!-- 도네이션 컨테이너 -->
+        <div class="container mx-auto mt-8 text-center px-4 md:px-32">
+            <!-- px-32를 추가하여 양옆에 패딩을 줌 -->
+            <h1 class="text-2xl text-green-600">후원하기</h1>
+            <!-- 이미지 공간 -->
+            <div class="mt-8 flex flex-col md:flex-row justify-center md:space-x-4">
+                <div class="flex flex-col items-center rounded bg-gray-700 p-12 mb-4">
+                    <div class="mb-4 flex flex-col items-center">
+                        <span class="text-2xl mb-2 text-white">토스로 후원하기</span>
+                        <img src="{{ url_for('static', filename='/img/donate/tossicon.png') }}" class="rounded-lg shadow-lg" style="width: 50px; height: 50px;">
+                    </div>
+                    <div class="w-64">
+                        <img src="{{ url_for('static', filename='/img/donate/toss.png') }}" alt="토스" class="rounded-lg shadow-lg w-full h-auto">
+                    </div>
                 </div>
-                <div class="w-64">
-                    <img src="{{ url_for('static', filename='/img/donate/toss.png') }}" alt="토스" class="rounded-lg shadow-lg w-full h-auto">
+                <div class="flex flex-col items-center rounded bg-gray-700 p-12 mb-4">
+                    <div class="mb-4 flex flex-col items-center">
+                        <span class="text-2xl mb-2 text-white">카카오로 후원하기</span>
+                        <!-- <img src="{{ url_for('static', filename='/img/donate/kakaoicon.png') }}" class="rounded-lg shadow-lg" style="width: 100px; height: 50px;"> -->
+                    </div>
+                    <div class="w-64">
+                        <img src="{{ url_for('static', filename='/img/donate/kakao.png') }}" alt="카카오" class="mt-12 rounded-lg shadow-lg w-full h-auto">
+                    </div>
                 </div>
             </div>
-            <div class="flex flex-col items-center rounded bg-gray-700 p-12 mb-4">
-                <div class="mb-4 flex flex-col items-center">
-                    <span class="text-2xl mb-2 text-white">카카오로 후원하기</span>
-                    <!-- <img src="{{ url_for('static', filename='/img/donate/kakaoicon.png') }}" class="rounded-lg shadow-lg" style="width: 100px; height: 50px;"> -->
-                </div>
-                <div class="w-64">
-                    <img src="{{ url_for('static', filename='/img/donate/kakao.png') }}" alt="카카오" class="mt-12 rounded-lg shadow-lg w-full h-auto">
-                </div>
+            {% if user.is_authenticated %}
+            <!-- 후원 후 안내 -->
+            <div class="p-6 bg-gray-900 shadow-lg text-white rounded-lg space-y-4 mb-4 max-w-xl mx-auto">
+                <h2 class="text-2xl text-green-600 mb-2">후원 안내</h2>
+                <p>후원을 완료하신 분들께서 추가 기능이 필요하시면 아래 안내를 따라 주시기 바랍니다.</p>
+                <table class="min-w-full border-collapse">
+                    <tbody class="space-y-2">
+                        <tr>
+                            <td class="border-t border-gray-800 p-2">1.</td>
+                            <td class="border-t border-gray-800 p-2">입금자명과 후원 금액을 정확히 기입해 주시기 바랍니다.</td>
+                        </tr>
+                        <tr>
+                            <td class="border-t border-gray-800 p-2">2.</td>
+                            <td class="border-t border-gray-800 p-2">양식을 제출하신 후, 후원 내역을 확인해 드리겠습니다.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button id="showDonateContainer" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-500 transition-all duration-300 mt-4">양식 작성</button>
             </div>
-        </div>
-        {% if user.is_authenticated %}
-        <!-- 후원 후 안내 -->
-        <div class="p-6 bg-gray-900 shadow-lg text-white rounded-lg space-y-4 mb-4 max-w-xl mx-auto">
-            <h2 class="text-2xl text-green-600 mb-2">후원 안내</h2>
-            <p>후원을 완료하신 분들께서 추가 기능이 필요하시면 아래 안내를 따라 주시기 바랍니다.</p>
-            <table class="min-w-full border-collapse">
-                <tbody class="space-y-2">
-                    <tr>
-                        <td class="border-t border-gray-800 p-2">1.</td>
-                        <td class="border-t border-gray-800 p-2">입금자명과 후원 금액을 정확히 기입해 주시기 바랍니다.</td>
-                    </tr>
-                    <tr>
-                        <td class="border-t border-gray-800 p-2">2.</td>
-                        <td class="border-t border-gray-800 p-2">양식을 제출하신 후, 후원 내역을 확인해 드리겠습니다.</td>
-                    </tr>
-                </tbody>
-            </table>
-            <button id="showDonateContainer" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-500 transition-all duration-300 mt-4">양식 작성</button>
-        </div>
-        {% endif %}
-        <!-- 도네이션 폼 -->
+            {% endif %}
+            <!-- 도네이션 폼 -->
 
-        <div class="donate-container p-6 bg-gray-900 shadow-lg space-y-4 hidden rounded-lg max-w-xl mx-auto">
-            <h1 class="text-2xl text-green-600 mb-2">기능 엑세스 양식 작성</h1>
-            <p class="text-white">저희 프로젝트에 후원해 주신 것에 진심으로 감사 드립니다.</p>
-            <p class="text-white mb-4">후원하신 분들께 추가적인 기능을 제공해 드리고 있습니다. 그러나 이는 어디까지나 기부의 형태로, 기능 확장에 대한 무조건적인 요구사항을 만족하는 것은 아닙니다. 양해 부탁 드립니다.</p>
-            <div class="space-y-4">
-                <input type="text" id="donationName" placeholder="입금자명을 입력해 주십시오" class="w-full p-2 bg-gray-800 rounded text-white placeholder-gray-500">
-                <input type="text" id="donationAmount" placeholder="금액을 입력해 주십시오" class="w-full p-2 bg-gray-800 rounded text-white placeholder-gray-500">
+            <div class="donate-container p-6 bg-gray-900 shadow-lg space-y-4 hidden rounded-lg max-w-xl mx-auto">
+                <h1 class="text-2xl text-green-600 mb-2">기능 엑세스 양식 작성</h1>
+                <p class="text-white">저희 프로젝트에 후원해 주신 것에 진심으로 감사 드립니다.</p>
+                <p class="text-white mb-4">후원하신 분들께 추가적인 기능을 제공해 드리고 있습니다. 그러나 이는 어디까지나 기부의 형태로, 기능 확장에 대한 무조건적인 요구사항을 만족하는 것은 아닙니다. 양해 부탁 드립니다.</p>
+                <div class="space-y-4">
+                    <input type="text" id="donationName" placeholder="입금자명을 입력해 주십시오" class="w-full p-2 bg-gray-800 rounded text-white placeholder-gray-500">
+                    <input type="text" id="donationAmount" placeholder="금액을 입력해 주십시오" class="w-full p-2 bg-gray-800 rounded text-white placeholder-gray-500">
+                </div>
+                <button id="donateButton" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-500 transition-all duration-300 mt-2">양식 제출</button>
             </div>
-            <button id="donateButton" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-500 transition-all duration-300 mt-2">양식 제출</button>
+
         </div>
-
-
         <!-- 푸터 -->
         {% include "footer.html" %}
         <script src="{{ url_for('static', filename='js/donate.js') }}"></script>

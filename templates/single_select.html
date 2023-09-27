@@ -7,10 +7,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>맵 선택</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+    
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <style>
+       html
+        {
+            height: 100%;
+            margin: 0;
+            padding: 0;  
+        }
         body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100%;
             background: #121212;
+            font-family: 'Poppins', sans-serif;
         }
         
         .igeo-card {
@@ -27,24 +40,26 @@
 
 <body class="font-sans bg-black">
     {% include "header.html" %}
-    <div class="flex items-center justify-center">
-        <ins class="kakao_ad_area" style="display:none;" data-ad-unit="DAN-CiN4Rej85jMBJBJQ" data-ad-width="300" data-ad-height="250"></ins>
-        <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
-    </div>
-    <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
-        <h1 class="text-center text-3xl font-bold mb-8 text-white">맵 선택</h1>
-        <input type="text" id="searchInput" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md leading-5 bg-gray-700 text-white placeholder-gray-400" placeholder="맵 이름으로 검색...">
-        <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
-            {% for mission in missions %}
-            <a href="/single-play?id={{ mission.id }}" class="block igeo-card p-6 shadow-lg hover:shadow-xl rounded transition duration-300">
-                <p class="text-xl mb-4 truncate text-white">{{ mission.MapName }}</p>
-                <div class="mb-4">
-                    <img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" class="mx-auto w-full h-56 object-cover rounded-lg" />
-                </div>
-                <p class="text-gray-500 mb-2">제작자: {{ mission.MapProducer }}</p>
-                <p class="text-indigo-600">곡수: {{ mission.MusicNum }}곡</p>
-            </a>
-            {% endfor %}
+    <div class="main">
+        <div class="flex items-center justify-center">
+            <ins class="kakao_ad_area" style="display:none;" data-ad-unit="DAN-CiN4Rej85jMBJBJQ" data-ad-width="300" data-ad-height="250"></ins>
+            <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+        </div>
+        <div class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
+            <h1 class="text-center text-3xl font-bold mb-8 text-white">맵 선택</h1>
+            <input type="text" id="searchInput" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md leading-5 bg-gray-700 text-white placeholder-gray-400" placeholder="맵 이름으로 검색...">
+            <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
+                {% for mission in missions %}
+                <a href="/single-play?id={{ mission.id }}" class="block igeo-card p-6 shadow-lg hover:shadow-xl rounded transition duration-300">
+                    <p class="text-xl mb-4 truncate text-white">{{ mission.MapName }}</p>
+                    <div class="mb-4">
+                        <img src="{{ mission.Thumbnail }}" alt="{{ mission.MapName }}" class="mx-auto w-full h-56 object-cover rounded-lg" />
+                    </div>
+                    <p class="text-gray-500 mb-2">제작자: {{ mission.MapProducer }}</p>
+                    <p class="text-indigo-600">곡수: {{ mission.MusicNum }}곡</p>
+                </a>
+                {% endfor %}
+            </div>
         </div>
     </div>
     {% include "footer.html" %}
