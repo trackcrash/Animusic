@@ -45,7 +45,7 @@ $('#CreateRoomBtn').click(function() {
         if (user_id) { // 사용자가 로그인된 경우
             const room_name = $("#room_title").val();
             const room_password = $("#room_password").val();
-            const room_max_human = $("#room_max_human").val();
+            let room_max_human = $("#room_max_human").val();
             if(room_max_human > 8)
             {
                 room_max_human = 8;
