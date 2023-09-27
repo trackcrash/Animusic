@@ -564,14 +564,7 @@ window.onload = () => {
     });
     getidtourl();
 };
-window.addEventListener('scroll', function() {
-    let scrollYvalue = window.scrollY;
-    if (scrollYvalue > 140) {
-        this.document.getElementById('Players_Box_Left').style.transform = `translateY(${scrollYvalue-140}px)`;
-        this.document.getElementById('Players_Box_Right').style.transform = `translateY(${scrollYvalue-140}px)`
 
-    }
-});
 document.querySelector("#disconect").addEventListener("click", () => {
     window.location = "/room_list";
 })
