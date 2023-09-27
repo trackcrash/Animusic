@@ -1,11 +1,15 @@
-from flask import Blueprint, render_template, request, jsonify,redirect
+from flask import Blueprint, render_template, flash, request, jsonify,redirect
 from flask_login import current_user
 from controllers.donate_controller import donation
 donate_bp = Blueprint('donate', __name__, url_prefix='')
 
 @donate_bp.get('/donate')
 def donate_page():
-    return render_template('donate.html')
+    if current_user.is_authenticated:
+        return render_template('donate.html')
+    else:
+        flash('로그인이 필요합니다.')
+        return redirect('user.login')
     
 @donate_bp.route('/api/donate', methods=['POST'])
 def donate_api():
