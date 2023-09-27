@@ -235,7 +235,7 @@ class MusicDataManager:
         return 0
 music_data_manager = MusicDataManager()
 def save_data(id, answer):
-    answer_list = answer.split('/')
+    answer_list = answer.split(']/[')
     category_data= ""
     i = 0
     for data in answer_list:
@@ -258,7 +258,7 @@ def parse_categories(category_str):
         return None
 
 def parse_answers(answer_str):
-    main_items = answer_str.split('/')
+    main_items = answer_str.split(']/[')
     answer_list = []
 
     for main_item in main_items:

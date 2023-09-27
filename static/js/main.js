@@ -33,38 +33,32 @@ if (delete_btn) {delete_btn.addEventListener("click", ()=> {delete_mission()})}
 function zero_space_text(answer) {
     // console.log(answer);
     let answer_list = [];
-    if (answer.includes('/')) {
-        answer_list = answer.split('/');
+    answer = answer.slice(1,-1);
+    if (answer.includes(']/[')) {
+        answer_list = answer.split(']/[');
     } else {
         answer_list[0] = answer;
     }
-    let answertext_list = '', element_str = '', element_switch = 0;
+    let answertext_list = '', element_str = '';
     answer_list.forEach(answer=>
     {
-        const text_list = [];
-        
-        Array.from(answer).forEach(element => {
-            if (element === "[") {
-                element_switch = 1;
-                return
-            } else if (element === "]") {
-                element_switch = 0
-                text_list.push(element_str);
-                element_str = '';
-                return
-            }
-            // console.log(element_str);
-            if (element_switch > 0) {element_str += element};
-        });
-        text_list.forEach(text => {
-            const answerList = text.split(',').map(str => str.trim()).filter(Boolean);
+        let answer_list2 = [];
+        if (answer.includes('],[')) {
+            answer_list2 = answer.split('],[');
+        } else {
+            answer_list2[0] = answer;
+        }
+        answer_list2.forEach((answer)=>
+        {
+
+            const answerList = answer.split(',').map(str => str.trim()).filter(Boolean);
             const zeroSpaceList = answerList.map(str => str.replace(/\s+/g, ''));
-    
+        
             const combinedList = answerList.concat(zeroSpaceList);
             const combinedSet = new Set(combinedList);
-    
-            answertext_list += "[" + Array.from(combinedSet).join(',') + "],"
-        })   
+        
+            answertext_list += "[" + Array.from(combinedSet).join(',') + "],"   
+        })
         answertext_list = answertext_list.slice(0,-1);
         answertext_list+= "/";
         // answertext_list.slice(0, -1); 
@@ -136,11 +130,11 @@ function modifyFunction() {
             if(catedata == "")
             {
                 catedata[0] = "카테고리:";
-                answer[0] = h1text.replace('/');
+                answer[0] = h1text;
             }else
             {
-                if (h1text.includes('/')) {
-                    answer = h1text.split('/');
+                if (h1text.includes(']/[')) {
+                    answer = h1text.split(']/[');
                 } else {
                     answer[0] = h1text;
                 }
@@ -316,9 +310,13 @@ function boxClick(answer,index,element)
     answer2_buttonField.appendChild(answer2_buttonField_label);
     answer_div_inner_div.appendChild(answer_div_inner_div_firstbutton);
     answer_div_inner_div.appendChild(answer_div_inner_div_secondbutton);
-
-
-    const answer_data_list = answer_data.match(/\[([^\]]+)\]/g);
+    let answer_data_list = [];
+    if (answer_data.includes('],[')) {
+        answer_data_list = answer_data.split('],[');
+    } else {
+        answer_data_list[0] = answer_data;
+    }
+    
     for(const data of answer_data_list)
     {
         const button = document.createElement("button");
@@ -334,6 +332,7 @@ function boxClick(answer,index,element)
         }
         answer2_buttonField.appendChild(button);
     }
+
     answer_div.appendChild(answer2_buttonField);
     answer_div.appendChild(answer_div_inner_div);
     new_div.appendChild(new_category_input);
@@ -354,6 +353,7 @@ function boxClick(answer,index,element)
         }
         first_data++;
     }
+
     new_multi_answer.querySelector(".answer2_buttonField").appendChild(button);
     document.getElementById('answer_buttonField').appendChild(button);
     if(index == 0)
@@ -638,7 +638,7 @@ async function UploadBtn(event) {
         if (!(title && song && songURL && answer)) {
             error_items.push(items_index);
         }
-
+        // console.log(answer);
         let song_entry = {
             title: title,
             song: song,

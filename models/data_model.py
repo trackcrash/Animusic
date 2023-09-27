@@ -76,10 +76,29 @@ def save_to_db(data):
 
         for item in data:
             if not item.get('MapName'):
+                answer  = item['answer']
+                answer_list = answer.split(']/[')
+                category = item['category'].split('],[')
+
+                category_up = ''
+                for i in range(len(answer_list)):
+                    answer_num = len(answer_list[i].split('],['))
+                    this_cate = category[i].replace('[','').replace(']','').split(':')
+                    cate_name=this_cate[0]
+                    cate_num = this_cate[1]
+                    print(cate_num, cate_name, answer_num , "Test")
+                    if cate_num:
+                        if int(answer_num) < int(cate_num) :
+                            cate_num = answer_num
+                    else :
+                        cate_num = 0
+                    category_up = category_up+'['+cate_name +':'+str(cate_num)+'],'
+                category_up = category_up[:-1]
+                print(category_up, "Category")
                 new_music = Music(
                     item['title'], item['song'], item['songURL'],
-                    item['thumbnail'], item['answer'], item.get('hint'),
-                    mission_id, item.get('startTime'), item.get('endTime'),item.get('category')
+                    item['thumbnail'], answer, item.get('hint'),
+                    mission_id, item.get('startTime'), item.get('endTime'),category_up
                 )
                 session.add(new_music)
 
@@ -121,17 +140,34 @@ def update_to_db(data):
         now_music_idset = set(music.id for music in now_music_info) # id값만 추출한 set() 생성
         data_idset = set() # 비어있는 set() 생성
         for item in data:
+            answer  = item['answer']
+            answer_list = answer.split(']/[')
+            category = item['category'].split('],[')
+            category_up = ''
+            for i in range(len(answer_list)):
+                answer_num = len(answer_list[i].split('],['))
+                this_cate = category[i].replace('[','').replace(']','').split(':')
+                cate_name=this_cate[0]
+                cate_num = this_cate[1]
+                if cate_num:
+                    if int(answer_num) < int(cate_num) :
+                        cate_num = answer_num
+                else :
+                    cate_num = 0
+                category_up = category_up+'['+cate_name +':'+str(cate_num)+'],'
+            category_up = category_up[:-1]
+            print(category_up, "Category")
             if 'Music_id' in item:
                 now_music_info = session.query(Music).filter_by(id=item['Music_id']).first()
                 now_music_info.title = item.get('title')
                 now_music_info.song = item.get('song')
                 now_music_info.youtube_url = item.get('songURL')
                 now_music_info.thumbnail_url = item.get('thumbnail')
-                now_music_info.answer = item.get('answer')
+                now_music_info.answer = answer
                 now_music_info.hint = item.get('hint')
                 now_music_info.startTime = item.get('startTime')
                 now_music_info.endTime = item.get('endTime')
-                now_music_info.category = item.get('category')
+                now_music_info.category = category_up
                 data_idset.add(int(item['Music_id'])) # 전송받은 데이터 중 id가 있는 곡들의 id를 모두저장
             else:
                 new_music_info = Music(
@@ -139,12 +175,12 @@ def update_to_db(data):
                     song = item.get('song'),
                     youtube_url = item.get('songURL'),
                     thumbnail_url = item.get('thumbnail'),
-                    answer = item.get('answer'),
+                    answer = answer,
                     hint = item.get('hint'),
                     mission_id = mission_id,
                     startTime = item.get('startTime'),
                     endTime = item.get('endTime'),
-                    category = item.get('category')
+                    category = category_up
                 )
                 session.add(new_music_info)
         idset_for_delete = now_music_idset - data_idset # DB에 있는 곡 중에 전송받은 곡을 제외한 나머지
