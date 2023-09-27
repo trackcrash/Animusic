@@ -66,10 +66,13 @@ class RoomDataManger:
         character = user.character
         level = user.level
         character_link = str(character)
-        profile_background = "static/img/profile_background/"+str(current_user.id)+"/"+user.profile_background
-        permissions = current_user.permissions
-        if not os.path.exists(profile_background):
-            profile_background = ""
+        profile_background = ""
+        permissions = user.permissions
+        print(user.profile_background, "user")
+        if user.profile_background:
+            profile_background = "static/img/profile_background/"+str(current_user.id)+"/"+user.profile_background
+            if not os.path.exists(profile_background):
+                profile_background = ""
         user_data = {'username': user_name , 'host':0 ,'score':0 ,'joined_time' : time.time(), 'character':character_link,'level':level, 'profile_background': profile_background,"permissions":permissions}  # 유저 데이터를 리스트로 생성
         dict_join(self._data_store[room_key]["user"], session_id, user_data)
     def get_all_session_ids_in_rooms(self):

@@ -791,6 +791,7 @@ function playerListGet(players, effect) {
             "player-card",
             "flex", "flex-col", "items-center", "justify-between", "bg-gray-700", "p-4", "rounded-lg", "shadow-md", "my-2"
         );
+        console.log(value);
         if(value.permissions >= 1)
         {
             if(value.profile_background != "")
@@ -810,14 +811,10 @@ function playerListGet(players, effect) {
         `;
         let actionButtonsHTML = session_id == key ? "" : `
             <div class="flex justify-between mt-4">
-                <button id='${username}_kick_button' class='kick_button'>강퇴</button>
-                <button id='${username}_give_host' class='give_host'>방장</button>
+                <button id='${username}_kick_button' display="none" class='kick_button'>강퇴</button>
+                <button id='${username}_give_host' display="none" class='give_host'>방장</button>
             </div>
         `;
-
-        if (!isHost) {
-            actionButtonsHTML = "";
-        }
 
         userCard.innerHTML = userInfoHTML + actionButtonsHTML;
 
