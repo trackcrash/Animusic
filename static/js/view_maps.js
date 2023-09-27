@@ -46,7 +46,13 @@ $('#CreateRoomBtn').click(function() {
             const room_name = $("#room_title").val();
             const room_password = $("#room_password").val();
             const room_max_human = $("#room_max_human").val();
-
+            if(room_max_human > 8)
+            {
+                room_max_human = 8;
+            }else if(room_max_human < 1)
+            {
+                room_max_human = 1;
+            }
             if (room_name && room_name.trim() !== '') {
                 socket.emit('room_check', { room_name: room_name, room_password: room_password, room_max_human: room_max_human });
                 // 방 이름이 제대로 입력된 경우 방 생성 및 해당 방으로 리다이렉트

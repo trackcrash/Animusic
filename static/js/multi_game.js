@@ -862,8 +862,15 @@ $('#SettingRoomBtn').click(function() {
     $('#SettingRoomModal').addClass('hidden');
     const room_name = $("#room_title").val();
     const room_password = $("#room_password").val();
-    const room_max_human = $("#room_max_human").val();
+    let room_max_human = $("#room_max_human").val();
 
+    if(room_max_human > 8)
+    {
+        room_max_human = 8;
+    }else if(room_max_human < 1)
+    {
+        room_max_human = 1;
+    }
     if (room_name && room_name.trim() !== '') {
         socket.emit('room_setting_change', { room_key: room_key, room_name: room_name, room_password: room_password, room_max_human: room_max_human });
     } else if (room_name !== null) { // 취소 버튼을 클릭하지 않은 경우
@@ -874,7 +881,7 @@ socket.on("room_data_update_inroom", (data) => {
     const thisroom_key = data["room_key"];
     if (thisroom_key == room_key) {
         const room_name = data["room_name"];
-        const room_max_human = data["room_max_human"];
+        let room_max_human = data["room_max_human"];
         document.getElementById('room_name').innerText = room_name;
         document.getElementById("room_title").value = room_name;
         document.getElementById("room_password").value = data["room_password"];
