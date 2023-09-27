@@ -5,11 +5,7 @@ donate_bp = Blueprint('donate', __name__, url_prefix='')
 
 @donate_bp.get('/donate')
 def donate_page():
-    if current_user.is_authenticated:
-        return render_template('donate.html')
-    else:
-        flash('로그인이 필요합니다.')
-        return redirect('user.login')
+    return render_template('donate.html', user=current_user)
     
 @donate_bp.route('/api/donate', methods=['POST'])
 def donate_api():

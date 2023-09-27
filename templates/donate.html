@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-
+        {% if user.is_authenticated %}
         <!-- 후원 후 안내 -->
         <div class="p-6 bg-gray-900 shadow-lg text-white rounded-lg space-y-4 mb-4 max-w-xl mx-auto">
             <h2 class="text-2xl text-green-600 mb-2">후원 안내</h2>
@@ -63,8 +63,9 @@
             </table>
             <button id="showDonateContainer" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-500 transition-all duration-300 mt-4">양식 작성</button>
         </div>
-
+        {% endif %}
         <!-- 도네이션 폼 -->
+
         <div class="donate-container p-6 bg-gray-900 shadow-lg space-y-4 hidden rounded-lg max-w-xl mx-auto">
             <h1 class="text-2xl text-green-600 mb-2">기능 엑세스 양식 작성</h1>
             <p class="text-white">저희 프로젝트에 후원해 주신 것에 진심으로 감사 드립니다.</p>
@@ -75,6 +76,7 @@
             </div>
             <button id="donateButton" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-500 transition-all duration-300 mt-2">양식 제출</button>
         </div>
+
 
         <!-- 푸터 -->
         {% include "footer.html" %}
