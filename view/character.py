@@ -51,20 +51,7 @@ def upload_profile_background():
             os.makedirs(user_folder)
         
         filename = os.path.join(user_folder, file.filename)
-        
-        # 이미지 사이즈 변경
-        image = Image.open(file)
-        
-        width_ratio = (320 / float(image.size[0]))
-        height_size = int((float(image.size[1]) * float(width_ratio)))
-        
-        resized_image = image.resize((320, height_size), Image.ANTIALIAS)
-
-         # Get the original extension of the file
-        _, ext = os.path.splitext(file.filename)
-
-         # Save the image with its original format
-        resized_image.save(filename, format=ext.strip('.'))
+        file.save(filename)
 
         update_profile_background(current_user.id, filename)
        

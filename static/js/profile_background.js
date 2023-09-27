@@ -128,9 +128,13 @@ $.getJSON("/api/get_user", (userData) => {
             const file = event.target.files[0];
             
             if (file) {
+                if(file.size >= 5 *1024*1024)
+                {
+                    alert("파일 크기 5mb 이상은 등록 할 수 없습니다.");
+                    return;
+                }               
                 const formData = new FormData();
                 formData.append("file", file);
-                
                 // 서버로 파일 업로드 요청을 보냅니다.
                 fetch("/api/upload_profile_background", {
                     method: "POST",
@@ -183,10 +187,8 @@ $.getJSON("/api/get_user", (userData) => {
                                 console.error("이미지 제거 오류:", error);
                             });
                         });
-                        
                         // 이미지 박스에 제거 버튼 추가
                         profileBox.appendChild(removeButton);
-                        
                         // 프로필 목록에 이미지 박스 추가
                         profileList.insertBefore(profileBox, profile_list.querySelector("#add-button-box"));
                         
