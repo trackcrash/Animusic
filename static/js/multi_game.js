@@ -495,6 +495,7 @@ function initializeSocketEvents() {
     });
 
     socket.on('correctAnswer', data => {
+        console.log(isHost);
         isAnswer = false;
         nextButton.disabled = true;
         const left_answer = data["category_length"];
@@ -508,6 +509,7 @@ function initializeSocketEvents() {
             nextButton.disabled = false;
         }, 4000);
         showSongInfo(data.data.title, data.data.song, data.name, true, left_answer);
+        
         flag = true;
     });
 
@@ -751,7 +753,6 @@ function highlightCorrectPlayer(playerName) {
     $("#correctSound").get(0).play();
 
     // 모든 플레이어 카드를 순회
-    console.log(playerName);
     $(".player-card").each(function() {
         // 해당 카드 내의 플레이어 이름이 정답과 일치하는지 확인
         const currentPlayerName = $(this).find("p.text-lg").text();
@@ -791,7 +792,6 @@ function playerListGet(players, effect) {
             "player-card",
             "flex", "flex-col", "items-center", "justify-between", "bg-gray-700", "p-4", "rounded-lg", "shadow-md", "my-2"
         );
-        console.log(value);
         if(value.permissions >= 1)
         {
             if(value.profile_background != "")
@@ -809,12 +809,23 @@ function playerListGet(players, effect) {
                 <p class="font-medium text-white">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
             </div>
         `;
-        let actionButtonsHTML = session_id == key ? "" : `
+        let actionButtonsHTML = "";
+        if(isHost)
+        {
+            actionButtonsHTML = session_id == key ? "" : `
             <div class="flex justify-between mt-4">
-                <button id='${username}_kick_button' display="none" class='kick_button'>강퇴</button>
-                <button id='${username}_give_host' display="none" class='give_host'>방장</button>
+                <button id='${username}_kick_button' style="display:block" class='kick_button'>강퇴</button>
+                <button id='${username}_give_host' style="display:block" class='give_host'>방장</button>
             </div>
         `;
+        }else
+        {
+            actionButtonsHTML = session_id == key ? "" : `
+            <div class="flex justify-between mt-4">
+                <button id='${username}_kick_button' style="display:none" class='kick_button'>강퇴</button>
+                <button id='${username}_give_host' style="display:none" class='give_host'>방장</button>
+            </div>`;
+        }
 
         userCard.innerHTML = userInfoHTML + actionButtonsHTML;
 
