@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <style>
+        body {
+            font-family: 'Circular Std', Arial, sans-serif;
+            background-color: #181818;
+            color: #FFFFFF;
+        }
+        
+        h1 {
+            color: #1ED760;
+        }
+    </style>
+    <title>프로필 배경 선택</title>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+
+<body class="bg-black flex flex-col justify-center" style="height: 100%;">
+    {% include "header.html" %}
+    <div class="main h-screen mb-10 mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
+        <h1 class="text-center text-3xl font-bold mb-10">프로필 배경 변경</h1>
+        <div id="profile_list" class="flex justify-center grid md:grid-cols-3 lg:grid-cols-3 gap-4">
+        
+        </div>
+        <input type="file" id="file-input" style="display: none;" accept="image/*">
+    </div>
+    {% include "footer.html" %}
+
+</body>
+<script src="{{ url_for('static', filename='js/profile_background.js') }}"></script>
+</html>

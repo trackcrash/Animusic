@@ -162,3 +162,10 @@ def name_check():
     if name_check_model(name):
         return "Success"
     return "Fail"
+
+@user_bp.route('/api/get_user')
+def get_user():
+    data = {}
+    data["id"] = current_user.id
+    data["permissions"] = current_user.permissions
+    return data

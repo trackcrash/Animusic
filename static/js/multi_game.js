@@ -748,7 +748,15 @@ function playerListGet(players, effect) {
             "player-card",
             "flex", "flex-col", "items-center", "justify-between", "bg-gray-700", "p-4", "rounded-lg", "shadow-md", "my-2"
         );
-
+        if(value.permissions >= 1)
+        {
+            if(value.profile_background != "")
+            {
+                userCard.style.backgroundSize = "cover";
+                userCard.style.backgroundRepeat = "no-repeat";
+                userCard.style.backgroundImage = `url("/${value['profile_background']}")`;
+            }
+        }
         let userInfoHTML = `
             <div class="space-y-3 text-center">
                 <p class="font-semibold">${level}</p>

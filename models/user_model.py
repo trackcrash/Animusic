@@ -26,6 +26,8 @@ class User(Base):
     is_google_authenticated = Column(Boolean, default=False)
     donations = relationship("Donation", back_populates="user")
     missions = relationship("Mission", back_populates="MapProducerUser")
+    permissions = Column(Integer, nullable=False)
+    profile_background = Column(String(255))
      # Donation과의 관계 설정
     def __init__(self, email, name, password, level, exp, nextexp, character, is_google_authenticated):
         self.email = email
@@ -37,7 +39,8 @@ class User(Base):
         self.nextexp = nextexp
         self.character = character
         self.is_google_authenticated = is_google_authenticated
-
+        self.permissions = 0
+        self.profile_background = ""
 
     def verify_password(self, password):
         return bcrypt.check_password_hash(self.password, password)
@@ -67,6 +70,7 @@ def commit_or_rollback(session):
         session.rollback()
         print(f"An error occurred: {e}")
         raise
+
 
 def update_level_info(name, level, exp, nextexp):
     engine, session = create_session()
@@ -276,5 +280,22 @@ def password_update(email,password):
         user = session.query(User).filter_by(email=email).first()
         user.password = bcrypt.generate_password_hash(password).decode('utf-8')
         commit_or_rollback(session)
+    finally:
+        close_session(engine, session)
+
+
+def update_profile_background(user_id, profile_background):
+    engine, session = create_session()
+    try:
+        user = session.query(User).filter_by(id=user_id).first()
+        if user:
+            user.profile_background = profile_background  # profile_background 필드를 업데이트합니다.
+            commit_or_rollback(session)
+            return True
+        else:
+            return False  # 사용자가 존재하지 않을 경우 False 반환
+    except Exception as e:
+        print(f"업데이트 오류: {e}")
+        return False  # 업데이트 오류 발생 시 False 반환
     finally:
         close_session(engine, session)
