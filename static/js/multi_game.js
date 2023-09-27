@@ -277,10 +277,15 @@ function initEventListeners() {
     });
     // 키보드의 end 버튼을 눌러도 nextButton이 눌리게끔 하는 동작
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'End' && elements.nextButton.disabled === false) {
-            voteSkip();
+        if (event.key === 'End') {
+            event.preventDefault();
+            if(elements.nextButton.disabled === false)
+            {
+                voteSkip();
+            }
         }
-        if (event.key === 'Home' && elements.nextButton.disabled === false) {
+        if (event.key === 'Home') {
+            event.preventDefault();
             elements.hintButton.click();
         }
     });
