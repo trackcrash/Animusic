@@ -731,7 +731,8 @@ function resize_variable_declaration() {
     // 여기에 .box가 3~4줄 이상인 경우 .box의 height를 60으로 아니면 175px로 변경
     if (Math.floor(container_item / Math.floor(container_width / parseFloat(box_width))) >= 3) {
         document.querySelectorAll('.box').forEach(box_element => {
-            box_element.style.height = '60px';
+            // box_element.style.height = '60px';
+            //제거 함
         });
     } else {
         document.querySelectorAll('.box').forEach(box_element => {

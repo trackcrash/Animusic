@@ -145,8 +145,9 @@ function push_exceldata(excelFile_data) {
             if(cell_data[key])
             {
                 const categoryPattern = /^[\p{L}\d]+:[\d\s]*$/u;
-                if(categoryPattern.test(cell_data[key]))
+                if(categoryPattern.test(cell_data[key].replace(/\s/g, '')))
                 {
+                    console.log(cell_data[key]);
                     if(answer)
                     {
                         answer_list[i] = answer;
@@ -169,6 +170,7 @@ function push_exceldata(excelFile_data) {
             }
         }
         answer_list[i] = answer;
+        // console.log(answer_list);
         answer = answer_list.map(item=>item).join('/');
         cate = category_list.map(item=>item).join(',');  
         song_info = {
@@ -206,7 +208,7 @@ async function data_convert_upload() {
 
     let check_array = push_exceldata(excelFile_data);
 
-    console.log(check_array);
+    // console.log(check_array);
     // 가공된 내용을 .box에 저장 (없으면 생성) + 변경되지않은 .box는 삭제
 
     const boxList = document.querySelectorAll('.box');
