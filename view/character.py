@@ -33,6 +33,7 @@ def get_files():
         return jsonify({'error': str(e)})
 
 # 프로필 백그라운드 업로드 API
+
 @char_bp.route("/api/upload_profile_background", methods=["POST"])
 def upload_profile_background():
     if "file" not in request.files:
@@ -51,22 +52,26 @@ def upload_profile_background():
         
         filename = os.path.join(user_folder, file.filename)
         
-        
         # 이미지 사이즈 변경
         image = Image.open(file)
+        
         width_ratio = (320 / float(image.size[0]))
         height_size = int((float(image.size[1]) * float(width_ratio)))
         
         resized_image = image.resize((320, height_size), Image.ANTIALIAS)
-        
-        resized_image.save(filename)
+
+         # Get the original extension of the file
+        _, ext = os.path.splitext(file.filename)
+
+         # Save the image with its original format
+        resized_image.save(filename, format=ext.strip('.'))
 
         update_profile_background(current_user.id, filename)
+       
         # 파일 업로드 성공 응답
-        return jsonify({"success": True, "filename": file.filename})
+        return jsonify({"success": True, "filename": filename})
 
     return jsonify({"success": False, "message": "File upload failed"})
-
 @char_bp.route("/api/update_profile_background", methods=["POST"])
 def update_profile_background_endpoint():
     data = request.get_json()
