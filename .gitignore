@@ -6,3 +6,4 @@ banned_words.txt
 /venv
 test.py
 /hi
+/static/img/profile_background/

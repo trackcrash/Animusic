@@ -10,6 +10,13 @@
     }
 }
 
+.space-y-3 {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+}
+
 .fade-in-out {
     animation: fadeInOut 5s infinite;
 }
@@ -178,6 +185,7 @@ button:hover {
 
 
 /* 음량조절 스타일 */
+
 #correctVolumeBar,
 #VolumeBar {
     -webkit-appearance: none;

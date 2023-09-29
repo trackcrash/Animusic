@@ -279,8 +279,7 @@ function initEventListeners() {
     document.addEventListener('keydown', (event) => {
         if (event.key === 'End') {
             event.preventDefault();
-            if(elements.nextButton.disabled === false)
-            {
+            if (elements.nextButton.disabled === false) {
                 voteSkip();
             }
         }
@@ -514,7 +513,7 @@ function initializeSocketEvents() {
             nextButton.disabled = false;
         }, 4000);
         showSongInfo(data.data.title, data.data.song, data.name, true, left_answer);
-        
+
         flag = true;
     });
 
@@ -789,36 +788,32 @@ function playerListGet(players, effect) {
 
         userCard.classList.add(
             "player-card",
-            "flex", "flex-col", "items-center", "justify-between", "bg-gray-700", "p-4", "rounded-lg", "shadow-md", "my-2"
+            "flex", "flex-col", "items-center", "justify-between", "bg-gray-700", "rounded-lg", "shadow-md", "my-2"
         );
-        if(value.permissions >= 1)
-        {
-            if(value.profile_background != "")
-            {
+        if (value.permissions >= 1) {
+            if (value.profile_background != "") {
                 userCard.style.backgroundSize = "cover";
                 userCard.style.backgroundRepeat = "no-repeat";
                 userCard.style.backgroundImage = `url("/${value['profile_background']}")`;
             }
         }
         let userInfoHTML = `
-            <div class="space-y-3 text-center">
-                <p class="font-semibold">${level}</p>
-                <p class="font-semibold text-lg text-white">${username}</p>
-                <img src="${characterImageUrl}" alt="Character Image" class="mx-auto w-24 h-24 rounded-full shadow-md"/>
-                <p class="font-medium text-white">점수: <span class='ScoreSpan text-red-500'>${score}</span></p>
-            </div>
+        <div class="space-y-3 text-center p-4 rounded-lg">
+        <p class="font-semibold text-2xl text-white">${level}</p>
+    <p class="font-extrabold text-3xl text-white">${username}</p>
+    <img src="${characterImageUrl}" alt="Character Image" class="mx-auto w-28 h-28 rounded-full shadow-xl"/>
+    <p class="font-bold text-xl text-white">점수: <span class='font-bold ScoreSpan text-green-500'>${score}</span></p>
+    </div>
         `;
         let actionButtonsHTML = "";
-        if(isHost)
-        {
+        if (isHost) {
             actionButtonsHTML = session_id == key ? "" : `
             <div class="flex justify-between mt-4">
                 <button id='${username}_kick_button' style="display:block" class='kick_button'>강퇴</button>
                 <button id='${username}_give_host' style="display:block" class='give_host'>방장</button>
             </div>
         `;
-        }else
-        {
+        } else {
             actionButtonsHTML = session_id == key ? "" : `
             <div class="flex justify-between mt-4">
                 <button id='${username}_kick_button' style="display:none" class='kick_button'>강퇴</button>
@@ -851,10 +846,63 @@ function playerListGet(players, effect) {
             rightContainer.appendChild(userCard);
         }
         index++;
+        // if (value.profile_background != "") {
+        //     getCentralImageBrightness(`/${value['profile_background']}`, (brightness) => {
+        //         if (brightness > 100) {
+        //             userCard.querySelector(".font-semibold").classList.remove("text-white");
+        //             userCard.querySelector(".font-bold").classList.remove("text-white");
+        //             userCard.querySelector(".font-extrabold").classList.remove("text-white");
+
+        //             userCard.querySelector(".font-semibold").classList.add("text-black");
+        //             userCard.querySelector(".font-bold").classList.add("text-black");
+        //             userCard.querySelector(".font-extrabold").classList.add("text-black");
+        //         }
+        //     });
+        // }
     });
     if (effect)
         highlightCorrectPlayer(current_answer_user);
 }
+
+// function getCentralImageBrightness(imageSrc, callback) {
+//     let img = new Image();
+//     img.src = imageSrc;
+
+//     img.onload = function() {
+//         let canvas = document.createElement('canvas');
+//         canvas.width = this.width;
+//         canvas.height = this.height;
+
+//         let ctx = canvas.getContext('2d');
+//         ctx.drawImage(this, 0, 0);
+
+//         let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+//         let data = imageData.data;
+//         let r, g, b, avg;
+
+//         let colorSum = 0;
+//         let totalPixels = 0;
+
+//         // Check only the center 50% of the image
+//         let quarterWidth = this.width / 4;
+//         let quarterHeight = this.height / 4;
+//         for (let x = quarterWidth; x < this.width - quarterWidth; x++) {
+//             for (let y = quarterHeight; y < this.height - quarterHeight; y++) {
+//                 let idx = (y * this.width + x) * 4;
+//                 r = data[idx];
+//                 g = data[idx + 1];
+//                 b = data[idx + 2];
+
+//                 avg = (r + g + b) / 3;
+//                 colorSum += avg;
+//                 totalPixels++;
+//             }
+//         }
+
+//         let brightness = Math.floor(colorSum / totalPixels);
+//         callback(brightness);
+//     }
+// }
 
 function Setting_room_btn() {
     // 사용자 정보를 가져옵니다.
@@ -869,11 +917,9 @@ $('#SettingRoomBtn').click(function() {
     const room_password = $("#room_password").val();
     let room_max_human = $("#room_max_human").val();
 
-    if(room_max_human > 8)
-    {
+    if (room_max_human > 8) {
         room_max_human = 8;
-    }else if(room_max_human < 1)
-    {
+    } else if (room_max_human < 1) {
         room_max_human = 1;
     }
     if (room_name && room_name.trim() !== '') {
