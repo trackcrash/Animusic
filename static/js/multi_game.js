@@ -398,10 +398,12 @@ function initializeSocketEvents() {
         clearInterval(gameTimerInterval);
         document.querySelector("div #videoFrame").remove();
         const all_play = document.getElementById("all_play");
-
+        const songTitle = document.getElementById('songTitle');
+        const songArtist = document.getElementById('songArtist');
         songTitle.innerHTML = "";
         all_play.innerHTML = "";
         songHint.innerText = "";
+        songArtist.innerHTML = "";
         songHint.style.display = "none";
         videoOverlay.style.display = 'flex';
         nextButton.disabled = true;
