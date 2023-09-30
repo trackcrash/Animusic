@@ -169,3 +169,6 @@ def get_user():
     data["id"] = current_user.id
     data["permissions"] = current_user.permissions
     return data
+@user_bp.route('/kick_page')
+def kick():
+    return render_template("kick.html")

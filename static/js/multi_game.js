@@ -595,13 +595,25 @@ socket.on('host_updated', (data) => {
     if (data.user === socket.id) {
         isHost = true; // 방장이면 isHost를 true로 설정
     }
+    const player = document.querySelectorAll(".player-card");
+    for(const elements of player)
+    {
+        if(elements.querySelector('.user_name').textContent == data["host"]["username"])
+        {
+            elements.querySelector('.host').style.display = "block";
+        }
+        else
+        {
+            elements.querySelector('.host').style.display = "none";
+        }
+        
+    }
     showHostContent(game_status);
 });
 
 function showHostContent(game_status) {
-    kickButton = document.querySelectorAll(".kick_button");
-    HostButton = document.querySelectorAll(".give_host");
-
+    let kickButton = document.querySelectorAll(".kick_button");
+    let HostButton = document.querySelectorAll(".give_host");
     if (isHost) {
         elements.room_setting.style.display = "block";
         elements.room_setting.disabled = false;
@@ -785,26 +797,6 @@ function playerListGet(players, effect) {
         let charImg = findKeysByValue(CharacterEnum, value['character']);
         let characterImageUrl = getCharacter(charImg);
         let userCard = document.createElement("div");
-
-        userCard.classList.add(
-            "player-card",
-            "flex", "flex-col", "items-center", "justify-between", "bg-gray-700", "rounded-lg", "shadow-md", "my-2"
-        );
-        if (value.permissions >= 1) {
-            if (value.profile_background != "") {
-                userCard.style.backgroundSize = "cover";
-                userCard.style.backgroundRepeat = "no-repeat";
-                userCard.style.backgroundImage = `url("/${value['profile_background']}")`;
-            }
-        }
-        let userInfoHTML = `
-        <div class="space-y-3 text-center p-4 rounded-lg">
-        <p class="font-semibold text-2xl text-white">${level}</p>
-    <p class="font-extrabold text-3xl text-white">${username}</p>
-    <img src="${characterImageUrl}" alt="Character Image" class="mx-auto w-28 h-28 rounded-full shadow-xl"/>
-    <p class="font-bold text-xl text-white">점수: <span class='font-bold ScoreSpan text-green-500'>${score}</span></p>
-    </div>
-        `;
         let actionButtonsHTML = "";
         if (isHost) {
             actionButtonsHTML = session_id == key ? "" : `
@@ -820,8 +812,28 @@ function playerListGet(players, effect) {
                 <button id='${username}_give_host' style="display:none" class='give_host'>방장</button>
             </div>`;
         }
-
-        userCard.innerHTML = userInfoHTML + actionButtonsHTML;
+        userCard.classList.add(
+            "player-card",
+            "flex", "flex-col", "items-center", "justify-between", "bg-gray-700", "rounded-lg", "shadow-md", "my-2"
+        );
+        if (value.permissions >= 1) {
+            if (value.profile_background != "") {
+                userCard.style.backgroundSize = "cover";
+                userCard.style.backgroundRepeat = "no-repeat";
+                userCard.style.backgroundImage = `url("/${value['profile_background']}")`;
+            }
+        }
+        let userInfoHTML = `
+        <div class="space-y-3 text-center p-4 rounded-lg">
+        <p class = "host" style="display:none">👑</p>
+        <p class="font-semibold text-2xl text-white">${level}</p>
+        <p class="user_name font-extrabold text-3xl text-white">${username}</p>
+        <img src="${characterImageUrl}" alt="Character Image" class="mx-auto w-28 h-28 rounded-full shadow-xl"/>
+        <p class="font-bold text-xl text-white">점수: <span class='font-bold ScoreSpan text-green-500'>${score}</span></p>
+        ${actionButtonsHTML}
+        </div>
+        `;
+        userCard.innerHTML = userInfoHTML;
 
         if (userCard.querySelector(".kick_button")) {
             userCard.querySelector(".kick_button").addEventListener("click", function() {
@@ -946,8 +958,7 @@ socket.on("kick_player", (data) => {
     elements.messages.appendChild(item);
     elements.messages.scrollTop = elements.messages.scrollHeight;
     if (data["session_id"] == session_id) {
-        alert("강퇴당하셨습니다.");
-        window.location = "/";
+        window.location = "/kick_page";
     }
 })
 socket.on("set_session_id", (data) => {

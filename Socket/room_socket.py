@@ -50,7 +50,9 @@ def room_Socket(socketio):
             emit("set_session_id", {"user":user_id, "session_id":session_id}, room=session_id)
             update_room_player_count(room_key, "님이 참가 하셨습니다.", room_data_manager._data_store[room_key]['user'][session_id]['username'],0,0)
             if user_id != "":
-                emit("host_updated", {"user":user_id, "game_status":game_status}, room=room_key)
+                host = room_data_manager._data_store[room_key]["user"][user_id]
+                emit("host_updated", {"user":user_id, "game_status":game_status, "room_key" : room_key, "host" : host}, room=room_key)
+                emit("room_host_updated", {"room_key" : room_key, "host" : host}, broadcast = True)
             try:
                 if current_user.name in socket_class.waitingroom_userlist:
                     del socket_class.waitingroom_userlist[current_user.name]
@@ -144,4 +146,5 @@ def room_Socket(socketio):
             if "username" in value and value["username"] == user_name:
                 value["host"] = 1
                 user_id = key
-                emit("host_updated", {"user":user_id, "game_status":game_status}, room=room_key)
+                emit("host_updated", {"user":user_id, "game_status":game_status,"room_key":room_key ,"host":value}, room=room_key)
+                emit("room_host_updated", {"room_key" : room_key, "host" : value}, broadcast = True)
