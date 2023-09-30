@@ -495,9 +495,12 @@ function initializeSocketEvents() {
     });
 
     socket.on('MissionSelect_get', data => {
-        const map_name = data['map_data'][0]['MapName'];
-        const Producer = data['map_data'][0]['MapProducer'];
-        songTitle.innerText = `${map_name} \n 제작자 : ${Producer}`;
+        if(data['room_key'] == room_key)
+        {
+            const map_name = data['map_data'][0]['MapName'];
+            const Producer = data['map_data'][0]['MapProducer'];
+            songTitle.innerText = `${map_name} \n 제작자 : ${Producer}`;
+        }
     });
 
     socket.on('correctAnswer', data => {
