@@ -562,7 +562,6 @@ window.onload = () => {
                     }
                 } else {
                     songTitle.innerText = `로딩중입니다. 잠시만 기다려주세요.`;
-                    console.log(songTitle.innerText);
                 }
             });
         })
@@ -596,6 +595,8 @@ socket.on('host_updated', (data) => {
         isHost = true; // 방장이면 isHost를 true로 설정
     }
     const player = document.querySelectorAll(".player-card");
+
+    showHostContent(game_status);
     for(const elements of player)
     {
         if(elements.querySelector('.user_name').textContent == data["host"]["username"])
@@ -606,9 +607,7 @@ socket.on('host_updated', (data) => {
         {
             elements.querySelector('.host').style.display = "none";
         }
-        
     }
-    showHostContent(game_status);
 });
 
 function showHostContent(game_status) {

@@ -106,6 +106,9 @@ class RoomDataManger:
                     # 변경된 정보 출력
                     return first_user_key
                 else:
+                    for user_key, user_info in users.items():
+                        if user_info["host"] == 1:
+                            return user_key
                     print("Not all users have host set to 0.")
             else:
                 print("No user data in the room.")

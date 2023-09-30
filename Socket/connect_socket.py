@@ -35,18 +35,15 @@ def connect_MySocket(socketio):
         for room_key, room_data in list(room_data_manager._data_store.items()):
             if 'user' in room_data and request.sid in room_data['user']:
                 user_name = room_data['user'][request.sid]['username']
-                
                 game_status = room_data_manager._data_store[room_key]['room_info']['room_status']
-                print(game_status,"game_statust")
                 del room_data['user'][request.sid]  # 해당 유저 제거
                 room = room_data_manager.host_setting(room_key)
+                if user_name:
+                    update_room_player_count(room_key, "님이 퇴장 하셨습니다.", user_name,0,0)  # 플레이어 수 업데이트
                 if room:
                     host = room_data_manager._data_store[room_key]["user"][room]
                     emit("host_updated", {"user":room, "game_status":game_status, "room_key" : room_key, "host" : host}, room=room_key)
                     emit("room_host_updated", {"room_key" : room_key, "host" : host}, broadcast = True)
-
-                if user_name:
-                    update_room_player_count(room_key, "님이 퇴장 하셨습니다.", user_name,0,0)  # 플레이어 수 업데이트
                 if not room_data['user']:  # 방에 더 이상 유저가 없으면 방 제거
                     removed_rooms.append(room_key)
                 else:
