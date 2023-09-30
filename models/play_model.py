@@ -364,8 +364,11 @@ def get_room_dict():
     room_dict = copy.deepcopy(room_data_manager._data_store)
     for key, value in room_dict.items():
         room_dict[key]["room_info"]["room_password"] = False if room_dict[key]["room_info"]["room_password"] in ('', None) else True 
+        
     return jsonify(room_dict)
 
+
+        
 def get_thisroom_dict(room_key):
     room_dict = copy.deepcopy(room_data_manager._data_store[room_key])
     

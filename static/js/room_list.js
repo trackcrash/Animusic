@@ -16,7 +16,7 @@ socket.on('room_update', (data) => {
         const room_name = data["room_name"];
         const max_user = data["max_user"];
         const isPassword = data["is_password"];
-        addRoomToList(room_key, room_name, max_user, isPassword);
+        addRoomToList(room_key, room_name, max_user, isPassword,"");
     });
 });
 
@@ -48,6 +48,15 @@ socket.on('request_room_changed', (data) => {
     } else {
         document.getElementById(`room_status_${data['room_key']}`).innerText = "🔴 대기중";
     }
+});
+
+socket.on('room_host_updated', (data) => {
+    // 방장 정보가 업데이트되었을 때 클라이언트에서 수행할 동작
+    const room_key = data["room_key"];
+    const host = data["host"]["username"];
+    console.log(data);
+    console.log(host);
+    document.getElementById(`HostUser-${room_key}`).textContent = `👑 ${host}`;
 });
 socket.on("room_full_user", (data) => {
     alert(data + "방의 인원이 가득 차있습니다.");
@@ -85,7 +94,7 @@ socket.on("room_data_update", (data) => {
     document.getElementById(`room-private-${room_key}`).style.backgroundColor = room_private ? "#F87171" : "#34D399";
 });
 
-function createRoomElement(room_key, room_name, room_status, user_count, mission, max_user, isPassword) {
+function createRoomElement(room_key, room_name, room_status, user_count, mission, max_user, isPassword, host) {
     const roomContainer = document.createElement('div');
     roomContainer.id = `roomContainer_${room_key}`;
     roomContainer.classList.add('room-container', 'p-6', 'bg-black', 'text-white', 'shadow-md', 'rounded-xl', 'transition', 'duration-300', 'hover:shadow-xl', 'cursor-pointer', 'space-y-4');
@@ -146,6 +155,12 @@ function createRoomElement(room_key, room_name, room_status, user_count, mission
     MissionProducerElement.classList.add('block', 'text-sm', 'font-medium');
     MissionProducerElement.textContent = `👤 ${mission ? mission[0]['MapProducer'] : "미설정"}`;
 
+    const HostUserElement = document.createElement('span');
+    HostUserElement.id = `HostUser-${room_key}`;
+    HostUserElement.classList.add('block', 'text-sm', 'font-medium');
+    HostUserElement.textContent = `👑 ${host}`;
+
+
     const roomStatusElement = document.createElement('span');
     roomStatusElement.id = `room_status_${room_key}`
     roomStatusElement.classList.add('block', 'text-sm', 'font-semibold', 'text-gray-700');
@@ -154,8 +169,8 @@ function createRoomElement(room_key, room_name, room_status, user_count, mission
     detailsContainer.appendChild(roomCountElement);
     detailsContainer.appendChild(roomMissionElement);
     detailsContainer.appendChild(MissionProducerElement);
+    detailsContainer.appendChild(HostUserElement);
     detailsContainer.appendChild(roomStatusElement);
-
     roomContainer.appendChild(titleContainer);
     roomContainer.appendChild(thumbnailContainer);
     roomContainer.appendChild(detailsContainer);
@@ -229,17 +244,26 @@ function firstCreateRoom() {
                 const user_count = Object.keys(user_info).length;
                 const max_user = roomInfo["room_full_user"];
                 const isPassword = roomInfo["room_password"];
-                console.log(isPassword);
+                let host = "";
+                for(let user_key in room_dict[room_key]["user"])
+                {
+                    if(room_dict[room_key]["user"][user_key]["host"] == 1)
+                    {
+                        host = room_dict[room_key]["user"][user_key]["username"];
+                        break;
+                    }
+                }
                 // roomStatus를 이용하여 원하는 작업 수행
-                roomButtonsContainer.appendChild(createRoomElement(room_key, room_name, roomStatus, user_count, Mission, max_user, isPassword));
+                roomButtonsContainer.appendChild(createRoomElement(room_key, room_name, roomStatus, user_count, Mission, max_user, isPassword,host));
             }
         });
     });
 }
 
-function addRoomToList(room_key, room_name, max_user, isPassword) {
+function addRoomToList(room_key, room_name, max_user, isPassword,host) {
     const roomButtonsContainer = document.getElementById('room-buttons');
-    roomButtonsContainer.appendChild(createRoomElement(room_key, room_name, false, false, false, max_user, isPassword));
+
+    roomButtonsContainer.appendChild(createRoomElement(room_key, room_name, false, false, false, max_user, isPassword,host));
 }
 
 function removeRoomFromList(room_key) {
