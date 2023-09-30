@@ -12,6 +12,7 @@
     <link href="{{ url_for('static', filename='css/index.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
     
+    
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <style>
         .igeo-card {
@@ -41,7 +42,6 @@
 </head>
 
 <body class="flex flex-col bg-black">
-
     {% include "header.html" %}
     <div class="main">
         <div class="flex-grow flex flex-col items-center justify-center p-5 space-y-6 md:space-y-12 w-full md:w-4/5 mx-auto">
@@ -65,7 +65,7 @@
 
                 <!-- Multi Play Button -->
                 <a href="/room_list" class="flex-1 p-6 rounded-xl shadow-lg igeo-card space-y-4">
-                    <h2 class="text-xl md:text-2xl font-bold text-center text-white">멀티플레이</h2>
+                    <h2 class="text-xl md:text-2xl font-bold text-center text-white">멀티플레이 룸 : <span id="room_number">0</span> 개</h2>
                     <p class="text-lg text-center text-white">나는 친구가 많다.</p>
                 </a>
             </div>

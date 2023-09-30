@@ -57,6 +57,7 @@ def room_Socket(socketio):
                 if current_user.name in socket_class.waitingroom_userlist:
                     del socket_class.waitingroom_userlist[current_user.name]
                     emit('update_waiting_userlist', socket_class.waitingroom_userlist, broadcast=True)
+                emit("room_number_update", str(room_data_manager.get_room_list()), broadcast = True)    
             except:
                 pass
         

@@ -39,6 +39,7 @@
             <input id="notificationCt" type="text" class="text-black">
             <button type="submit">send</button>
         </div>
+        <p><span id="socket_number">0</span>명</p>
         <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
         {% endif %} {% if current_user.is_authenticated %}
         <span class="text-green-500">

@@ -2,7 +2,7 @@
 import jwt, datetime
 from decouple import config
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, Flask
-
+from Socket.socket import get_socket_number
 from flask_login import logout_user, login_required, current_user,login_user
 from controllers.user_controller import site_login, google_login, google_callback,register as user_register,send_verification_email,generate_verification_code,emailDict
 from models.user_model import delete_account, account_insert, account_insert_in_googleuser, insert_character_number,email_check_model,name_check_model,password_update
@@ -172,3 +172,6 @@ def get_user():
 @user_bp.route('/kick_page')
 def kick():
     return render_template("kick.html")
+@user_bp.route("/api/socket_number")
+def socket_number():
+    return get_socket_number()

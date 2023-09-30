@@ -2,7 +2,7 @@ from flask_socketio import emit
 from flask import request
 from flask_login import current_user
 from models.play_model import room_data_manager
-from Socket.socket import socket_class
+from Socket.socket import socket_class,get_socket_number
 from models.room_model import update_room_player_count
 from models.notification_model import notification
 def connect_MySocket(socketio):
@@ -15,7 +15,8 @@ def connect_MySocket(socketio):
     def handle_connect():
         print("SocketConnect")
         # 소켓이 연결되면 실행되는 함수
-        num_connected = len(socketio.server.eio.sockets)
+        num_connected = get_socket_number()
+        emit("socket_connected_user", num_connected, broadcast = True)
         print(f"현재 연결된 소켓 수: {num_connected}")
      
     @socketio.on('Waiting')
@@ -31,7 +32,8 @@ def connect_MySocket(socketio):
     def disconnect():
         removed_rooms = []  # 나간 방의 이름을 저장할 리스트
         user_name = ""  # 유저 이름을 저장할 변수
-
+        num_connected = int(get_socket_number())-1
+        emit("socket_connected_user", num_connected, broadcast = True)
         for room_key, room_data in list(room_data_manager._data_store.items()):
             if 'user' in room_data and request.sid in room_data['user']:
                 user_name = room_data['user'][request.sid]['username']
@@ -63,5 +65,6 @@ def connect_MySocket(socketio):
                 if current_user.name in socket_class.waitingroom_userlist:
                     del socket_class.waitingroom_userlist[current_user.name]
                     emit('update_waiting_userlist', socket_class.waitingroom_userlist, broadcast=True)
+            emit("room_number_update", str(room_data_manager.get_room_list()), broadcast = True)
         except:
             pass

@@ -144,7 +144,10 @@ class RoomDataManger:
     def room_user_check(self, room_key):
         playerNum = len(self._data_store[room_key]['user'])
         return playerNum
-                
+    def get_room_list(self):
+        room = len(self._data_store.items())
+        print(room)
+        return room          
 room_data_manager = RoomDataManger()
 class MusicDataManager:
     def __init__(self):

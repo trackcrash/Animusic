@@ -4,6 +4,15 @@ window.onload = () => {
         .fail(error => {
             console.error('Error fetching mission table data:', error);
         });
+    $.get('/api/get_room_list')
+        .done((data)=>
+        {
+            $("#room_number").text(data);
+        })
+        .fail(error =>
+        {
+            console.log(error)
+        });
 }
 let flag = false;
 let id = null;
@@ -91,6 +100,7 @@ function getRankingClass(rank) {
 function fetchData(url, callback) {
     $.getJSON(url, callback);
 }
+
 $('#CreateRoomBtn').click(function() {
     $('#CreateRoomModal').addClass('hidden');
     fetchData("/get_user_info", (user_id) => {
@@ -118,8 +128,9 @@ $('#CreateRoomBtn').click(function() {
         }
     });
 });
-
-
+socket.on("room_number_update",(data)=>{
+    $("#room_number").text(data);
+})
 socket.on('Join_room', (data) => {
     joinChatRoom(data);
 })
