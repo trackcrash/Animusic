@@ -48,12 +48,6 @@ def get_info_for_room(room_key):
     return user_info, update_info
 
 def exp_calculator(name, exp, nextexp, score, level, room_key,session_id):
-    if level == -1:
-        return {
-            'exp': exp,
-            'nextexp': nextexp,
-            'level': level
-        }
     if score == 0:
         return {
             'exp': exp,
