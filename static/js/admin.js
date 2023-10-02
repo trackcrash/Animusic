@@ -17,6 +17,5 @@ $.get('/api/socket_number')
 });
 socket.on("socket_connected_user", (data)=>
 {
-    console.log(data);
     document.getElementById('socket_number').textContent = data;
 })

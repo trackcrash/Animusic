@@ -451,43 +451,39 @@ function initializeSocketEvents() {
         const currentExp = (newUserData.nextexp);
         const currentUser = currentData.before_data[player_name];
         const beforeExp = currentUser.exp;
-        const beforeLevel = currentUser.level;
         const beforeNextExp = currentUser.nextexp;
         if (!currentUser) {
             console.warn("Current user data is missing!");
             return;
         }
-        if (currentUser.level != -1) {
-            const startPercentage = (beforeExp / beforeNextExp) * 100;
-            const endPercentage = (newExp / currentExp) * 100;
+        const startPercentage = (beforeExp / beforeNextExp) * 100;
+        const endPercentage = (newExp / currentExp) * 100;
 
-            $('#expBar').css('width', `${startPercentage}%`);
+        $('#expBar').css('width', `${startPercentage}%`);
 
-            $('#expText').text(`${beforeExp}/${beforeNextExp}`);
+        $('#expText').text(`${beforeExp}/${beforeNextExp}`);
 
-            $('#expBar').animate({ width: `${endPercentage}%` }, 3000);
+        $('#expBar').animate({ width: `${endPercentage}%` }, 3000);
 
-            setTimeout(() => {
-                $('#expText').text(`${newExp}/${currentExp}`);
-            }, 1000);
+        setTimeout(() => {
+            $('#expText').text(`${newExp}/${currentExp}`);
+        }, 1000);
 
-            if (newLevel > currentUser.level) {
-                $('#levelUpModal h2').text(`축하합니다! ${newLevel} 레벨이 되었습니다!`);
-                $('#levelUpModal').removeClass('hidden');
-            } else {
-                $('#levelUpModal h2').text(`다음 레벨까지`);
-                $('#levelUpModal').removeClass('hidden');
-            }
-            // 사용자 정보 업데이트
-            $('#userExp').text(newExp);
-            $('#userLevel').text(newLevel);
-
-            currentUser.exp = newExp;
-            currentUser.level = newLevel;
-
-            currentData = null;
+        if (newLevel > currentUser.level) {
+            $('#levelUpModal h2').text(`축하합니다! ${newLevel} 레벨이 되었습니다!`);
+            $('#levelUpModal').removeClass('hidden');
+        } else {
+            $('#levelUpModal h2').text(`다음 레벨까지`);
+            $('#levelUpModal').removeClass('hidden');
         }
+        // 사용자 정보 업데이트
+        $('#userExp').text(newExp);
+        $('#userLevel').text(newLevel);
 
+        currentUser.exp = newExp;
+        currentUser.level = newLevel;
+
+        currentData = null;
     });
 
     $('#levelUpModalCloseBtn').click(function() {
@@ -795,9 +791,7 @@ function playerListGet(players, effect) {
         let username = value["username"];
         let score = value['score'];
         let level = value['level'];
-        if (level == -1) {
-            level = "GM";
-        }
+        let permisions = value["permissions"];
         let charImg = findKeysByValue(CharacterEnum, value['character']);
         let characterImageUrl = getCharacter(charImg);
         let userCard = document.createElement("div");
@@ -830,7 +824,7 @@ function playerListGet(players, effect) {
         let userInfoHTML = `
         <div class="space-y-3 text-center p-4 rounded-lg">
         <p class = "host" style="display:none">👑</p>
-        <p class="font-semibold text-2xl text-white">${level}</p>
+        <p class="font-semibold text-2xl text-white">${permisions >= 2?"GM "+level:level}</p>
         <p class="user_name font-extrabold text-3xl text-white">${username}</p>
         <img src="${characterImageUrl}" alt="Character Image" class="mx-auto w-28 h-28 rounded-full shadow-xl"/>
         <p class="font-bold text-xl text-white">점수: <span class='font-bold ScoreSpan text-green-500'>${score}</span></p>
